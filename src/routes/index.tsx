@@ -1,24 +1,60 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+import { CreateTab } from "@/components/CreateTab";
+import { ScanTab } from "@/components/ScanTab";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "QR Master — Create & Scan QR Codes" },
+      {
+        name: "description",
+        content:
+          "Design custom QR codes with your own colors and dot styles, download high-res PNGs, and scan codes with your camera.",
+      },
+      { property: "og:title", content: "QR Master — Create & Scan QR Codes" },
+      {
+        property: "og:description",
+        content:
+          "Design custom QR codes with your own colors and dot styles, download high-res PNGs, and scan codes with your camera.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const [tab, setTab] = useState<"create" | "scan">("create");
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="mx-auto min-h-screen w-full max-w-md px-5 pb-16 pt-10">
+      <header className="mb-6 text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">QR Master</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Create and scan, beautifully.</p>
+      </header>
+
+      <div className="mb-6 grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1">
+        {(["create", "scan"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`rounded-xl px-4 py-2.5 text-sm font-semibold capitalize transition ${
+              tab === t
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <ClientOnly fallback={<div className="h-96 rounded-3xl border border-border bg-card" />}>
+        {tab === "create" ? <CreateTab /> : <ScanTab />}
+      </ClientOnly>
+    </main>
   );
 }
