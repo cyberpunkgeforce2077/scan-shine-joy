@@ -46,6 +46,8 @@ const DESIGNS: Design[] = [
   { name: "Forest Mint", fg: "#065f46", fg2: "#34d399", bg: "#ecfdf5", corner: "#065f46", gradient: true, dots: "dots", cornersSquare: "dot" },
 ];
 
+const D0 = DESIGNS[0]!;
+
 const CONTENT_TABS: { id: ContentType; label: string; icon: typeof Link2 }[] = [
   { id: "url", label: "URL", icon: Link2 },
   { id: "text", label: "Text", icon: Type },
@@ -94,10 +96,10 @@ export function QRGenerator() {
   const [wifi, setWifi] = useState({ ssid: "", password: "", encryption: "WPA" });
   const [email, setEmail] = useState({ to: "", subject: "", body: "" });
 
-  const [fg, setFg] = useState(DESIGNS[0].fg);
-  const [fg2, setFg2] = useState(DESIGNS[0].fg2);
-  const [bg, setBg] = useState(DESIGNS[0].bg);
-  const [corner, setCorner] = useState(DESIGNS[0].corner);
+  const [fg, setFg] = useState(D0.fg);
+  const [fg2, setFg2] = useState(D0.fg2);
+  const [bg, setBg] = useState(D0.bg);
+  const [corner, setCorner] = useState(D0.corner);
   const [gradient, setGradient] = useState(true);
   const [dots, setDots] = useState<(typeof DOT_STYLES)[number]>("rounded");
   const [cornersSquare, setCornersSquare] = useState<(typeof CORNER_SQUARE)[number]>("extra-rounded");
@@ -148,7 +150,7 @@ export function QRGenerator() {
       data,
       margin: 12,
       qrOptions: { errorCorrectionLevel: "H" as const },
-      image: processedLogo,
+      image: processedLogo ?? "",
       imageOptions: {
         crossOrigin: "anonymous" as const,
         imageSize: logoScale * 2,
