@@ -93,9 +93,10 @@ export function FileScanTab() {
       let previewSet = false;
 
       for (let i = 0; i < scales.length; i++) {
+        const scale = scales[i] ?? 1;
         const canvas = isPdf
-          ? await renderPdfFirstPage(file, scales[i])
-          : await renderImageToCanvas(file, scales[i]);
+          ? await renderPdfFirstPage(file, scale)
+          : await renderImageToCanvas(file, scale);
         if (!previewSet) {
           setPreview(canvas.toDataURL("image/png"));
           previewSet = true;
