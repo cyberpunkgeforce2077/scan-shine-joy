@@ -4,6 +4,7 @@ import { ClientOnly } from "@tanstack/react-router";
 import { QrCode } from "lucide-react";
 import { QRGenerator } from "@/components/QRGenerator";
 import { ScanTab } from "@/components/ScanTab";
+import { FileScanTab } from "@/components/FileScanTab";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/")({
