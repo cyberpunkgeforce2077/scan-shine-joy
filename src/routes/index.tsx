@@ -4,6 +4,7 @@ import { ClientOnly } from "@tanstack/react-router";
 import { QrCode } from "lucide-react";
 import { QRGenerator } from "@/components/QRGenerator";
 import { ScanTab } from "@/components/ScanTab";
+import { FileScanTab } from "@/components/FileScanTab";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/")({
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [tab, setTab] = useState<"create" | "scan">("create");
+  const [scanMode, setScanMode] = useState<"camera" | "upload">("camera");
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6">
@@ -67,7 +69,28 @@ function Index() {
       </div>
 
       <ClientOnly fallback={<div className="h-96 rounded-3xl border border-border bg-card" />}>
-        {tab === "create" ? <QRGenerator /> : <div className="max-w-md"><ScanTab /></div>}
+        {tab === "create" ? (
+          <QRGenerator />
+        ) : (
+          <div className="max-w-md space-y-5">
+            <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card/70 p-1">
+              {(["camera", "upload"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setScanMode(m)}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold capitalize transition ${
+                    scanMode === m
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {m === "upload" ? "Upload file" : "Camera"}
+                </button>
+              ))}
+            </div>
+            {scanMode === "camera" ? <ScanTab /> : <FileScanTab />}
+          </div>
+        )}
       </ClientOnly>
     </main>
   );
