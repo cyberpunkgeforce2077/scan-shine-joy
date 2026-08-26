@@ -91,12 +91,12 @@ export function ScanTab() {
 
       {result && (
         <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm"
+          className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 p-6-sm"
           onClick={closeResult}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl"
+            className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-lg"
           >
             <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Scan result
@@ -108,7 +108,7 @@ export function ScanTab() {
                   navigator.clipboard?.writeText(result);
                   setCopied(true);
                 }}
-                className="flex-1 rounded-2xl border border-input bg-secondary px-4 py-3 text-sm font-semibold text-foreground transition active:scale-[0.98]"
+                className="flex-1 rounded-full border border-input bg-secondary px-4 py-3 text-sm font-semibold text-foreground transition active:scale-[0.98]"
               >
                 {copied ? "Copied!" : "Copy Text"}
               </button>
@@ -117,7 +117,7 @@ export function ScanTab() {
                   href={result}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 rounded-2xl bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition active:scale-[0.98]"
+                  className="flex-1 rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition active:scale-[0.98]"
                 >
                   Open Link
                 </a>
