@@ -253,7 +253,7 @@ export function QRGenerator() {
       {/* Controls */}
       <div className="space-y-5">
         <Card title="Content" icon={<Type className="h-4 w-4" />}>
-          <div className="grid grid-cols-4 gap-1 rounded-xl border border-border bg-secondary/60 p-1">
+          <div className="grid grid-cols-4 gap-1 rounded-xl border border-border bg-surface-2 p-1">
             {CONTENT_TABS.map((t) => (
               <button
                 key={t.id}
@@ -282,7 +282,7 @@ export function QRGenerator() {
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   rows={3}
-                  className="w-full resize-none rounded-xl border border-input bg-secondary/60 px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+                  className="w-full resize-none rounded-xl border border-input bg-surface-2 px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
                 />
               </Field>
             )}
@@ -325,7 +325,7 @@ export function QRGenerator() {
               <button
                 key={d.name}
                 onClick={() => applyDesign(d)}
-                className="group flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary hover:shadow-md active:scale-95"
+                className="group flex items-center gap-2 rounded-xl border border-border bg-surface-2 px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary hover:shadow-md active:scale-95"
               >
                 <span
                   className="h-4 w-4 rounded-full ring-1 ring-border"
@@ -354,7 +354,7 @@ export function QRGenerator() {
             </Field>
           </div>
 
-          <label className="mt-4 flex items-center justify-between rounded-xl border border-border bg-secondary/60 px-4 py-3">
+          <label className="mt-4 flex items-center justify-between rounded-xl border border-border bg-surface-2 px-4 py-3">
             <span className="text-sm font-medium text-foreground">Gradient foreground</span>
             <input
               type="checkbox"
@@ -379,14 +379,14 @@ export function QRGenerator() {
                 key={i.id}
                 onClick={() => setLogo(i.src)}
                 title={i.label}
-                className={`grid h-11 w-11 place-items-center rounded-xl border bg-secondary/60 transition hover:border-primary active:scale-95 ${
+                className={`grid h-11 w-11 place-items-center rounded-xl border bg-surface-2 transition hover:border-primary active:scale-95 ${
                   logo === i.src ? "border-primary ring-2 ring-primary/40" : "border-border"
                 }`}
               >
                 <img src={i.src} alt={i.label} className="h-6 w-6 rounded" />
               </button>
             ))}
-            <label className="cursor-pointer rounded-xl border border-dashed border-border bg-secondary/60 px-4 py-3 text-xs font-semibold text-muted-foreground transition hover:border-primary hover:text-foreground">
+            <label className="cursor-pointer rounded-xl border border-dashed border-border bg-surface-2 px-4 py-3 text-xs font-semibold text-muted-foreground transition hover:border-primary hover:text-foreground">
               Upload
               <input
                 type="file"
@@ -398,7 +398,7 @@ export function QRGenerator() {
             {logo && (
               <button
                 onClick={() => setLogo(null)}
-                className="grid h-11 w-11 place-items-center rounded-xl border border-border bg-secondary/60 text-muted-foreground transition hover:border-destructive hover:text-destructive"
+                className="grid h-11 w-11 place-items-center rounded-xl border border-border bg-surface-2 text-muted-foreground transition hover:border-destructive hover:text-destructive"
                 title="Remove logo"
               >
                 <Trash2 className="h-4 w-4" />
@@ -429,7 +429,7 @@ export function QRGenerator() {
             </Field>
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-1 rounded-xl border border-border bg-secondary/60 p-1">
+          <div className="mt-3 grid grid-cols-3 gap-1 rounded-xl border border-border bg-surface-2 p-1">
             {LOGO_SHAPES.map((s) => (
               <button
                 key={s.id}
@@ -449,7 +449,7 @@ export function QRGenerator() {
 
       {/* Preview */}
       <div className="lg:sticky lg:top-6 lg:self-start">
-        <div className="rounded-3xl border border-border bg-card/70 p-6 shadow-xl backdrop-blur-xl">
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
           <div className="flex justify-center">
             <div ref={ref} className="overflow-hidden rounded-2xl" />
           </div>
@@ -457,20 +457,20 @@ export function QRGenerator() {
           <div className="mt-6 grid grid-cols-2 gap-3">
             <button
               onClick={() => download("png")}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-12px_var(--primary)] transition hover:brightness-110 active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:brightness-110 active:scale-[0.98]"
             >
               <Download className="h-4 w-4" /> PNG
             </button>
             <button
               onClick={() => download("svg")}
-              className="flex items-center justify-center gap-2 rounded-2xl border border-input bg-secondary/70 px-4 py-3.5 text-sm font-semibold text-foreground transition hover:border-primary active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 rounded-full border border-input bg-surface-2 px-4 py-3.5 text-sm font-semibold text-foreground transition hover:border-primary active:scale-[0.98]"
             >
               <Download className="h-4 w-4" /> SVG
             </button>
           </div>
           <button
             onClick={copyImage}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-input bg-secondary/70 px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary active:scale-[0.98]"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-input bg-surface-2 px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary active:scale-[0.98]"
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copied ? "Copied!" : "Copy to clipboard"}
@@ -494,7 +494,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-border bg-card/70 p-5 shadow-lg backdrop-blur-xl transition">
+    <section className="rounded-3xl border border-border bg-card p-5 shadow-sm transition">
       <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
         <span className="text-primary">{icon}</span>
         {title}
@@ -529,7 +529,7 @@ function Input({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full rounded-xl border border-input bg-secondary/60 px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
+      className="w-full rounded-xl border border-input bg-surface-2 px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
     />
   );
 }
@@ -547,7 +547,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-xl border border-input bg-secondary/60 px-4 py-3 text-sm capitalize text-foreground outline-none transition focus:border-primary"
+      className="w-full rounded-xl border border-input bg-surface-2 px-4 py-3 text-sm capitalize text-foreground outline-none transition focus:border-primary"
     >
       {options.map((o) => (
         <option key={o} value={o} className="capitalize">
@@ -569,7 +569,7 @@ function ColorField({
 }) {
   return (
     <Field label={label}>
-      <div className="flex items-center gap-2 rounded-xl border border-input bg-secondary/60 px-3 py-2">
+      <div className="flex items-center gap-2 rounded-xl border border-input bg-surface-2 px-3 py-2">
         <input
           type="color"
           value={value}

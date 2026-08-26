@@ -155,7 +155,7 @@ export function FileScanTab() {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={loading}
-          className="mt-5 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition active:scale-[0.98] disabled:opacity-60"
+          className="mt-5 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition active:scale-[0.98] disabled:opacity-60"
         >
           Browse Files
         </button>
@@ -201,7 +201,7 @@ export function FileScanTab() {
               reset();
               inputRef.current?.click();
             }}
-            className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-input bg-secondary px-4 py-2.5 text-sm font-semibold text-foreground transition active:scale-[0.98]"
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-input bg-secondary px-4 py-2.5 text-sm font-semibold text-foreground transition active:scale-[0.98]"
           >
             <RefreshCw className="h-4 w-4" /> Upload another file
           </button>
@@ -218,7 +218,7 @@ export function FileScanTab() {
                 navigator.clipboard?.writeText(result);
                 setCopied(true);
               }}
-              className="flex-1 rounded-2xl border border-input bg-secondary px-4 py-3 text-sm font-semibold text-foreground transition active:scale-[0.98]"
+              className="flex-1 rounded-full border border-input bg-secondary px-4 py-3 text-sm font-semibold text-foreground transition active:scale-[0.98]"
             >
               {copied ? "Copied!" : "Copy to Clipboard"}
             </button>
@@ -227,7 +227,7 @@ export function FileScanTab() {
                 href={result}
                 target="_blank"
                 rel="noreferrer"
-                className="flex-1 rounded-2xl bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition active:scale-[0.98]"
+                className="flex-1 rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition active:scale-[0.98]"
               >
                 Open Link
               </a>

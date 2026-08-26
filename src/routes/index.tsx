@@ -37,7 +37,7 @@ function Index() {
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-20 pt-6 sm:px-6">
       <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-[0_10px_30px_-12px_var(--primary)]">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm">
             <QrCode className="h-5 w-5" />
           </div>
           <div className="min-w-0">
@@ -52,7 +52,7 @@ function Index() {
         <ThemeToggle />
       </header>
 
-      <div className="mb-6 grid max-w-xs grid-cols-2 gap-1 rounded-2xl border border-border bg-card/70 p-1 backdrop-blur">
+      <div className="mb-6 grid max-w-xs grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1">
         {(["create", "scan"] as const).map((t) => (
           <button
             key={t}
@@ -73,7 +73,7 @@ function Index() {
           <QRGenerator />
         ) : (
           <div className="max-w-md space-y-5">
-            <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card/70 p-1">
+            <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1">
               {(["camera", "upload"] as const).map((m) => (
                 <button
                   key={m}
