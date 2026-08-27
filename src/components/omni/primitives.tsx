@@ -22,7 +22,7 @@ export function PlushCard({
       initial={{ opacity: 0, y: 26, scale: 0.965 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={interactive ? { y: -6, scale: 1.015 } : undefined}
+      whileHover={interactive ? { y: -6, scale: 1.015 } : {}}
       className={cn("plush p-5 transition-shadow hover:shadow-[var(--shadow-plush-lg)]", className)}
     >
       {children}
