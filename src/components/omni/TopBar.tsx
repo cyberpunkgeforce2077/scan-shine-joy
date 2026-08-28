@@ -10,10 +10,6 @@ export const NAV = [
   { to: "/", label: "Hub" },
   { to: "/qr", label: "QR" },
   { to: "/scanner", label: "Docs" },
-  { to: "/compress", label: "Compress" },
-  { to: "/bg-remover", label: "Cutout" },
-  { to: "/eraser", label: "Eraser" },
-  { to: "/downloader", label: "Fetch" },
   { to: "/ocr", label: "OCR" },
 ] as const;
 
