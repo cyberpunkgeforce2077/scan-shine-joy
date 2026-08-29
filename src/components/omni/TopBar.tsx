@@ -11,6 +11,7 @@ export const NAV = [
   { to: "/qr", label: "QR" },
   { to: "/scanner", label: "Docs" },
   { to: "/ocr", label: "OCR" },
+  { to: "/dakphraser", label: "DakPhraser" },
 ] as const;
 
 function ThemeSelector() {
