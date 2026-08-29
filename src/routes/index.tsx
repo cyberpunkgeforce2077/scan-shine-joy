@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { FileText, QrCode, ScanText, ArrowRight } from "lucide-react";
+import { FileText, QrCode, ScanText, ArrowRight, Wand2 } from "lucide-react";
 import { PlushCard, SectionHeading, StatusChip } from "@/components/omni/primitives";
 
 export const Route = createFileRoute("/")({
@@ -42,6 +42,12 @@ const TOOLS = [
     icon: QrCode,
     name: "QR Studio",
     desc: "Design styled QR codes with logos and gradients, and scan codes by camera or file.",
+  },
+  {
+    to: "/dakphraser",
+    icon: Wand2,
+    name: "DakPhraser",
+    desc: "AI paraphraser that rewrites your text in formal, casual, concise, academic or creative tones.",
   },
 ] as const;
 
