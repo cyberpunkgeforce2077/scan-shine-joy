@@ -343,6 +343,10 @@ export async function __probe(file: File) {
   const w = await createWorker("eng", 1);
   const out: Record<string, unknown> = {};
   out.raw = (await w.recognize(file)).data.text;
+  await w.setParameters({ preserve_interword_spaces: "1", user_defined_dpi: "300" });
+  out.dpi = (await w.recognize(r.binary)).data.text;
+  await w.setParameters({ tessedit_pageseg_mode: "3" as never });
+  out.psm3 = (await w.recognize(r.binary)).data.text;
   out.gray = (await w.recognize(r.gray)).data.text;
   out.bin = (await w.recognize(r.binary)).data.text;
   await w.terminate();
