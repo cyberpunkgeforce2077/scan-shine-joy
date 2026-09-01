@@ -336,3 +336,15 @@ export function OcrStudio() {
     </div>
   );
 }
+
+export async function __probe(file: File) {
+  const { createWorker } = await import("tesseract.js");
+  const r = await preprocess(file);
+  const w = await createWorker("eng", 1);
+  const out: Record<string, unknown> = {};
+  out.raw = (await w.recognize(file)).data.text;
+  out.gray = (await w.recognize(r.gray)).data.text;
+  out.bin = (await w.recognize(r.binary)).data.text;
+  await w.terminate();
+  return out;
+}
