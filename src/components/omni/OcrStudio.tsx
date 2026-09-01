@@ -182,11 +182,39 @@ export function OcrStudio() {
     setPhase("Preparing image");
     setBusy(true);
     try {
-      const canvas = await preprocess(file);
+      const { gray, binary } = await preprocess(file);
       const worker = await getWorker();
-      await worker.setParameters({ preserve_interword_spaces: "1" });
-      const result = await worker.recognize(canvas);
-      const value = result.data.text.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+      await worker.setParameters({
+        preserve_interword_spaces: "1",
+        user_defined_dpi: "300",
+      });
+
+      // Try a few page-segmentation / image combinations and keep the best read;
+      // phone photos vary wildly and no single mode wins on all of them.
+      const attempts: { canvas: HTMLCanvasElement; psm: string }[] = [
+        { canvas: binary, psm: "3" },
+        { canvas: gray, psm: "3" },
+        { canvas: binary, psm: "6" },
+      ];
+      let best = "";
+      let bestScore = -1;
+      for (const attempt of attempts) {
+        setPhase("Reading text");
+        await worker.setParameters({ tessedit_pageseg_mode: attempt.psm as never });
+        const result = await worker.recognize(attempt.canvas);
+        const cleaned = result.data.text
+          .replace(/[ \t]+\n/g, "\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+        const score = scoreResult(cleaned, result.data.confidence ?? 0);
+        if (score > bestScore) {
+          bestScore = score;
+          best = cleaned;
+        }
+        // Good enough — don't burn time on the remaining passes.
+        if ((result.data.confidence ?? 0) >= 82 && cleaned.length > 40) break;
+      }
+      const value = best;
       setText(value);
       if (!value) toast.error("No readable text found. Try a sharper, brighter photo.");
       else toast.success("Text extracted");
