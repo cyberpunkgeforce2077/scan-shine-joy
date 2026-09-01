@@ -14,7 +14,7 @@ type Prepped = { gray: HTMLCanvasElement; binary: HTMLCanvasElement };
 // Upscale small photos, drop to grayscale, stretch contrast and produce a
 // locally-binarized twin — Tesseract is far more accurate on high-contrast,
 // deshadowed input than on raw camera JPEGs.
-export async function preprocess(file: File): Promise<Prepped> {
+async function preprocess(file: File): Promise<Prepped> {
   const bitmap = await createImageBitmap(file);
   const longest = Math.max(bitmap.width, bitmap.height);
   const shortest = Math.min(bitmap.width, bitmap.height);
@@ -335,20 +335,4 @@ export function OcrStudio() {
       )}
     </div>
   );
-}
-
-export async function __probe(file: File) {
-  const { createWorker } = await import("tesseract.js");
-  const r = await preprocess(file);
-  const w = await createWorker("eng", 1);
-  const out: Record<string, unknown> = {};
-  out.raw = (await w.recognize(file)).data.text;
-  await w.setParameters({ preserve_interword_spaces: "1", user_defined_dpi: "300" });
-  out.dpi = (await w.recognize(r.binary)).data.text;
-  await w.setParameters({ tessedit_pageseg_mode: "3" as never });
-  out.psm3 = (await w.recognize(r.binary)).data.text;
-  out.gray = (await w.recognize(r.gray)).data.text;
-  out.bin = (await w.recognize(r.binary)).data.text;
-  await w.terminate();
-  return out;
 }
