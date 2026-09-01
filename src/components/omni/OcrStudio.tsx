@@ -6,12 +6,15 @@ import { PillButton } from "./primitives";
 
 type Worker = Awaited<ReturnType<typeof import("tesseract.js").createWorker>>;
 
-const MAX_SIDE = 2200;
-const MIN_SIDE = 1200;
+const MAX_SIDE = 2600;
+const MIN_SIDE = 1500;
 
-// Upscale small photos, drop to grayscale and stretch contrast — Tesseract is
-// far more accurate on high-contrast, ~1500px-wide input than on raw camera JPEGs.
-async function preprocess(file: File): Promise<HTMLCanvasElement> {
+type Prepped = { gray: HTMLCanvasElement; binary: HTMLCanvasElement };
+
+// Upscale small photos, drop to grayscale, stretch contrast and produce a
+// locally-binarized twin — Tesseract is far more accurate on high-contrast,
+// deshadowed input than on raw camera JPEGs.
+async function preprocess(file: File): Promise<Prepped> {
   const bitmap = await createImageBitmap(file);
   const longest = Math.max(bitmap.width, bitmap.height);
   const shortest = Math.min(bitmap.width, bitmap.height);
@@ -27,9 +30,11 @@ async function preprocess(file: File): Promise<HTMLCanvasElement> {
   ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   bitmap.close?.();
 
-  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const w = canvas.width;
+  const h = canvas.height;
+  const image = ctx.getImageData(0, 0, w, h);
   const data = image.data;
-  const gray = new Uint8ClampedArray(data.length / 4);
+  const gray = new Float32Array(w * h);
   const histogram = new Array<number>(256).fill(0);
   for (let i = 0, p = 0; i < data.length; i += 4, p++) {
     const value = Math.round(
@@ -61,13 +66,64 @@ async function preprocess(file: File): Promise<HTMLCanvasElement> {
   const span = Math.max(1, high - low);
   for (let p = 0, i = 0; p < gray.length; p++, i += 4) {
     const stretched = Math.max(0, Math.min(255, (((gray[p] ?? 0) - low) * 255) / span));
+    gray[p] = stretched;
     data[i] = stretched;
     data[i + 1] = stretched;
     data[i + 2] = stretched;
     data[i + 3] = 255;
   }
   ctx.putImageData(image, 0, 0);
-  return canvas;
+
+  // Adaptive (mean minus C) threshold via an integral image — removes uneven
+  // lighting and shadow gradients that wreck Tesseract on phone photos.
+  const integral = new Float64Array((w + 1) * (h + 1));
+  for (let y = 0; y < h; y++) {
+    let rowSum = 0;
+    for (let x = 0; x < w; x++) {
+      rowSum += gray[y * w + x] ?? 0;
+      integral[(y + 1) * (w + 1) + (x + 1)] = (integral[y * (w + 1) + (x + 1)] ?? 0) + rowSum;
+    }
+  }
+  const radius = Math.max(8, Math.round(Math.min(w, h) / 40));
+  const binary = document.createElement("canvas");
+  binary.width = w;
+  binary.height = h;
+  const bctx = binary.getContext("2d", { willReadFrequently: true })!;
+  const bimg = bctx.createImageData(w, h);
+  const bdata = bimg.data;
+  for (let y = 0; y < h; y++) {
+    const y0 = Math.max(0, y - radius);
+    const y1 = Math.min(h - 1, y + radius);
+    for (let x = 0; x < w; x++) {
+      const x0 = Math.max(0, x - radius);
+      const x1 = Math.min(w - 1, x + radius);
+      const area = (y1 - y0 + 1) * (x1 - x0 + 1);
+      const sum =
+        (integral[(y1 + 1) * (w + 1) + (x1 + 1)] ?? 0) -
+        (integral[y0 * (w + 1) + (x1 + 1)] ?? 0) -
+        (integral[(y1 + 1) * (w + 1) + x0] ?? 0) +
+        (integral[y0 * (w + 1) + x0] ?? 0);
+      const mean = sum / area;
+      const value = (gray[y * w + x] ?? 0) < mean - 10 ? 0 : 255;
+      const i = (y * w + x) * 4;
+      bdata[i] = value;
+      bdata[i + 1] = value;
+      bdata[i + 2] = value;
+      bdata[i + 3] = 255;
+    }
+  }
+  bctx.putImageData(bimg, 0, 0);
+
+  return { gray: canvas, binary };
+}
+
+/** Rough quality score: confidence weighted by how much plausible text came back. */
+function scoreResult(text: string, confidence: number) {
+  const cleaned = text.replace(/\s+/g, " ").trim();
+  if (!cleaned) return -1;
+  const letters = (cleaned.match(/[A-Za-z0-9]/g) ?? []).length;
+  const ratio = letters / cleaned.length;
+  return confidence * (0.5 + ratio) + Math.min(letters, 400) / 20;
 }
 
 const PHASES: Record<string, string> = {
