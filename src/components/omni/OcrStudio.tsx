@@ -14,7 +14,7 @@ type Prepped = { gray: HTMLCanvasElement; binary: HTMLCanvasElement };
 // Upscale small photos, drop to grayscale, stretch contrast and produce a
 // locally-binarized twin — Tesseract is far more accurate on high-contrast,
 // deshadowed input than on raw camera JPEGs.
-async function preprocess(file: File): Promise<Prepped> {
+export async function preprocess(file: File): Promise<Prepped> {
   const bitmap = await createImageBitmap(file);
   const longest = Math.max(bitmap.width, bitmap.height);
   const shortest = Math.min(bitmap.width, bitmap.height);
