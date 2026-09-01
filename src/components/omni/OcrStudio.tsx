@@ -43,14 +43,16 @@ export async function preprocess(file: File): Promise<Prepped> {
     gray[p] = value;
     histogram[value] = (histogram[value] ?? 0) + 1;
   }
-  // 2% / 98% percentile contrast stretch keeps shadows and paper glare in check.
+  // Gentle 0.2% percentile stretch. Anything more aggressive collapses clean
+  // documents (where ink is only a few percent of pixels) into a solid block.
   const total = gray.length;
+  const cut = total * 0.002;
   let low = 0;
   let high = 255;
   let acc = 0;
   for (let v = 0; v < 256; v++) {
     acc += histogram[v] ?? 0;
-    if (acc > total * 0.02) {
+    if (acc > cut) {
       low = v;
       break;
     }
@@ -58,10 +60,14 @@ export async function preprocess(file: File): Promise<Prepped> {
   acc = 0;
   for (let v = 255; v >= 0; v--) {
     acc += histogram[v] ?? 0;
-    if (acc > total * 0.02) {
+    if (acc > cut) {
       high = v;
       break;
     }
+  }
+  if (high - low < 32) {
+    low = 0;
+    high = 255;
   }
   const span = Math.max(1, high - low);
   for (let p = 0, i = 0; p < gray.length; p++, i += 4) {
