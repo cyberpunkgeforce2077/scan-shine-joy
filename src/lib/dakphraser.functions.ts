@@ -22,19 +22,36 @@ export type ParaphraseResult = { variants: string[] };
 export const paraphrase = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<ParaphraseResult> => {
-    const key = process.env["LOVABLE_API_KEY"];
-    if (!key) throw new Error("AI is not configured for this app.");
+    // Lovable hosting injects LOVABLE_API_KEY automatically. On other hosts
+    // (Vercel, etc.) set AI_API_KEY — plus optionally AI_BASE_URL / AI_MODEL
+    // to point at another OpenAI-compatible provider.
+    const lovableKey = process.env["LOVABLE_API_KEY"];
+    const genericKey = process.env["AI_API_KEY"];
+    const key = lovableKey || genericKey;
+    if (!key) {
+      throw new Error(
+        "AI is not configured for this deployment. Set an AI_API_KEY environment variable (or deploy on Lovable).",
+      );
+    }
+    const baseUrl = (process.env["AI_BASE_URL"] || "https://ai.gateway.lovable.dev/v1").replace(
+      /\/$/,
+      "",
+    );
+    const model = process.env["AI_MODEL"] || "google/gemini-3.7-flash";
+    const usingLovable = baseUrl.includes("ai.gateway.lovable.dev");
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Lovable-API-Key": key,
-        "X-Lovable-AIG-SDK": "fetch",
+        ...(usingLovable
+          ? { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch" }
+          : { Authorization: `Bearer ${key}` }),
       },
       body: JSON.stringify({
-        model: "google/gemini-3.7-flash",
+        model,
         response_format: { type: "json_object" },
+
         messages: [
           {
             role: "system",
