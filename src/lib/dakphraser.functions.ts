@@ -22,22 +22,23 @@ export type ParaphraseResult = { variants: string[] };
 export const paraphrase = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<ParaphraseResult> => {
-    // Lovable hosting injects LOVABLE_API_KEY automatically. On other hosts
-    // (Vercel, etc.) set AI_API_KEY — plus optionally AI_BASE_URL / AI_MODEL
-    // to point at another OpenAI-compatible provider.
-    const lovableKey = process.env["LOVABLE_API_KEY"];
+    // Priority: your own Gemini key (works on any host, incl. Vercel) ->
+    // generic OpenAI-compatible AI_API_KEY -> Lovable-hosted key.
+    const geminiKey = process.env["GEMINI_API_KEY"];
     const genericKey = process.env["AI_API_KEY"];
-    const key = lovableKey || genericKey;
+    const lovableKey = process.env["LOVABLE_API_KEY"];
+    const key = geminiKey || genericKey || lovableKey;
     if (!key) {
       throw new Error(
-        "AI is not configured for this deployment. Set an AI_API_KEY environment variable (or deploy on Lovable).",
+        "AI is not configured for this deployment. Set a GEMINI_API_KEY environment variable.",
       );
     }
-    const baseUrl = (process.env["AI_BASE_URL"] || "https://ai.gateway.lovable.dev/v1").replace(
-      /\/$/,
-      "",
-    );
-    const model = process.env["AI_MODEL"] || "google/gemini-3.7-flash";
+    const defaultBase = geminiKey
+      ? "https://generativelanguage.googleapis.com/v1beta/openai"
+      : "https://ai.gateway.lovable.dev/v1";
+    const baseUrl = (process.env["AI_BASE_URL"] || defaultBase).replace(/\/$/, "");
+    const model =
+      process.env["AI_MODEL"] || (geminiKey ? "gemini-2.5-flash" : "google/gemini-3.7-flash");
     const usingLovable = baseUrl.includes("ai.gateway.lovable.dev");
 
     const res = await fetch(`${baseUrl}/chat/completions`, {
