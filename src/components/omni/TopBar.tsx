@@ -12,6 +12,7 @@ export const NAV = [
   { to: "/scanner", label: "Docs" },
   { to: "/ocr", label: "OCR" },
   { to: "/dakphraser", label: "DakPhraser" },
+  { to: "/downloader", label: "Downloader" },
 ] as const;
 
 function ThemeSelector() {

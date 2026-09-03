@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DakphraserRouteImport } from './routes/dakphraser'
+import { Route as DownloaderRouteImport } from './routes/downloader'
 import { Route as OcrRouteImport } from './routes/ocr'
 import { Route as QrRouteImport } from './routes/qr'
 import { Route as ScannerRouteImport } from './routes/scanner'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const DakphraserRoute = DakphraserRouteImport.update({
   id: '/dakphraser',
   path: '/dakphraser',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DownloaderRoute = DownloaderRouteImport.update({
+  id: '/downloader',
+  path: '/downloader',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OcrRoute = OcrRouteImport.update({
@@ -44,6 +50,7 @@ const ScannerRoute = ScannerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dakphraser': typeof DakphraserRoute
+  '/downloader': typeof DownloaderRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dakphraser': typeof DakphraserRoute
+  '/downloader': typeof DownloaderRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
@@ -59,21 +67,30 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dakphraser': typeof DakphraserRoute
+  '/downloader': typeof DownloaderRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dakphraser' | '/ocr' | '/qr' | '/scanner'
+  fullPaths: '/' | '/dakphraser' | '/downloader' | '/ocr' | '/qr' | '/scanner'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dakphraser' | '/ocr' | '/qr' | '/scanner'
-  id: '__root__' | '/' | '/dakphraser' | '/ocr' | '/qr' | '/scanner'
+  to: '/' | '/dakphraser' | '/downloader' | '/ocr' | '/qr' | '/scanner'
+  id:
+    | '__root__'
+    | '/'
+    | '/dakphraser'
+    | '/downloader'
+    | '/ocr'
+    | '/qr'
+    | '/scanner'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DakphraserRoute: typeof DakphraserRoute
+  DownloaderRoute: typeof DownloaderRoute
   OcrRoute: typeof OcrRoute
   QrRoute: typeof QrRoute
   ScannerRoute: typeof ScannerRoute
@@ -93,6 +110,13 @@ declare module '@tanstack/react-router' {
       path: '/dakphraser'
       fullPath: '/dakphraser'
       preLoaderRoute: typeof DakphraserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/downloader': {
+      id: '/downloader'
+      path: '/downloader'
+      fullPath: '/downloader'
+      preLoaderRoute: typeof DownloaderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ocr': {
@@ -122,6 +146,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DakphraserRoute: DakphraserRoute,
+  DownloaderRoute: DownloaderRoute,
   OcrRoute: OcrRoute,
   QrRoute: QrRoute,
   ScannerRoute: ScannerRoute,
