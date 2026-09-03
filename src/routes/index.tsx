@@ -49,6 +49,12 @@ const TOOLS = [
     name: "DakPhraser",
     desc: "AI paraphraser that rewrites your text in formal, casual, concise, academic or creative tones.",
   },
+  {
+    to: "/downloader",
+    icon: Download,
+    name: "Media Downloader",
+    desc: "Paste a YouTube, Instagram or TikTok link and download the video in 480p, 720p or 1080p.",
+  },
 ] as const;
 
 function Hub() {
