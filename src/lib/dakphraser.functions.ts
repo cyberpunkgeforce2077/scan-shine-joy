@@ -38,7 +38,7 @@ export const paraphrase = createServerFn({ method: "POST" })
       : "https://ai.gateway.lovable.dev/v1";
     const baseUrl = (process.env["AI_BASE_URL"] || defaultBase).replace(/\/$/, "");
     const model =
-      process.env["AI_MODEL"] || (geminiKey ? "gemini-2.5-flash" : "google/gemini-3.7-flash");
+      process.env["AI_MODEL"] || (geminiKey ? "gemini-3.6-flash" : "google/gemini-3.7-flash");
     const usingLovable = baseUrl.includes("ai.gateway.lovable.dev");
 
     const res = await fetch(`${baseUrl}/chat/completions`, {
