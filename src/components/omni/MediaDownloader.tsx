@@ -66,8 +66,32 @@ export function MediaDownloader() {
       <div className="plush-raised p-5 sm:p-6">
         <h2 className="text-base font-bold">Paste a link</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Works with YouTube, Instagram and TikTok links.
+          Works with YouTube, Instagram, TikTok, Facebook and X.
         </p>
+
+        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Platform
+        </p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {PLATFORMS.map((p) => {
+            const active = (platform ?? source) === p;
+            return (
+              <button
+                key={p}
+                onClick={() => setSource(p)}
+                className={cn(
+                  "rounded-full px-4 py-2 text-[13px] font-semibold transition active:scale-95",
+                  active
+                    ? "bg-primary-container text-primary-container-foreground"
+                    : "bg-surface-2/80 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
+
 
         <div className="mt-4 flex items-center gap-2 rounded-full bg-surface-2/70 px-4 py-2.5">
           <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
