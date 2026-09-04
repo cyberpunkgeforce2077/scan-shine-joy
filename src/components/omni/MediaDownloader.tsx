@@ -113,7 +113,7 @@ export function MediaDownloader() {
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && generate()}
             inputMode="url"
-            placeholder="https://youtube.com/watch?v=…"
+            placeholder={PLACEHOLDERS[platform ?? source]}
             className="w-full bg-transparent text-sm outline-none"
           />
           <button
