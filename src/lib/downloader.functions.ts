@@ -111,12 +111,17 @@ export const resolveMedia = createServerFn({ method: "POST" })
 
     if (!res.ok) {
       const body = await res.text();
+      const fallback = await tryCobalt(url, platform);
+      if (fallback) return fallback;
       if (res.status === 429)
         throw new Error("The download service is rate-limited right now. Try again in a minute.");
       if (res.status === 401 || res.status === 403)
-        throw new Error("The download service rejected the API key. Check your RAPIDAPI_KEY.");
+        throw new Error(
+          "The download service rejected the API key — make sure your RapidAPI account is subscribed to the Auto Download All in One API.",
+        );
       throw new Error(body?.slice(0, 300) || `Could not read that link (${res.status}).`);
     }
+
 
     const json = (await res.json()) as {
       title?: string;
