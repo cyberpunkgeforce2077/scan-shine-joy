@@ -42,41 +42,66 @@ const normalizeQuality = (raw: string): string => {
   return raw || "auto";
 };
 
+// Public cobalt (v10) instances. The old api.cobalt.tools/api/json (v7) was shut
+// down in Nov 2024, so we POST to the v10 root endpoint of community instances.
+const COBALT_INSTANCES = [
+  "https://dwnld.nichind.dev",
+  "https://cobalt-api.kwiatekmiki.com",
+  "https://cobalt-backend.canine.tools",
+];
+
+async function cobaltCall(base: string, url: string) {
+  const res = await fetch(base, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({ url, videoQuality: "1080", filenameStyle: "basic" }),
+  });
+  if (!res.ok && res.status !== 400) return null;
+  return (await res.json()) as {
+    status?: string;
+    url?: string;
+    filename?: string;
+    error?: { code?: string };
+    picker?: { url?: string; type?: string }[];
+    audio?: string;
+  };
+}
+
 async function tryCobalt(url: string, platform: string): Promise<MediaResult | null> {
-  try {
-    const res = await fetch("https://api.cobalt.tools/api/json", {
-      method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      status?: string;
-      url?: string;
-      text?: string;
-      picker?: { url?: string; type?: string }[];
-    };
-    const formats: MediaFormat[] = [];
-    if ((json.status === "redirect" || json.status === "tunnel" || json.status === "stream") && json.url) {
-      formats.push({ quality: "auto", label: "Best available", ext: "mp4", url: json.url });
-    }
-    if (json.status === "picker" && json.picker?.length) {
-      for (const p of json.picker) {
-        if (!p.url) continue;
-        const isAudio = p.type === "audio";
-        formats.push({
-          quality: isAudio ? "audio" : "auto",
-          label: isAudio ? "Audio" : "Media",
-          ext: isAudio ? "mp3" : "mp4",
-          url: p.url,
-        });
+  for (const base of COBALT_INSTANCES) {
+    try {
+      const json = await cobaltCall(base, url);
+      if (!json) continue;
+      const formats: MediaFormat[] = [];
+      if (
+        (json.status === "redirect" || json.status === "tunnel" || json.status === "stream") &&
+        json.url
+      ) {
+        formats.push({ quality: "auto", label: "Best available", ext: "mp4", url: json.url });
       }
+      if (json.status === "picker" && json.picker?.length) {
+        for (const p of json.picker) {
+          if (!p.url) continue;
+          const isAudio = p.type === "audio";
+          formats.push({
+            quality: isAudio ? "audio" : "auto",
+            label: isAudio ? "Audio" : "Media",
+            ext: isAudio ? "mp3" : "mp4",
+            url: p.url,
+          });
+        }
+        if (json.audio) {
+          formats.push({ quality: "audio", label: "Audio", ext: "mp3", url: json.audio });
+        }
+      }
+      if (!formats.length) continue;
+      const title = json.filename?.replace(/\.[a-z0-9]+$/i, "") || `${platform} media`;
+      return { platform, title, formats };
+    } catch {
+      // try the next instance
     }
-    if (!formats.length) return null;
-    return { platform, title: `${platform} media`, formats };
-  } catch {
-    return null;
   }
+  return null;
 }
 
 export const resolveMedia = createServerFn({ method: "POST" })
