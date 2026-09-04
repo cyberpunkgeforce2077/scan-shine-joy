@@ -8,6 +8,17 @@ import { cn } from "@/lib/utils";
 const QUALITIES = ["480p", "720p", "1080p"] as const;
 type Quality = (typeof QUALITIES)[number];
 
+const PLATFORMS = ["YouTube", "Instagram", "TikTok", "Facebook", "X"] as const;
+type Platform = (typeof PLATFORMS)[number];
+
+const PLACEHOLDERS: Record<Platform, string> = {
+  YouTube: "https://youtube.com/watch?v=…",
+  Instagram: "https://instagram.com/reel/…",
+  TikTok: "https://tiktok.com/@user/video/…",
+  Facebook: "https://facebook.com/watch/?v=…",
+  X: "https://x.com/user/status/…",
+};
+
 export function MediaDownloader() {
   const run = useServerFn(resolveMedia);
   const [url, setUrl] = useState("");
@@ -15,8 +26,10 @@ export function MediaDownloader() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<MediaResult | null>(null);
   const [quality, setQuality] = useState<Quality>("720p");
+  const [source, setSource] = useState<Platform>("YouTube");
 
-  const platform = detectPlatform(url);
+  const platform = detectPlatform(url) as Platform | null;
+
 
   const videos = useMemo(
     () => result?.formats.filter((f) => f.quality !== "audio") ?? [],
