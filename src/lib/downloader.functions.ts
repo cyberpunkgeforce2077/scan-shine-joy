@@ -154,7 +154,12 @@ export const resolveMedia = createServerFn({ method: "POST" })
         };
       });
 
-    if (!formats.length) throw new Error("No downloadable media was found at that link.");
+    if (!formats.length) {
+      const fallback = await tryCobalt(url, platform);
+      if (fallback) return fallback;
+      throw new Error("No downloadable media was found at that link.");
+    }
+
 
     const seconds = Number(json.duration);
     const duration =
