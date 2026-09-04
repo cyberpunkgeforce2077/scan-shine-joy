@@ -57,7 +57,7 @@ export const resolveMedia = createServerFn({ method: "POST" })
         "The downloader isn't connected to an extraction service yet. Add a RAPIDAPI_KEY to enable downloads.",
       );
     }
-    const host = process.env["RAPIDAPI_HOST"] || "social-download-all-in-one.p.rapidapi.com";
+    const host = process.env["RAPIDAPI_HOST"] || "auto-download-all-in-one.p.rapidapi.com";
 
     const res = await fetch(`https://${host}/v1/social/autolink`, {
       method: "POST",
