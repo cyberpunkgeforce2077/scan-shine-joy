@@ -42,6 +42,43 @@ const normalizeQuality = (raw: string): string => {
   return raw || "auto";
 };
 
+async function tryCobalt(url: string, platform: string): Promise<MediaResult | null> {
+  try {
+    const res = await fetch("https://api.cobalt.tools/api/json", {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      status?: string;
+      url?: string;
+      text?: string;
+      picker?: { url?: string; type?: string }[];
+    };
+    const formats: MediaFormat[] = [];
+    if ((json.status === "redirect" || json.status === "tunnel" || json.status === "stream") && json.url) {
+      formats.push({ quality: "auto", label: "Best available", ext: "mp4", url: json.url });
+    }
+    if (json.status === "picker" && json.picker?.length) {
+      for (const p of json.picker) {
+        if (!p.url) continue;
+        const isAudio = p.type === "audio";
+        formats.push({
+          quality: isAudio ? "audio" : "auto",
+          label: isAudio ? "Audio" : "Media",
+          ext: isAudio ? "mp3" : "mp4",
+          url: p.url,
+        });
+      }
+    }
+    if (!formats.length) return null;
+    return { platform, title: `${platform} media`, formats };
+  } catch {
+    return null;
+  }
+}
+
 export const resolveMedia = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<MediaResult> => {
@@ -53,11 +90,14 @@ export const resolveMedia = createServerFn({ method: "POST" })
 
     const key = process.env["RAPIDAPI_KEY"];
     if (!key) {
+      const cobalt = await tryCobalt(url, platform);
+      if (cobalt) return cobalt;
       throw new Error(
         "The downloader isn't connected to an extraction service yet. Add a RAPIDAPI_KEY to enable downloads.",
       );
     }
     const host = process.env["RAPIDAPI_HOST"] || "auto-download-all-in-one.p.rapidapi.com";
+
 
     const res = await fetch(`https://${host}/v1/social/autolink`, {
       method: "POST",
