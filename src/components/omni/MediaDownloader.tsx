@@ -8,6 +8,17 @@ import { cn } from "@/lib/utils";
 const QUALITIES = ["480p", "720p", "1080p"] as const;
 type Quality = (typeof QUALITIES)[number];
 
+const PLATFORMS = ["YouTube", "Instagram", "TikTok", "Facebook", "X"] as const;
+type Platform = (typeof PLATFORMS)[number];
+
+const PLACEHOLDERS: Record<Platform, string> = {
+  YouTube: "https://youtube.com/watch?v=…",
+  Instagram: "https://instagram.com/reel/…",
+  TikTok: "https://tiktok.com/@user/video/…",
+  Facebook: "https://facebook.com/watch/?v=…",
+  X: "https://x.com/user/status/…",
+};
+
 export function MediaDownloader() {
   const run = useServerFn(resolveMedia);
   const [url, setUrl] = useState("");
@@ -15,8 +26,10 @@ export function MediaDownloader() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<MediaResult | null>(null);
   const [quality, setQuality] = useState<Quality>("720p");
+  const [source, setSource] = useState<Platform>("YouTube");
 
-  const platform = detectPlatform(url);
+  const platform = detectPlatform(url) as Platform | null;
+
 
   const videos = useMemo(
     () => result?.formats.filter((f) => f.quality !== "audio") ?? [],
@@ -66,8 +79,32 @@ export function MediaDownloader() {
       <div className="plush-raised p-5 sm:p-6">
         <h2 className="text-base font-bold">Paste a link</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Works with YouTube, Instagram and TikTok links.
+          Works with YouTube, Instagram, TikTok, Facebook and X.
         </p>
+
+        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Platform
+        </p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {PLATFORMS.map((p) => {
+            const active = (platform ?? source) === p;
+            return (
+              <button
+                key={p}
+                onClick={() => setSource(p)}
+                className={cn(
+                  "rounded-full px-4 py-2 text-[13px] font-semibold transition active:scale-95",
+                  active
+                    ? "bg-primary-container text-primary-container-foreground"
+                    : "bg-surface-2/80 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
+
 
         <div className="mt-4 flex items-center gap-2 rounded-full bg-surface-2/70 px-4 py-2.5">
           <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -76,7 +113,7 @@ export function MediaDownloader() {
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && generate()}
             inputMode="url"
-            placeholder="https://youtube.com/watch?v=…"
+            placeholder={PLACEHOLDERS[platform ?? source]}
             className="w-full bg-transparent text-sm outline-none"
           />
           <button
