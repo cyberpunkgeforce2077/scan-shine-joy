@@ -36,6 +36,19 @@ export const Route = createFileRoute("/")({
 
 const TOOLS = [
   {
+    to: "/guides",
+    icon: BookOpen,
+    name: "Tech Guides",
+    desc: "Plain-language walkthroughs for slow PCs, overheating laptops, Wi-Fi trouble, backups and staying safe online.",
+  },
+  {
+    to: "/ask",
+    icon: Sparkles,
+    name: "Ask the Navigator",
+    desc: "Describe any tech problem and get clear step-by-step help from the AI assistant — no sign-in needed.",
+  },
+  {
+
     to: "/scanner",
     icon: FileText,
     name: "Document Scanner",
