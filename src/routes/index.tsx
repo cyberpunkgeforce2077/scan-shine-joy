@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { FileText, QrCode, ScanText, ArrowRight, Wand2, Download } from "lucide-react";
+import {
+  FileText,
+  QrCode,
+  ScanText,
+  ArrowRight,
+  Wand2,
+  Download,
+  BookOpen,
+  Sparkles,
+} from "lucide-react";
+
 import { PlushCard, SectionHeading, StatusChip } from "@/components/omni/primitives";
 
 export const Route = createFileRoute("/")({

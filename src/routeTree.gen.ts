@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AskRouteImport } from './routes/ask'
 import { Route as DakphraserRouteImport } from './routes/dakphraser'
 import { Route as DownloaderRouteImport } from './routes/downloader'
 import { Route as GuidesRouteImport } from './routes/guides'
@@ -21,6 +22,11 @@ import { Route as GuidesSlugRouteImport } from './routes/guides_.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DakphraserRoute = DakphraserRouteImport.update({
@@ -61,6 +67,7 @@ const GuidesSlugRoute = GuidesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ask': typeof AskRoute
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ask': typeof AskRoute
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ask': typeof AskRoute
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ask'
     | '/dakphraser'
     | '/downloader'
     | '/guides'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ask'
     | '/dakphraser'
     | '/downloader'
     | '/guides'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ask'
     | '/dakphraser'
     | '/downloader'
     | '/guides'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AskRoute: typeof AskRoute
   DakphraserRoute: typeof DakphraserRoute
   DownloaderRoute: typeof DownloaderRoute
   GuidesRoute: typeof GuidesRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dakphraser': {
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AskRoute: AskRoute,
   DakphraserRoute: DakphraserRoute,
   DownloaderRoute: DownloaderRoute,
   GuidesRoute: GuidesRoute,

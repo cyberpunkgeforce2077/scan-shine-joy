@@ -8,12 +8,15 @@ import { cn } from "@/lib/utils";
 
 export const NAV = [
   { to: "/", label: "Hub" },
+  { to: "/guides", label: "Guides" },
+  { to: "/ask", label: "Ask" },
   { to: "/qr", label: "QR" },
   { to: "/scanner", label: "Docs" },
   { to: "/ocr", label: "OCR" },
   { to: "/dakphraser", label: "DakPhraser" },
   { to: "/downloader", label: "Downloader" },
 ] as const;
+
 
 function ThemeSelector() {
   const { theme, setTheme } = useThemeMode();
