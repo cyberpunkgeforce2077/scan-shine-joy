@@ -52,8 +52,7 @@ function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <ThemeProvider>
-      <div className="relative min-h-screen overflow-x-hidden">
-        <div className="pointer-events-none fixed inset-0 -z-10 mesh-hero animate-mesh opacity-[0.55]" />
+      <div className="relative min-h-screen overflow-x-hidden bg-background">
         <TopBar />
         <AnimatePresence mode="wait">
           <motion.div

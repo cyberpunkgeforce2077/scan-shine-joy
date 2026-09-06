@@ -8,25 +8,10 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const stored = localStorage.getItem("omni-theme") as Theme | null;
-    if (stored) setTheme(stored);
-  }, []);
-
-  useEffect(() => {
-    const apply = () => {
-      const dark =
-        theme === "dark" ||
-        (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      document.documentElement.classList.toggle("dark", dark);
-    };
-    apply();
-    localStorage.setItem("omni-theme", theme);
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
+    document.documentElement.classList.add("dark");
   }, [theme]);
 
   return <ThemeCtx.Provider value={{ theme, setTheme }}>{children}</ThemeCtx.Provider>;
