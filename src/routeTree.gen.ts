@@ -14,6 +14,7 @@ import { Route as AskRouteImport } from './routes/ask'
 import { Route as DakphraserRouteImport } from './routes/dakphraser'
 import { Route as DownloaderRouteImport } from './routes/downloader'
 import { Route as GuidesRouteImport } from './routes/guides'
+import { Route as HubRouteImport } from './routes/hub'
 import { Route as OcrRouteImport } from './routes/ocr'
 import { Route as QrRouteImport } from './routes/qr'
 import { Route as ScannerRouteImport } from './routes/scanner'
@@ -44,6 +45,11 @@ const GuidesRoute = GuidesRouteImport.update({
   path: '/guides',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HubRoute = HubRouteImport.update({
+  id: '/hub',
+  path: '/hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OcrRoute = OcrRouteImport.update({
   id: '/ocr',
   path: '/ocr',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
+  '/hub': typeof HubRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
+  '/hub': typeof HubRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
+  '/hub': typeof HubRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/dakphraser'
     | '/downloader'
     | '/guides'
+    | '/hub'
     | '/ocr'
     | '/qr'
     | '/scanner'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/dakphraser'
     | '/downloader'
     | '/guides'
+    | '/hub'
     | '/ocr'
     | '/qr'
     | '/scanner'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/dakphraser'
     | '/downloader'
     | '/guides'
+    | '/hub'
     | '/ocr'
     | '/qr'
     | '/scanner'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   DakphraserRoute: typeof DakphraserRoute
   DownloaderRoute: typeof DownloaderRoute
   GuidesRoute: typeof GuidesRoute
+  HubRoute: typeof HubRoute
   OcrRoute: typeof OcrRoute
   QrRoute: typeof QrRoute
   ScannerRoute: typeof ScannerRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hub': {
+      id: '/hub'
+      path: '/hub'
+      fullPath: '/hub'
+      preLoaderRoute: typeof HubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ocr': {
       id: '/ocr'
       path: '/ocr'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   DakphraserRoute: DakphraserRoute,
   DownloaderRoute: DownloaderRoute,
   GuidesRoute: GuidesRoute,
+  HubRoute: HubRoute,
   OcrRoute: OcrRoute,
   QrRoute: QrRoute,
   ScannerRoute: ScannerRoute,
