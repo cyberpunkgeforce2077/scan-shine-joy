@@ -8,10 +8,9 @@ import {
   Wand2,
   Download,
   BookOpen,
-  Sparkles,
 } from "lucide-react";
 
-import { PlushCard, SectionHeading, StatusChip } from "@/components/omni/primitives";
+import { PlushCard, SectionHeading } from "@/components/omni/primitives";
 
 export const Route = createFileRoute("/hub")({
   head: () => ({
@@ -42,13 +41,6 @@ const TOOLS = [
     desc: "Plain-language walkthroughs for slow PCs, overheating laptops, Wi-Fi trouble, backups and staying safe online.",
   },
   {
-    to: "/ask",
-    icon: Sparkles,
-    name: "Ask the Navigator",
-    desc: "Describe any tech problem and get clear step-by-step help from the AI assistant — no sign-in needed.",
-  },
-  {
-
     to: "/scanner",
     icon: FileText,
     name: "Document Scanner",
@@ -89,7 +81,6 @@ function Hub() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="plush-raised p-8 sm:p-12"
       >
-        <StatusChip />
         <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
           A calm, private toolkit for your documents.
         </h1>

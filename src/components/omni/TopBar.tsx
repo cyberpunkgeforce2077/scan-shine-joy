@@ -1,13 +1,15 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import { Menu, Moon, Sun } from "lucide-react";
 import { useState } from "react";
 import { AppDrawer } from "./AppDrawer";
 import { Sparkle } from "./Sparkle";
+import { useThemeMode } from "./ThemeProvider";
 
 export function TopBar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { theme, toggle } = useThemeMode();
 
   return (
     <>
@@ -23,7 +25,14 @@ export function TopBar() {
           <Sparkle className="h-5 w-5" />
           {path === "/" ? "Ask Vladimir" : "OmniSuite"}
         </Link>
-        <span className="ml-auto grid h-9 w-9 place-items-center rounded-full bg-primary-container text-xs font-bold text-primary-container-foreground">
+        <button
+          onClick={toggle}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          className="ml-auto grid h-10 w-10 place-items-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90"
+        >
+          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-primary-container text-xs font-bold text-primary-container-foreground">
           V
         </span>
       </header>
