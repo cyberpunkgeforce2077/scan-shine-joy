@@ -70,6 +70,7 @@ function Shell() {
             <Outlet />
           </motion.div>
         </AnimatePresence>
+        </div>
       </div>
       <Toaster position="top-center" />
     </ThemeProvider>
