@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * OmniSuite design system — warm plush, soft mineral, Gemini-material accents.
+ * Nexus AI design system — dark futuristic blue, glassmorphic, cybernetic.
  * All colors use oklch. Never hardcode colors in components.
  */
 
@@ -64,12 +64,12 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --shadow-plush:
-    0 1px 2px oklch(0.32 0.03 262 / 0.05), 0 8px 24px -12px oklch(0.32 0.03 262 / 0.18),
-    0 24px 48px -32px oklch(0.32 0.03 262 / 0.22);
+    0 1px 2px oklch(0.3 0.04 240 / 0.08), 0 8px 24px -12px oklch(0.4 0.08 240 / 0.2),
+    0 24px 48px -32px oklch(0.4 0.1 240 / 0.25);
   --shadow-plush-lg:
-    0 2px 4px oklch(0.32 0.03 262 / 0.06), 0 16px 40px -16px oklch(0.32 0.03 262 / 0.22),
-    0 40px 80px -40px oklch(0.32 0.03 262 / 0.3);
-  --shadow-inset-soft: inset 0 1px 0 oklch(1 0 0 / 0.7);
+    0 2px 4px oklch(0.3 0.04 240 / 0.08), 0 16px 40px -16px oklch(0.4 0.08 240 / 0.24),
+    0 40px 80px -40px oklch(0.45 0.12 240 / 0.32);
+  --shadow-inset-soft: inset 0 1px 0 oklch(0.9 0.02 220 / 0.12);
 }
 
 :root {
@@ -120,25 +120,25 @@
 }
 
 .dark {
-  --background: oklch(0 0 0);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0.19 0.014 265);
-  --card-foreground: oklch(1 0 0);
-  --surface-1: oklch(0.16 0.01 265);
-  --surface-2: oklch(0.245 0 0);
-  --surface-3: oklch(0.3 0 0);
-  --popover: oklch(0.19 0.014 265);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.62 0.16 262);
-  --primary-foreground: oklch(1 0 0);
-  --primary-container: oklch(0.32 0.09 262);
-  --primary-container-foreground: oklch(0.95 0.02 262);
-  --secondary: oklch(0.245 0 0);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.245 0 0);
-  --muted-foreground: oklch(0.71 0.019 261);
-  --accent: oklch(0.28 0.02 262);
-  --accent-foreground: oklch(1 0 0);
+  --background: oklch(0.13 0.02 260);
+  --foreground: oklch(0.93 0.01 250);
+  --card: oklch(0.16 0.025 260);
+  --card-foreground: oklch(0.93 0.01 250);
+  --surface-1: oklch(0.14 0.02 260);
+  --surface-2: oklch(0.19 0.03 260);
+  --surface-3: oklch(0.24 0.035 260);
+  --popover: oklch(0.16 0.025 260);
+  --popover-foreground: oklch(0.93 0.01 250);
+  --primary: oklch(0.72 0.17 220);
+  --primary-foreground: oklch(0.12 0.02 260);
+  --primary-container: oklch(0.28 0.08 220);
+  --primary-container-foreground: oklch(0.88 0.06 210);
+  --secondary: oklch(0.19 0.03 260);
+  --secondary-foreground: oklch(0.93 0.01 250);
+  --muted: oklch(0.19 0.03 260);
+  --muted-foreground: oklch(0.68 0.025 250);
+  --accent: oklch(0.3 0.06 210);
+  --accent-foreground: oklch(0.88 0.08 200);
   --amber: oklch(0.8 0.08 205);
   --amber-foreground: oklch(0.25 0.045 205);
   --sage: oklch(0.79 0.05 172);
@@ -147,22 +147,22 @@
   --rose-foreground: oklch(0.27 0.05 300);
   --destructive: oklch(0.68 0.13 25);
   --destructive-foreground: oklch(0.2 0.02 25);
-  --border: oklch(1 0 0 / 0.1);
-  --input: oklch(1 0 0 / 0.14);
-  --ring: oklch(0.62 0.16 262);
-  --chart-1: oklch(0.78 0.085 258);
-  --chart-2: oklch(0.79 0.05 172);
+  --border: oklch(0.88 0.03 220 / 0.12);
+  --input: oklch(0.88 0.03 220 / 0.16);
+  --ring: oklch(0.72 0.17 220);
+  --chart-1: oklch(0.72 0.17 220);
+  --chart-2: oklch(0.79 0.12 200);
   --chart-3: oklch(0.8 0.08 205);
   --chart-4: oklch(0.79 0.055 300);
   --chart-5: oklch(0.72 0.06 235);
-  --sidebar: oklch(0.24 0.012 262);
-  --sidebar-foreground: oklch(0.93 0.006 255);
-  --sidebar-primary: oklch(0.78 0.085 258);
-  --sidebar-primary-foreground: oklch(0.23 0.05 258);
-  --sidebar-accent: oklch(0.295 0.014 262);
-  --sidebar-accent-foreground: oklch(0.93 0.006 255);
-  --sidebar-border: oklch(0.335 0.014 262);
-  --sidebar-ring: oklch(0.78 0.085 258);
+  --sidebar: oklch(0.15 0.02 260);
+  --sidebar-foreground: oklch(0.93 0.01 250);
+  --sidebar-primary: oklch(0.72 0.17 220);
+  --sidebar-primary-foreground: oklch(0.12 0.02 260);
+  --sidebar-accent: oklch(0.22 0.03 260);
+  --sidebar-accent-foreground: oklch(0.93 0.01 250);
+  --sidebar-border: oklch(0.88 0.03 220 / 0.1);
+  --sidebar-ring: oklch(0.72 0.17 220);
 }
 
 @layer base {
@@ -190,27 +190,36 @@
   }
 }
 
-/* Plush frosted surface used across every module. */
+/* Glassmorphic dark surface used across every module. */
 @utility plush {
   border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 82%, transparent);
+  background-color: color-mix(in oklab, var(--color-card) 65%, transparent);
   backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid color-mix(in oklab, var(--color-border) 75%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
   box-shadow: var(--shadow-plush);
 }
 
 @utility plush-raised {
   border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 92%, transparent);
+  background-color: color-mix(in oklab, var(--color-card) 72%, transparent);
   backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 75%, transparent);
   box-shadow: var(--shadow-plush-lg);
 }
 
 @utility glass-bar {
-  background-color: color-mix(in oklab, var(--color-card) 68%, transparent);
+  background-color: color-mix(in oklab, var(--color-card) 55%, transparent);
   backdrop-filter: blur(24px) saturate(1.6);
-  border: 1px solid color-mix(in oklab, var(--color-border) 65%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+  box-shadow: var(--shadow-plush);
+}
+
+/* Translucent dark glass panel — rgba(15,23,42,0.65) with crisp border. */
+@utility glass-panel {
+  border-radius: var(--radius-2xl);
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: var(--shadow-plush);
 }
 
@@ -218,24 +227,33 @@
   background-image:
     radial-gradient(
       42rem 26rem at 12% 6%,
-      color-mix(in oklab, var(--color-primary) 26%, transparent),
+      color-mix(in oklab, var(--color-primary) 30%, transparent),
       transparent 70%
     ),
     radial-gradient(
       36rem 24rem at 88% 0%,
-      color-mix(in oklab, var(--color-amber) 34%, transparent),
+      color-mix(in oklab, oklch(0.82 0.14 200) 28%, transparent),
       transparent 70%
     ),
     radial-gradient(
       40rem 28rem at 70% 92%,
-      color-mix(in oklab, var(--color-sage) 30%, transparent),
+      color-mix(in oklab, var(--color-primary) 24%, transparent),
       transparent 72%
     ),
     radial-gradient(
       34rem 22rem at 24% 96%,
-      color-mix(in oklab, var(--color-rose) 30%, transparent),
+      color-mix(in oklab, oklch(0.82 0.14 200) 22%, transparent),
       transparent 72%
     );
+}
+
+/* Cybernetic grid lines — 5% opacity, fixed behind app shell. */
+@utility ambient-grid {
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 90%);
 }
 
 @keyframes mesh-drift {
@@ -291,22 +309,40 @@
 }
 
 @utility ambient-orb-a {
-  background: radial-gradient(circle, oklch(0.72 0.16 165 / 0.35), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.32), transparent 70%);
   filter: blur(90px);
   will-change: transform;
   animation: orb-drift-a 26s ease-in-out infinite;
 }
 
 @utility ambient-orb-b {
-  background: radial-gradient(circle, oklch(0.65 0.17 255 / 0.35), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.28), transparent 70%);
   filter: blur(90px);
   will-change: transform;
   animation: orb-drift-b 32s ease-in-out infinite;
 }
 
+@keyframes orb-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-4%, 8%, 0) scale(1.2);
+  }
+}
+
+@utility ambient-orb-c {
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.22), transparent 70%);
+  filter: blur(100px);
+  will-change: transform;
+  animation: orb-drift-c 38s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient-orb-a,
-  .ambient-orb-b {
+  .ambient-orb-b,
+  .ambient-orb-c {
     animation: none;
   }
 }

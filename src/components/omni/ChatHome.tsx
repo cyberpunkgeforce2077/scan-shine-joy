@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
-import { Loader2, Mic, MicOff, Plus, SendHorizonal, X } from "lucide-react";
+import { Loader2, Mic, MicOff, Plus, SendHorizonal, Sparkle, X } from "lucide-react";
 import { toast } from "sonner";
 import { askAssistant } from "@/lib/ask.functions";
-import { Sparkle } from "@/components/omni/Sparkle";
 import { cn } from "@/lib/utils";
+import {
+  useWorkspace,
+  getSessionMessages,
+  type Attachment,
+  type ChatMessage,
+} from "@/components/omni/WorkspaceContext";
 
-type Attachment = { data: string; mime: string };
-type Msg = { role: "user" | "assistant"; content: string; images?: Attachment[] };
-
-const STORE_KEY = "omni-ask-history";
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
@@ -25,7 +26,6 @@ const PILLS = [
   { label: "Downloader", to: "/downloader" as const },
 ];
 
-/* Minimal typings for the Web Speech API (not in standard TS DOM lib) */
 interface SpeechRecognitionEventLike {
   results: { [index: number]: { [index: number]: { transcript: string } } };
   resultIndex: number;
@@ -41,10 +41,11 @@ interface SpeechRecognitionLike {
   stop: () => void;
 }
 
-export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
+export function ChatHome() {
   const ask = useServerFn(askAssistant);
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const { sessions, activeSessionId, updateMessages } = useWorkspace();
+  const messages = getSessionMessages(sessions, activeSessionId);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -55,34 +56,12 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) setMessages(JSON.parse(raw) as Msg[]);
-    } catch {
-      /* ignore */
-    }
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    if (resetKey === 0) return;
-    setMessages([]);
-    try {
-      localStorage.removeItem(STORE_KEY);
-    } catch {
-      /* ignore */
-    }
-    inputRef.current?.focus();
-  }, [resetKey]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(messages.slice(-20)));
-    } catch {
-      /* ignore */
-    }
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, busy]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [activeSessionId]);
 
   const readFileAsBase64 = (file: File): Promise<Attachment> =>
     new Promise((resolve, reject) => {
@@ -162,13 +141,13 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   async function send(text: string) {
     const question = text.trim();
     if ((!question && attachments.length === 0) || busy) return;
-    const userMsg: Msg = {
+    const userMsg: ChatMessage = {
       role: "user",
       content: question || "(image attached)",
       images: attachments.length > 0 ? attachments : undefined,
     };
-    const next: Msg[] = [...messages, userMsg];
-    setMessages(next);
+    const next: ChatMessage[] = [...messages, userMsg];
+    updateMessages(next);
     setInput("");
     setAttachments([]);
     setBusy(true);
@@ -182,10 +161,10 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           })),
         },
       });
-      setMessages([...next, { role: "assistant", content: reply }]);
+      updateMessages([...next, { role: "assistant", content: reply }]);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong. Try again.");
-      setMessages(next);
+      updateMessages(next);
     } finally {
       setBusy(false);
       inputRef.current?.focus();
@@ -195,14 +174,14 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const empty = messages.length === 0;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-40 pt-24">
+    <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-3xl flex-col px-4 pb-40 pt-8">
       {empty ? (
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
+        <div className="flex flex-1 flex-col items-center justify-center pt-12 text-center">
           <span className="relative grid place-items-center">
-            <span className="absolute h-20 w-20 rounded-full bg-primary/25 blur-2xl" />
+            <span className="absolute h-20 w-20 rounded-full bg-cyan-400/25 blur-2xl" />
             <Sparkle className="relative h-12 w-12" />
           </span>
-          <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-100 sm:text-4xl">
             Where should we start?
           </h1>
           <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -213,7 +192,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
                   if ("to" in p && p.to) void navigate({ to: p.to });
                   else void send(p.prompt!);
                 }}
-                className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:text-foreground active:scale-95"
+                className="rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2.5 text-sm font-medium text-slate-400 backdrop-blur-xl transition hover:border-cyan-300/30 hover:text-cyan-100 active:scale-95"
               >
                 {p.label}
               </button>
@@ -221,15 +200,15 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           </div>
         </div>
       ) : (
-        <div className="flex-1 space-y-5">
+        <div className="flex-1 space-y-5 pt-4">
           {messages.map((m, i) => (
             <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
               <div
                 className={cn(
                   "max-w-[88%] rounded-3xl text-sm leading-relaxed",
                   m.role === "user"
-                    ? "bg-primary px-4 py-3 text-primary-foreground"
-                    : "text-foreground",
+                    ? "bg-cyan-500/20 px-4 py-3 text-cyan-50 ring-1 ring-cyan-300/25"
+                    : "text-slate-200",
                 )}
               >
                 {m.images && m.images.length > 0 && (
@@ -249,7 +228,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             </div>
           ))}
           {busy && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-slate-400">
               <Loader2 className="h-4 w-4 animate-spin" /> Thinking…
             </div>
           )}
@@ -271,13 +250,13 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
                 <img
                   src={`data:${img.mime};base64,${img.data}`}
                   alt="preview"
-                  className="h-16 w-16 rounded-xl border border-border object-cover"
+                  className="h-16 w-16 rounded-xl border border-white/[0.08] object-cover"
                 />
                 <button
                   type="button"
                   onClick={() => removeAttachment(i)}
                   aria-label="Remove attachment"
-                  className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-foreground text-background shadow"
+                  className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-slate-200 text-slate-900 shadow"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -286,7 +265,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           </div>
         )}
 
-        <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-[28px] border border-border bg-card px-3 py-2.5 shadow-[var(--shadow-plush-lg)]">
+        <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-[28px] border border-white/[0.08] bg-[#0c1320]/70 px-3 py-2.5 shadow-[0_8px_40px_-12px_rgba(0,102,255,0.25)] backdrop-blur-2xl">
           <input
             ref={fileInputRef}
             type="file"
@@ -302,7 +281,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             type="button"
             aria-label="Attach file"
             onClick={() => fileInputRef.current?.click()}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-400 transition hover:text-cyan-200 active:scale-90"
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -317,8 +296,8 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
               }
             }}
             rows={1}
-            placeholder={listening ? "Listening…" : "Ask Vladimir"}
-            className="max-h-32 min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+            placeholder={listening ? "Listening…" : "Ask Nexus"}
+            className="max-h-32 min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-sm text-slate-100 outline-none placeholder:text-slate-500"
           />
           <button
             type="button"
@@ -326,9 +305,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             onClick={toggleVoice}
             className={cn(
               "grid h-10 w-10 shrink-0 place-items-center rounded-full transition active:scale-90",
-              listening
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground",
+              listening ? "bg-cyan-400/30 text-cyan-100" : "text-slate-400 hover:text-cyan-200",
             )}
           >
             {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
@@ -337,7 +314,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             type="submit"
             disabled={busy || (!input.trim() && attachments.length === 0)}
             aria-label="Send"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition active:scale-90 disabled:opacity-40"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-cyan-400/20 text-cyan-100 ring-1 ring-cyan-300/30 transition hover:bg-cyan-400/30 active:scale-90 disabled:opacity-40"
           >
             <SendHorizonal className="h-4 w-4" />
           </button>
