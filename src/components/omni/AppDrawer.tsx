@@ -83,8 +83,8 @@ export function AppDrawer({
               >
                 <MessageSquarePlus className="h-5 w-5" /> New chat
               </button>
-              <Link to="/ask" onClick={onClose} className={rowClass(path === "/ask")}>
-                <Search className="h-5 w-5" /> Search chats
+              <Link to="/" onClick={onClose} className={rowClass(path === "/")}>
+                <Search className="h-5 w-5" /> Chat
               </Link>
 
               <p className="px-4 pb-2 pt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
