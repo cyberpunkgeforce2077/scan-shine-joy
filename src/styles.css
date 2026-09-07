@@ -268,3 +268,45 @@
   scrollbar-width: thin;
   scrollbar-color: var(--color-surface-3) transparent;
 }
+
+/* Ambient slow-drifting glow orbs behind the app shell. GPU-friendly. */
+@keyframes orb-drift-a {
+  0%,
+  100% {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(8%, 6%, 0) scale(1.15);
+  }
+}
+
+@keyframes orb-drift-b {
+  0%,
+  100% {
+    transform: translate3d(6%, 5%, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-7%, -6%, 0) scale(0.95);
+  }
+}
+
+@utility ambient-orb-a {
+  background: radial-gradient(circle, oklch(0.72 0.16 165 / 0.35), transparent 70%);
+  filter: blur(90px);
+  will-change: transform;
+  animation: orb-drift-a 26s ease-in-out infinite;
+}
+
+@utility ambient-orb-b {
+  background: radial-gradient(circle, oklch(0.65 0.17 255 / 0.35), transparent 70%);
+  filter: blur(90px);
+  will-change: transform;
+  animation: orb-drift-b 32s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb-a,
+  .ambient-orb-b {
+    animation: none;
+  }
+}
