@@ -1,15 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
-import { Loader2, Mic, Plus, SendHorizonal } from "lucide-react";
+import { Loader2, Mic, MicOff, Plus, SendHorizonal, X } from "lucide-react";
 import { toast } from "sonner";
 import { askAssistant } from "@/lib/ask.functions";
 import { Sparkle } from "@/components/omni/Sparkle";
 import { cn } from "@/lib/utils";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Attachment = { data: string; mime: string };
+type Msg = { role: "user" | "assistant"; content: string; images?: Attachment[] };
 
 const STORE_KEY = "omni-ask-history";
+const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
+const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
 const PILLS = [
   { label: "Help me generate code", prompt: "Help me generate code for a small web project." },
@@ -22,14 +25,34 @@ const PILLS = [
   { label: "Downloader", to: "/downloader" as const },
 ];
 
+/* Minimal typings for the Web Speech API (not in standard TS DOM lib) */
+interface SpeechRecognitionEventLike {
+  results: { [index: number]: { [index: number]: { transcript: string } } };
+  resultIndex: number;
+}
+interface SpeechRecognitionLike {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((e: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
 export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const ask = useServerFn(askAssistant);
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [listening, setListening] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     try {
@@ -61,15 +84,104 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const readFileAsBase64 = (file: File): Promise<Attachment> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1] ?? "";
+        resolve({ data: base64, mime: file.type });
+      };
+      reader.onerror = () => reject(new Error("Could not read file."));
+      reader.readAsDataURL(file);
+    });
+
+  const handleFiles = useCallback(async (files: FileList | File[]) => {
+    const arr = Array.from(files);
+    for (const file of arr) {
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        toast.error("Only PNG, JPEG, WebP, and GIF images are supported.");
+        continue;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error("Image must be under 4 MB.");
+        continue;
+      }
+      try {
+        const att = await readFileAsBase64(file);
+        setAttachments((prev) => (prev.length >= 4 ? prev : [...prev, att]));
+      } catch {
+        toast.error("Could not load that image.");
+      }
+    }
+  }, []);
+
+  const toggleVoice = useCallback(() => {
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    const Ctor =
+      (window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown })
+        .SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
+    if (!Ctor) {
+      toast.error("Voice input isn't supported in this browser. Try Chrome or Edge.");
+      return;
+    }
+    const rec = new (Ctor as new () => SpeechRecognitionLike)();
+    rec.lang = "en-US";
+    rec.interimResults = true;
+    rec.continuous = false;
+    let finalText = "";
+    rec.onresult = (e) => {
+      let interim = "";
+      const len = e.results.length;
+      for (let i = e.resultIndex; i < len; i++) {
+        const transcript = e.results[i]?.[0]?.transcript ?? "";
+        interim += transcript;
+      }
+      setInput(finalText + interim);
+    };
+    rec.onerror = () => {
+      toast.error("Voice input failed. Check your microphone permission.");
+      setListening(false);
+    };
+    rec.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+    recognitionRef.current = rec;
+    setListening(true);
+    rec.start();
+  }, [listening]);
+
+  const removeAttachment = (index: number) =>
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+
   async function send(text: string) {
     const question = text.trim();
-    if (!question || busy) return;
-    const next: Msg[] = [...messages, { role: "user", content: question }];
+    if ((!question && attachments.length === 0) || busy) return;
+    const userMsg: Msg = {
+      role: "user",
+      content: question || "(image attached)",
+      images: attachments.length > 0 ? attachments : undefined,
+    };
+    const next: Msg[] = [...messages, userMsg];
     setMessages(next);
     setInput("");
+    setAttachments([]);
     setBusy(true);
     try {
-      const { reply } = await ask({ data: { messages: next.slice(-10) } });
+      const { reply } = await ask({
+        data: {
+          messages: next.slice(-10).map((m) => ({
+            role: m.role,
+            content: m.content,
+            images: m.images,
+          })),
+        },
+      });
       setMessages([...next, { role: "assistant", content: reply }]);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong. Try again.");
@@ -114,13 +226,25 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
               <div
                 className={cn(
-                  "max-w-[88%] whitespace-pre-wrap rounded-3xl text-sm leading-relaxed",
+                  "max-w-[88%] rounded-3xl text-sm leading-relaxed",
                   m.role === "user"
                     ? "bg-primary px-4 py-3 text-primary-foreground"
                     : "text-foreground",
                 )}
               >
-                {m.content}
+                {m.images && m.images.length > 0 && (
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    {m.images.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={`data:${img.mime};base64,${img.data}`}
+                        alt="attachment"
+                        className="h-28 w-28 rounded-2xl object-cover"
+                      />
+                    ))}
+                  </div>
+                )}
+                <div className="whitespace-pre-wrap">{m.content}</div>
               </div>
             </div>
           ))}
@@ -140,11 +264,45 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
         }}
         className="fixed inset-x-0 bottom-0 z-40 px-4 pb-5"
       >
+        {attachments.length > 0 && (
+          <div className="mx-auto mb-2 flex w-full max-w-3xl flex-wrap gap-2">
+            {attachments.map((img, i) => (
+              <div key={i} className="relative">
+                <img
+                  src={`data:${img.mime};base64,${img.data}`}
+                  alt="preview"
+                  className="h-16 w-16 rounded-xl border border-border object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(i)}
+                  aria-label="Remove attachment"
+                  className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-foreground text-background shadow"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-[28px] border border-border bg-card px-3 py-2.5 shadow-[var(--shadow-plush-lg)]">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_TYPES.join(",")}
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) void handleFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
           <button
             type="button"
             aria-label="Attach file"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground"
+            onClick={() => fileInputRef.current?.click()}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90"
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -159,19 +317,25 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
               }
             }}
             rows={1}
-            placeholder="Ask Vladimir"
+            placeholder={listening ? "Listening…" : "Ask Vladimir"}
             className="max-h-32 min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-sm outline-none placeholder:text-muted-foreground"
           />
           <button
             type="button"
             aria-label="Voice input"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground"
+            onClick={toggleVoice}
+            className={cn(
+              "grid h-10 w-10 shrink-0 place-items-center rounded-full transition active:scale-90",
+              listening
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
           >
-            <Mic className="h-5 w-5" />
+            {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
           </button>
           <button
             type="submit"
-            disabled={busy || !input.trim()}
+            disabled={busy || (!input.trim() && attachments.length === 0)}
             aria-label="Send"
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition active:scale-90 disabled:opacity-40"
           >
