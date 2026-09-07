@@ -8,10 +8,9 @@ import {
   Wand2,
   Download,
   BookOpen,
-  Sparkles,
 } from "lucide-react";
 
-import { PlushCard, SectionHeading, StatusChip } from "@/components/omni/primitives";
+import { PlushCard, SectionHeading } from "@/components/omni/primitives";
 
 export const Route = createFileRoute("/hub")({
   head: () => ({
@@ -42,8 +41,6 @@ const TOOLS = [
     desc: "Plain-language walkthroughs for slow PCs, overheating laptops, Wi-Fi trouble, backups and staying safe online.",
   },
   {
-
-
     to: "/scanner",
     icon: FileText,
     name: "Document Scanner",
