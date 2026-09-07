@@ -81,7 +81,6 @@ function Hub() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="plush-raised p-8 sm:p-12"
       >
-        <StatusChip />
         <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
           A calm, private toolkit for your documents.
         </h1>
