@@ -1,7 +1,16 @@
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
-import { ClipboardPaste, Download, Link2, Loader2, Music4, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import {
+  ClipboardPaste,
+  Download,
+  ExternalLink,
+  Link2,
+  Loader2,
+  Music4,
+  Sparkles,
+} from "lucide-react";
 import { detectPlatform, resolveMedia, type MediaResult } from "@/lib/downloader.functions";
 import { cn } from "@/lib/utils";
 
@@ -53,13 +62,16 @@ export function MediaDownloader() {
     setError(null);
     setResult(null);
     try {
-      const res = await run({ data: { url: url.trim() } });
+      const res = await run({ data: { url: url.trim(), quality } });
       setResult(res);
       const set = new Set(res.formats.map((f) => f.quality));
       const preferred = (["1080p", "720p", "480p"] as Quality[]).find((q) => set.has(q));
       if (preferred) setQuality(preferred);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not process that link.");
+    } catch {
+      setError(null);
+      toast.error("Download service temporarily busy. Please try again.", {
+        icon: <ExternalLink className="h-4 w-4 text-destructive" />,
+      });
     } finally {
       setBusy(false);
     }
