@@ -36,13 +36,13 @@ function QRPage() {
       title="Create and scan QR codes"
       description="Styled generation with logos and gradients, plus camera and file scanning — all local to your device."
     >
-      <div className="mb-6 flex gap-2">
+      <div className="mb-7 flex gap-2 rounded-2xl border border-border/70 bg-card/65 p-1.5 shadow-sm">
         {(["create", "scan"] as const).map((t) => (
           <PillButton
             key={t}
             variant={tab === t ? "primary" : "outline"}
             onClick={() => setTab(t)}
-            className="capitalize"
+            className="flex-1 capitalize"
           >
             {t}
           </PillButton>

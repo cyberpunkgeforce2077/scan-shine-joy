@@ -133,7 +133,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
     rec.lang = "en-US";
     rec.interimResults = true;
     rec.continuous = false;
-    let finalText = "";
+    const finalText = "";
     rec.onresult = (e) => {
       let interim = "";
       const len = e.results.length;
@@ -195,17 +195,23 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const empty = messages.length === 0;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-40 pt-24">
+    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-40 pt-28 sm:px-6">
       {empty ? (
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <span className="relative grid place-items-center">
-            <span className="absolute h-20 w-20 rounded-full bg-primary/25 blur-2xl" />
-            <Sparkle className="relative h-12 w-12" />
+        <div className="flex flex-1 flex-col items-center justify-center pb-12 text-center">
+          <span className="relative grid h-20 w-20 place-items-center rounded-3xl border border-primary/10 bg-primary-container shadow-[var(--shadow-plush)]">
+            <span className="absolute h-14 w-14 rounded-full bg-primary/20 blur-xl" />
+            <Sparkle className="relative h-11 w-11" />
           </span>
-          <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          <p className="mt-7 text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary">
+            Your private assistant
+          </p>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.05em] sm:text-5xl">
             Where should we start?
           </h1>
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
+          <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+            Choose a starting point or ask anything you need help with.
+          </p>
+          <div className="mt-8 flex max-w-2xl flex-wrap justify-center gap-2">
             {PILLS.map((p) => (
               <button
                 key={p.label}
@@ -213,7 +219,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
                   if ("to" in p && p.to) void navigate({ to: p.to });
                   else void send(p.prompt!);
                 }}
-                className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:text-foreground active:scale-95"
+                className="min-h-11 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold text-muted-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:text-foreground hover:shadow-[var(--shadow-plush)] active:translate-y-0 active:scale-95"
               >
                 {p.label}
               </button>
@@ -223,13 +229,16 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
       ) : (
         <div className="flex-1 space-y-5">
           {messages.map((m, i) => (
-            <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+            <div
+              key={i}
+              className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+            >
               <div
                 className={cn(
                   "max-w-[88%] rounded-3xl text-sm leading-relaxed",
                   m.role === "user"
                     ? "bg-primary px-4 py-3 text-primary-foreground"
-                    : "text-foreground",
+                    : "border border-border/70 bg-card/70 px-4 py-3 text-foreground shadow-sm",
                 )}
               >
                 {m.images && m.images.length > 0 && (
@@ -262,7 +271,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           e.preventDefault();
           void send(input);
         }}
-        className="fixed inset-x-0 bottom-0 z-40 px-4 pb-5"
+        className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:pb-5"
       >
         {attachments.length > 0 && (
           <div className="mx-auto mb-2 flex w-full max-w-3xl flex-wrap gap-2">
@@ -286,7 +295,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           </div>
         )}
 
-        <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-[28px] border border-border bg-card px-3 py-2.5 shadow-[var(--shadow-plush-lg)]">
+        <div className="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-[26px] border border-border bg-card/95 px-3 py-2.5 shadow-[var(--shadow-plush-lg)] backdrop-blur-xl">
           <input
             ref={fileInputRef}
             type="file"
@@ -302,7 +311,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             type="button"
             aria-label="Attach file"
             onClick={() => fileInputRef.current?.click()}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-90"
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -325,7 +334,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             aria-label="Voice input"
             onClick={toggleVoice}
             className={cn(
-              "grid h-10 w-10 shrink-0 place-items-center rounded-full transition active:scale-90",
+              "grid h-10 w-10 shrink-0 place-items-center rounded-xl transition active:scale-90",
               listening
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground",
@@ -337,7 +346,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
             type="submit"
             disabled={busy || (!input.trim() && attachments.length === 0)}
             aria-label="Send"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition active:scale-90 disabled:opacity-40"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm transition hover:brightness-110 active:scale-90 disabled:opacity-40"
           >
             <SendHorizonal className="h-4 w-4" />
           </button>

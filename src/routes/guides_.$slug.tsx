@@ -58,18 +58,18 @@ function GuidePage() {
             </span>
           </div>
         </div>
-        <h1 className="mt-6 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
+        <h1 className="mt-6 text-3xl font-extrabold leading-tight tracking-[-0.05em] sm:text-5xl">
           {guide.title}
         </h1>
         <p className="mt-3 text-base text-muted-foreground">{guide.excerpt}</p>
       </header>
 
-      <div className="plush mt-8 space-y-8 p-6 sm:p-9">
+      <div className="plush mt-9 space-y-9 p-6 sm:p-10">
         {guide.sections.map((section) => (
           <section key={section.heading}>
-            <h2 className="text-xl font-bold tracking-tight">{section.heading}</h2>
+            <h2 className="text-xl font-extrabold tracking-[-0.03em]">{section.heading}</h2>
             {section.paragraphs.map((p, i) => (
-              <p key={i} className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+              <p key={i} className="mt-3 text-[15px] leading-7 text-muted-foreground">
                 {p}
               </p>
             ))}
@@ -94,7 +94,7 @@ function GuidePage() {
             key={g.slug}
             to="/guides/$slug"
             params={{ slug: g.slug }}
-            className="plush flex flex-col p-5 transition hover:-translate-y-1"
+            className="plush flex flex-col p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[var(--shadow-plush-lg)]"
           >
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary-container text-primary-container-foreground">
               <g.icon className="h-4.5 w-4.5" />

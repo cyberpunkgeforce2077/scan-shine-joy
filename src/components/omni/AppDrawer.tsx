@@ -38,9 +38,9 @@ export function AppDrawer({
 
   const rowClass = (active: boolean) =>
     cn(
-      "flex w-full items-center gap-3 rounded-full px-4 py-3 text-left text-sm font-medium transition",
+      "flex min-h-11 w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition-all duration-200 active:scale-[0.98]",
       active
-        ? "bg-surface-2 text-foreground"
+        ? "bg-primary-container text-primary-container-foreground shadow-sm"
         : "text-muted-foreground hover:bg-surface-1 hover:text-foreground",
     );
 
@@ -60,14 +60,14 @@ export function AppDrawer({
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", stiffness: 420, damping: 40 }}
-            className="fixed inset-y-0 left-0 z-[61] flex w-[86%] max-w-[330px] flex-col border-r border-border bg-card"
+            className="fixed inset-y-3 left-3 z-[61] flex w-[86%] max-w-[340px] flex-col rounded-3xl border border-border bg-card/95 shadow-[var(--shadow-plush-lg)] backdrop-blur-xl"
           >
             <div className="flex items-center justify-between px-5 pb-2 pt-5">
-              <span className="text-2xl font-bold tracking-tight">OmniSuite</span>
+              <span className="text-xl font-extrabold tracking-[-0.04em]">OmniSuite</span>
               <button
                 onClick={onClose}
                 aria-label="Close menu"
-                className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground transition hover:text-foreground active:scale-90"
+                className="grid h-10 w-10 place-items-center rounded-xl text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-90"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -87,7 +87,7 @@ export function AppDrawer({
                 <Search className="h-5 w-5" /> Chat
               </Link>
 
-              <p className="px-4 pb-2 pt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <p className="px-4 pb-2 pt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted-foreground">
                 Tools
               </p>
               {TOOLS.map((t) => (
@@ -101,9 +101,7 @@ export function AppDrawer({
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-container text-sm font-bold text-primary-container-foreground">
                 V
               </span>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                Vladimir Selorm…
-              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">Vladimir Selorm…</span>
               <button
                 aria-label="Settings"
                 className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground transition hover:text-foreground"
