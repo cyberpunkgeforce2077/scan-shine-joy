@@ -53,9 +53,13 @@ function Shell() {
   return (
     <ThemeProvider>
       <div className="relative min-h-screen overflow-x-hidden bg-background">
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div
+          aria-hidden
+          className="personalized-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        >
           <span className="ambient-orb-a absolute -left-24 top-[-10%] h-[26rem] w-[26rem] rounded-full" />
           <span className="ambient-orb-b absolute -right-24 bottom-[-15%] h-[30rem] w-[30rem] rounded-full" />
+          <span className="ambient-orb-c absolute left-[38%] top-[34%] h-[24rem] w-[24rem] rounded-full" />
         </div>
         <div className="relative z-10">
           <TopBar />
