@@ -10,7 +10,6 @@ import {
   Copy,
   Download,
   FileText,
-  LayoutGrid,
   Loader2,
   Mic,
   MicOff,
@@ -46,7 +45,6 @@ const QUICK_ACTIONS = [
     icon: Bot,
     prompt: "What AI tools should I try for everyday work?",
   },
-  { label: "Hub", description: "Browse the full toolkit", icon: LayoutGrid, to: "/hub" as const },
   {
     label: "Guides",
     description: "Practical tech walkthroughs",

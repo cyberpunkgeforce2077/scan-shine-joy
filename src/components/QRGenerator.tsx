@@ -143,7 +143,7 @@ export function QRGenerator() {
   const qr = useRef<any>(null);
 
   const [type, setType] = useState<ContentType>("url");
-  const [url, setUrl] = useState("https://lovable.dev");
+  const [url, setUrl] = useState("");
   const [text, setText] = useState("Hello from QR Master");
   const [wifi, setWifi] = useState({ ssid: "", password: "", encryption: "WPA" });
   const [email, setEmail] = useState({ to: "", subject: "", body: "" });
@@ -342,7 +342,7 @@ export function QRGenerator() {
           <div className="mt-4 space-y-3">
             {type === "url" && (
               <Field label="Website URL">
-                <Input value={url} onChange={setUrl} placeholder="https://example.com" />
+                <Input value={url} onChange={setUrl} placeholder="Paste your URL" />
               </Field>
             )}
             {type === "text" && (

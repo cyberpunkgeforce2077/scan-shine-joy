@@ -24,7 +24,7 @@ function NotFoundComponent() {
           to="/"
           className="mt-6 inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
         >
-          Back to the hub
+          Back to Ask Vladimir
         </Link>
       </div>
     </div>
@@ -41,7 +41,7 @@ function ErrorComponent({ error }: { error: Error }) {
           to="/"
           className="mt-6 inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
         >
-          Back to the hub
+          Back to Ask Vladimir
         </Link>
       </div>
     </div>

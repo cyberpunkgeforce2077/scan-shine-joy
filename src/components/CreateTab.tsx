@@ -2,13 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { CelebrationModal } from "./CelebrationModal";
 
-const DOT_STYLES = ["rounded", "dots", "classy", "classy-rounded", "square", "extra-rounded"] as const;
+const DOT_STYLES = [
+  "rounded",
+  "dots",
+  "classy",
+  "classy-rounded",
+  "square",
+  "extra-rounded",
+] as const;
 
 export function CreateTab() {
   const ref = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const qr = useRef<any>(null);
-  const [data, setData] = useState("https://lovable.dev");
+  const [data, setData] = useState("");
   const [fg, setFg] = useState("#7c5cff");
   const [bg, setBg] = useState("#12121a");
   const [dots, setDots] = useState<string>("rounded");
@@ -75,7 +82,7 @@ export function CreateTab() {
           <input
             value={data}
             onChange={(e) => setData(e.target.value)}
-            placeholder="https://example.com"
+            placeholder="Paste your URL"
             className="w-full rounded-xl border border-input bg-secondary px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>

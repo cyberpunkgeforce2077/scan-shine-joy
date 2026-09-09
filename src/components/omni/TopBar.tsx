@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BookOpen, FileText, LayoutGrid, Menu, Moon, QrCode, Sun } from "lucide-react";
+import { BookOpen, FileText, Menu, Moon, QrCode, Sun } from "lucide-react";
 import { useState } from "react";
 import { AppDrawer } from "./AppDrawer";
 import { Sparkle } from "./Sparkle";
@@ -11,7 +11,6 @@ export function TopBar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { theme, toggle } = useThemeMode();
   const desktopLinks = [
-    { to: "/hub" as const, label: "Hub", icon: LayoutGrid },
     { to: "/guides" as const, label: "Guides", icon: BookOpen },
     { to: "/qr" as const, label: "QR", icon: QrCode },
     { to: "/scanner" as const, label: "Docs", icon: FileText },

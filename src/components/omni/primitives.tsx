@@ -1,5 +1,5 @@
 import { motion, useInView } from "motion/react";
-import { ArrowLeft, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -93,18 +93,6 @@ export function PillButton({
   );
 }
 
-export function StatusChip({ label = "100% In-Browser & Private" }: { label?: string }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full bg-sage/25 px-3 py-1.5 text-[11px] font-semibold text-sage-foreground">
-      <span className="relative flex h-2 w-2">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sage opacity-70" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-sage" />
-      </span>
-      {label}
-    </span>
-  );
-}
-
 export function PageShell({
   eyebrow,
   title,
@@ -131,13 +119,6 @@ export function PageShell({
           <ArrowLeft className="h-3.5 w-3.5" /> Ask Vladimir
         </Link>
         <SectionHeading eyebrow={eyebrow} title={title} description={description} />
-        <div className="mt-5 flex flex-wrap items-center gap-2.5">
-          <StatusChip />
-          <span className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/70 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">
-            <CheckCircle2 className="h-3.5 w-3.5 text-sage-foreground" />
-            Works in your browser
-          </span>
-        </div>
       </motion.header>
       {children}
     </div>
