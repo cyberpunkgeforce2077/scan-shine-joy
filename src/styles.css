@@ -117,6 +117,9 @@
   --sidebar-accent-foreground: oklch(0.31 0.02 262);
   --sidebar-border: oklch(0.898 0.009 255);
   --sidebar-ring: oklch(0.55 0.115 258);
+  --backdrop-lavender: oklch(0.72 0.14 300);
+  --backdrop-cyan: oklch(0.76 0.12 205);
+  --backdrop-peach: oklch(0.82 0.1 55);
 }
 
 .dark {
@@ -163,6 +166,9 @@
   --sidebar-accent-foreground: oklch(0.93 0.006 255);
   --sidebar-border: oklch(0.335 0.014 262);
   --sidebar-ring: oklch(0.78 0.085 258);
+  --backdrop-lavender: oklch(0.38 0.12 300);
+  --backdrop-cyan: oklch(0.4 0.1 205);
+  --backdrop-peach: oklch(0.44 0.08 55);
 }
 
 @layer base {
@@ -315,23 +321,39 @@
   }
 }
 
+@utility personalized-backdrop {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in oklab, var(--backdrop-lavender) 8%, transparent), transparent 30%),
+    radial-gradient(circle at 86% 16%, color-mix(in oklab, var(--backdrop-cyan) 7%, transparent), transparent 28%),
+    radial-gradient(circle at 52% 92%, color-mix(in oklab, var(--backdrop-peach) 6%, transparent), transparent 32%);
+  opacity: 0.88;
+}
+
 @utility ambient-orb-a {
-  background: radial-gradient(circle, oklch(0.72 0.16 165 / 0.22), transparent 70%);
-  filter: blur(90px);
+  background: radial-gradient(circle, color-mix(in oklab, var(--backdrop-lavender) 18%, transparent), transparent 70%);
+  filter: blur(110px);
   will-change: transform;
   animation: orb-drift-a 26s ease-in-out infinite;
 }
 
 @utility ambient-orb-b {
-  background: radial-gradient(circle, oklch(0.65 0.17 255 / 0.22), transparent 70%);
-  filter: blur(90px);
+  background: radial-gradient(circle, color-mix(in oklab, var(--backdrop-cyan) 17%, transparent), transparent 70%);
+  filter: blur(110px);
   will-change: transform;
   animation: orb-drift-b 32s ease-in-out infinite;
+}
+
+@utility ambient-orb-c {
+  background: radial-gradient(circle, color-mix(in oklab, var(--backdrop-peach) 14%, transparent), transparent 70%);
+  filter: blur(120px);
+  will-change: transform;
+  animation: orb-drift-a 30s ease-in-out infinite reverse;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ambient-orb-a,
   .ambient-orb-b,
+  .ambient-orb-c,
   .animate-mesh {
     animation: none;
   }
