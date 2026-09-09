@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 
 const QUALITIES = ["480p", "720p", "1080p"] as const;
 type Quality = (typeof QUALITIES)[number];
+const FORMAT_MODES = ["all", "video", "audio"] as const;
+type FormatMode = (typeof FORMAT_MODES)[number];
 
 const PLATFORMS = ["YouTube", "Instagram", "TikTok", "Facebook", "X"] as const;
 type Platform = (typeof PLATFORMS)[number];
@@ -35,15 +37,12 @@ export function MediaDownloader() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<MediaResult | null>(null);
   const [quality, setQuality] = useState<Quality>("720p");
+  const [format, setFormat] = useState<FormatMode>("all");
   const [source, setSource] = useState<Platform>("YouTube");
 
   const platform = detectPlatform(url) as Platform | null;
 
-
-  const videos = useMemo(
-    () => result?.formats.filter((f) => f.quality !== "audio") ?? [],
-    [result],
-  );
+  const videos = useMemo(() => result?.formats.filter((f) => f.ext !== "mp3") ?? [], [result]);
   const audio = useMemo(() => result?.formats.find((f) => f.quality === "audio"), [result]);
 
   const available = useMemo(() => {
@@ -62,14 +61,18 @@ export function MediaDownloader() {
     setError(null);
     setResult(null);
     try {
-      const res = await run({ data: { url: url.trim(), quality } });
+      const res = await run({ data: { url: url.trim(), quality, format } });
       setResult(res);
       const set = new Set(res.formats.map((f) => f.quality));
       const preferred = (["1080p", "720p", "480p"] as Quality[]).find((q) => set.has(q));
       if (preferred) setQuality(preferred);
-    } catch {
-      setError(null);
-      toast.error("Download service temporarily busy. Please try again.", {
+    } catch (caught) {
+      const message =
+        caught instanceof Error
+          ? caught.message
+          : "The download service could not resolve that link.";
+      setError(message);
+      toast.error(message, {
         icon: <ExternalLink className="h-4 w-4 text-destructive" />,
       });
     } finally {
@@ -117,7 +120,6 @@ export function MediaDownloader() {
           })}
         </div>
 
-
         <div className="mt-4 flex items-center gap-2 rounded-full bg-surface-2/70 px-4 py-2.5">
           <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
           <input
@@ -139,7 +141,9 @@ export function MediaDownloader() {
 
         {url.trim() && (
           <p className="mt-2 text-xs font-medium text-muted-foreground">
-            {platform ? `Detected: ${platform}` : "Unsupported link — try YouTube, Instagram or TikTok."}
+            {platform
+              ? `Detected: ${platform}`
+              : "Unsupported link — try YouTube, Instagram or TikTok."}
           </p>
         )}
 
@@ -165,6 +169,26 @@ export function MediaDownloader() {
               </button>
             );
           })}
+        </div>
+
+        <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Format
+        </p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {FORMAT_MODES.map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setFormat(mode)}
+              className={cn(
+                "rounded-full px-4 py-2.5 text-[13px] font-semibold transition active:scale-95",
+                format === mode
+                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-plush)]"
+                  : "bg-surface-2/80 text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {mode === "all" ? "Video + MP3" : mode === "video" ? "Video" : "MP3 audio"}
+            </button>
+          ))}
         </div>
 
         <button
@@ -242,7 +266,7 @@ export function MediaDownloader() {
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-plush)] transition-transform active:scale-95"
                 >
                   <Download className="h-4 w-4" />
-                  Download {chosen.quality} {chosen.ext.toUpperCase()}
+                  Download {chosen.label} {chosen.ext.toUpperCase()}
                   {chosen.size ? ` · ${chosen.size}` : ""}
                 </a>
               )}
@@ -254,7 +278,7 @@ export function MediaDownloader() {
                   download
                   className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-5 py-3 text-sm font-semibold transition active:scale-95"
                 >
-                  <Music4 className="h-4 w-4" /> Audio only
+                  <Music4 className="h-4 w-4" /> Download MP3
                 </a>
               )}
             </div>

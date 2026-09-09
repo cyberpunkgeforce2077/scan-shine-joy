@@ -11,10 +11,10 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void; tog
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    let initial: Theme = "dark";
+    let initial: Theme = "light";
     try {
       const stored = localStorage.getItem(KEY) as Theme | null;
       if (stored === "light" || stored === "dark") initial = stored;

@@ -1,4 +1,6 @@
 import { motion, useInView } from "motion/react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +26,7 @@ export function PlushCard({
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={interactive ? { y: -4, scale: 1.008 } : {}}
       className={cn(
-        "plush p-5 transition-[box-shadow,transform,border-color] duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-plush-lg)]",
+        "plush group p-5 transition-[box-shadow,transform,border-color] duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-plush-lg)]",
         className,
       )}
     >
@@ -108,11 +110,29 @@ export function PageShell({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-9"
+        className="mb-10"
       >
+        <Link
+          to="/"
+          className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Ask Vladimir
+        </Link>
         <SectionHeading eyebrow={eyebrow} title={title} description={description} />
       </motion.header>
       {children}
     </div>
+  );
+}
+
+export function ToolLink({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center gap-1.5 text-sm font-bold text-primary transition hover:gap-2.5"
+    >
+      {children}
+      <ArrowUpRight className="h-4 w-4" />
+    </Link>
   );
 }
