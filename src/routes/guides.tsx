@@ -38,7 +38,7 @@ function GuidesPage() {
   }, [query, category]);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-28 sm:px-6 sm:pt-32">
+    <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-28 sm:px-6 sm:pt-32 lg:px-8">
       <SectionHeading
         eyebrow="Guides"
         title="Fix it yourself, confidently"
@@ -46,7 +46,7 @@ function GuidesPage() {
       />
 
       <div className="mt-6 max-w-xl">
-        <div className="plush flex items-center gap-3 rounded-full px-5 py-3">
+        <div className="plush flex items-center gap-3 rounded-2xl px-5 py-3 transition-shadow focus-within:shadow-[var(--shadow-plush-lg)]">
           <Search className="h-4.5 w-4.5 shrink-0 text-muted-foreground" />
           <input
             value={query}
@@ -68,14 +68,14 @@ function GuidesPage() {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         {CATEGORIES.map((c) => (
           <button
             key={c}
             type="button"
             onClick={() => setCategory(c)}
             className={cn(
-              "rounded-full px-4 py-1.5 text-[13px] font-semibold transition-all duration-200 active:scale-95",
+              "min-h-10 rounded-full px-4 py-1.5 text-[13px] font-bold transition-all duration-200 active:scale-95",
               category === c
                 ? "bg-primary text-primary-foreground shadow-[var(--shadow-plush)]"
                 : "bg-surface-2/80 text-muted-foreground hover:text-foreground",
@@ -87,7 +87,7 @@ function GuidesPage() {
       </div>
 
       {results.length > 0 ? (
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((guide, i) => (
             <PlushCard key={guide.slug} delay={Math.min(i, 8) * 0.06}>
               <Link

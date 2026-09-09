@@ -1,14 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import {
-  FileText,
-  QrCode,
-  ScanText,
-  ArrowRight,
-  Wand2,
-  Download,
-  BookOpen,
-} from "lucide-react";
+import { FileText, QrCode, ScanText, ArrowRight, Wand2, Download, BookOpen } from "lucide-react";
 
 import { PlushCard, SectionHeading } from "@/components/omni/primitives";
 
@@ -74,14 +66,17 @@ const TOOLS = [
 
 function Hub() {
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-28 sm:px-6 sm:pt-32">
+    <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-28 sm:px-6 sm:pt-32 lg:px-8">
       <motion.section
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="plush-raised p-8 sm:p-12"
+        className="plush-raised relative overflow-hidden p-7 sm:p-12"
       >
-        <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+        <span className="inline-flex rounded-full border border-primary/10 bg-primary-container px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary-container-foreground">
+          Private by design
+        </span>
+        <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.05em] sm:text-6xl">
           A calm, private toolkit for your documents.
         </h1>
         <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
@@ -91,13 +86,13 @@ function Hub() {
         <div className="mt-7 flex flex-wrap gap-3">
           <Link
             to="/scanner"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-plush)] transition-transform active:scale-95"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-plush)] transition-all hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
           >
             Scan a document <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/ocr"
-            className="inline-flex items-center gap-2 rounded-full bg-primary-container px-6 py-3 text-sm font-semibold text-primary-container-foreground transition-transform active:scale-95"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary-container px-6 py-3 text-sm font-bold text-primary-container-foreground transition-all hover:-translate-y-0.5 hover:brightness-[1.03] active:translate-y-0 active:scale-95"
           >
             Extract text
           </Link>
@@ -107,11 +102,11 @@ function Hub() {
       <SectionHeading
         className="mt-14"
         eyebrow="Tools"
-        title="Everything in one plush hub"
-        description="Pick a module and start working — no sign-up, no waiting."
+        title="One quiet place for every task"
+        description="Pick a tool and get started right away — no sign-up, no waiting."
       />
 
-      <div className="mt-6 grid gap-5 md:grid-cols-3">
+      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TOOLS.map((tool, i) => (
           <PlushCard key={tool.to} delay={i * 0.08}>
             <Link to={tool.to} className="flex h-full flex-col">

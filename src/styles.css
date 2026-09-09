@@ -73,14 +73,14 @@
 }
 
 :root {
-  --radius: 1rem;
-  --background: oklch(0.975 0.006 255);
-  --foreground: oklch(0.27 0.02 262);
-  --card: oklch(0.995 0.003 255);
+  --radius: 1.125rem;
+  --background: oklch(0.978 0.004 255);
+  --foreground: oklch(0.245 0.018 262);
+  --card: oklch(1 0 0);
   --card-foreground: oklch(0.27 0.02 262);
-  --surface-1: oklch(0.968 0.007 255);
-  --surface-2: oklch(0.942 0.009 255);
-  --surface-3: oklch(0.912 0.011 255);
+  --surface-1: oklch(0.966 0.006 255);
+  --surface-2: oklch(0.936 0.009 255);
+  --surface-3: oklch(0.902 0.012 255);
   --popover: oklch(0.995 0.003 255);
   --popover-foreground: oklch(0.27 0.02 262);
   --primary: oklch(0.55 0.115 258);
@@ -101,8 +101,8 @@
   --rose-foreground: oklch(0.35 0.055 300);
   --destructive: oklch(0.58 0.15 25);
   --destructive-foreground: oklch(0.99 0.003 255);
-  --border: oklch(0.898 0.009 255);
-  --input: oklch(0.898 0.009 255);
+  --border: oklch(0.885 0.009 255);
+  --input: oklch(0.885 0.009 255);
   --ring: oklch(0.55 0.115 258);
   --chart-1: oklch(0.55 0.115 258);
   --chart-2: oklch(0.77 0.055 172);
@@ -179,9 +179,23 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
     transition:
       background-color 0.35s ease,
       color 0.35s ease;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--color-ring) 42%, transparent);
+    outline-offset: 3px;
   }
 
   ::selection {
@@ -193,17 +207,17 @@
 /* Plush frosted surface used across every module. */
 @utility plush {
   border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 82%, transparent);
-  backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid color-mix(in oklab, var(--color-border) 75%, transparent);
+  background-color: color-mix(in oklab, var(--color-card) 90%, transparent);
+  backdrop-filter: blur(16px) saturate(1.25);
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   box-shadow: var(--shadow-plush);
 }
 
 @utility plush-raised {
   border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 92%, transparent);
-  backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+  background-color: color-mix(in oklab, var(--color-card) 96%, transparent);
+  backdrop-filter: blur(20px) saturate(1.25);
+  border: 1px solid color-mix(in oklab, var(--color-border) 85%, transparent);
   box-shadow: var(--shadow-plush-lg);
 }
 
@@ -306,7 +320,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ambient-orb-a,
-  .ambient-orb-b {
+  .ambient-orb-b,
+  .animate-mesh {
     animation: none;
   }
 }
