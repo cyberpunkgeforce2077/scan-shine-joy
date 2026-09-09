@@ -16,7 +16,14 @@ import {
 import { CelebrationModal } from "./CelebrationModal";
 import { PRESET_ICONS } from "@/lib/qr-icons";
 
-const DOT_STYLES = ["square", "rounded", "dots", "extra-rounded", "classy", "classy-rounded"] as const;
+const DOT_STYLES = [
+  "square",
+  "rounded",
+  "dots",
+  "extra-rounded",
+  "classy",
+  "classy-rounded",
+] as const;
 const CORNER_SQUARE = ["square", "extra-rounded", "dot"] as const;
 const CORNER_DOT = ["square", "dot"] as const;
 const LOGO_SHAPES = [
@@ -39,11 +46,56 @@ type Design = {
 };
 
 const DESIGNS: Design[] = [
-  { name: "Neon Dark", fg: "#8b5cf6", fg2: "#22d3ee", bg: "#0b0b12", corner: "#22d3ee", gradient: true, dots: "rounded", cornersSquare: "extra-rounded" },
-  { name: "Minimal Pure", fg: "#111827", fg2: "#111827", bg: "#ffffff", corner: "#111827", gradient: false, dots: "square", cornersSquare: "square" },
-  { name: "Corporate Navy", fg: "#1e3a8a", fg2: "#1e3a8a", bg: "#f8fafc", corner: "#0ea5e9", gradient: false, dots: "classy-rounded", cornersSquare: "extra-rounded" },
-  { name: "Sunset Gradient", fg: "#f97316", fg2: "#db2777", bg: "#fff7ed", corner: "#db2777", gradient: true, dots: "extra-rounded", cornersSquare: "dot" },
-  { name: "Forest Mint", fg: "#065f46", fg2: "#34d399", bg: "#ecfdf5", corner: "#065f46", gradient: true, dots: "dots", cornersSquare: "dot" },
+  {
+    name: "Neon Dark",
+    fg: "#8b5cf6",
+    fg2: "#22d3ee",
+    bg: "#0b0b12",
+    corner: "#22d3ee",
+    gradient: true,
+    dots: "rounded",
+    cornersSquare: "extra-rounded",
+  },
+  {
+    name: "Minimal Pure",
+    fg: "#111827",
+    fg2: "#111827",
+    bg: "#ffffff",
+    corner: "#111827",
+    gradient: false,
+    dots: "square",
+    cornersSquare: "square",
+  },
+  {
+    name: "Corporate Navy",
+    fg: "#1e3a8a",
+    fg2: "#1e3a8a",
+    bg: "#f8fafc",
+    corner: "#0ea5e9",
+    gradient: false,
+    dots: "classy-rounded",
+    cornersSquare: "extra-rounded",
+  },
+  {
+    name: "Sunset Gradient",
+    fg: "#f97316",
+    fg2: "#db2777",
+    bg: "#fff7ed",
+    corner: "#db2777",
+    gradient: true,
+    dots: "extra-rounded",
+    cornersSquare: "dot",
+  },
+  {
+    name: "Forest Mint",
+    fg: "#065f46",
+    fg2: "#34d399",
+    bg: "#ecfdf5",
+    corner: "#065f46",
+    gradient: true,
+    dots: "dots",
+    cornersSquare: "dot",
+  },
 ];
 
 const D0 = DESIGNS[0]!;
@@ -102,7 +154,8 @@ export function QRGenerator() {
   const [corner, setCorner] = useState(D0.corner);
   const [gradient, setGradient] = useState(true);
   const [dots, setDots] = useState<(typeof DOT_STYLES)[number]>("rounded");
-  const [cornersSquare, setCornersSquare] = useState<(typeof CORNER_SQUARE)[number]>("extra-rounded");
+  const [cornersSquare, setCornersSquare] =
+    useState<(typeof CORNER_SQUARE)[number]>("extra-rounded");
   const [cornersDot, setCornersDot] = useState<(typeof CORNER_DOT)[number]>("dot");
 
   const [logo, setLogo] = useState<string | null>(null);
@@ -117,8 +170,11 @@ export function QRGenerator() {
   const data = useMemo(() => {
     if (type === "url") return url || " ";
     if (type === "text") return text || " ";
-    if (type === "wifi")
-      return `WIFI:T:${wifi.encryption};S:${wifi.ssid};P:${wifi.password};;` || " ";
+    if (type === "wifi") {
+      return wifi.ssid || wifi.password
+        ? `WIFI:T:${wifi.encryption};S:${wifi.ssid};P:${wifi.password};;`
+        : " ";
+    }
     return `mailto:${email.to}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`;
   }, [type, url, text, wifi, email]);
 
@@ -174,7 +230,20 @@ export function QRGenerator() {
       cornersSquareOptions: { type: cornersSquare, color: corner },
       cornersDotOptions: { type: cornersDot, color: corner },
     }),
-    [data, processedLogo, logoScale, logoMargin, gradient, dots, fg, fg2, bg, cornersSquare, cornersDot, corner],
+    [
+      data,
+      processedLogo,
+      logoScale,
+      logoMargin,
+      gradient,
+      dots,
+      fg,
+      fg2,
+      bg,
+      cornersSquare,
+      cornersDot,
+      corner,
+    ],
   );
 
   useEffect(() => {
@@ -289,10 +358,18 @@ export function QRGenerator() {
             {type === "wifi" && (
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Network name (SSID)">
-                  <Input value={wifi.ssid} onChange={(v) => setWifi({ ...wifi, ssid: v })} placeholder="MyNetwork" />
+                  <Input
+                    value={wifi.ssid}
+                    onChange={(v) => setWifi({ ...wifi, ssid: v })}
+                    placeholder="MyNetwork"
+                  />
                 </Field>
                 <Field label="Password">
-                  <Input value={wifi.password} onChange={(v) => setWifi({ ...wifi, password: v })} placeholder="••••••" />
+                  <Input
+                    value={wifi.password}
+                    onChange={(v) => setWifi({ ...wifi, password: v })}
+                    placeholder="••••••"
+                  />
                 </Field>
                 <Field label="Encryption">
                   <Select
@@ -306,13 +383,25 @@ export function QRGenerator() {
             {type === "email" && (
               <div className="space-y-3">
                 <Field label="To">
-                  <Input value={email.to} onChange={(v) => setEmail({ ...email, to: v })} placeholder="hi@example.com" />
+                  <Input
+                    value={email.to}
+                    onChange={(v) => setEmail({ ...email, to: v })}
+                    placeholder="hi@example.com"
+                  />
                 </Field>
                 <Field label="Subject">
-                  <Input value={email.subject} onChange={(v) => setEmail({ ...email, subject: v })} placeholder="Hello" />
+                  <Input
+                    value={email.subject}
+                    onChange={(v) => setEmail({ ...email, subject: v })}
+                    placeholder="Hello"
+                  />
                 </Field>
                 <Field label="Message">
-                  <Input value={email.body} onChange={(v) => setEmail({ ...email, body: v })} placeholder="Message body" />
+                  <Input
+                    value={email.body}
+                    onChange={(v) => setEmail({ ...email, body: v })}
+                    placeholder="Message body"
+                  />
                 </Field>
               </div>
             )}
@@ -340,7 +429,11 @@ export function QRGenerator() {
         <Card title="Shapes & colors" icon={<Palette className="h-4 w-4" />}>
           <div className="grid gap-3 sm:grid-cols-3">
             <Field label="Dot style">
-              <Select value={dots} onChange={(v) => setDots(v as typeof dots)} options={[...DOT_STYLES]} />
+              <Select
+                value={dots}
+                onChange={(v) => setDots(v as typeof dots)}
+                options={[...DOT_STYLES]}
+              />
             </Field>
             <Field label="Corner frame">
               <Select
@@ -350,7 +443,11 @@ export function QRGenerator() {
               />
             </Field>
             <Field label="Corner eye">
-              <Select value={cornersDot} onChange={(v) => setCornersDot(v as typeof cornersDot)} options={[...CORNER_DOT]} />
+              <Select
+                value={cornersDot}
+                onChange={(v) => setCornersDot(v as typeof cornersDot)}
+                options={[...CORNER_DOT]}
+              />
             </Field>
           </div>
 
@@ -365,7 +462,11 @@ export function QRGenerator() {
           </label>
 
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <ColorField label={gradient ? "Gradient start" : "Foreground"} value={fg} onChange={setFg} />
+            <ColorField
+              label={gradient ? "Gradient start" : "Foreground"}
+              value={fg}
+              onChange={setFg}
+            />
             {gradient && <ColorField label="Gradient end" value={fg2} onChange={setFg2} />}
             <ColorField label="Background" value={bg} onChange={setBg} />
             <ColorField label="Corner accent" value={corner} onChange={setCorner} />
@@ -448,9 +549,18 @@ export function QRGenerator() {
       </div>
 
       {/* Preview */}
-      <div className="lg:sticky lg:top-6 lg:self-start">
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
-          <div className="flex justify-center">
+      <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="plush-raised overflow-hidden p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold">Live preview</p>
+              <p className="mt-1 text-xs text-muted-foreground">Updates as you design</p>
+            </div>
+            <span className="rounded-full bg-sage/20 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-sage-foreground">
+              Ready
+            </span>
+          </div>
+          <div className="flex justify-center rounded-2xl bg-surface-1 p-4">
             <div ref={ref} className="overflow-hidden rounded-2xl" />
           </div>
 
@@ -479,7 +589,11 @@ export function QRGenerator() {
         </div>
       </div>
 
-      <CelebrationModal open={celebrate} onClose={() => setCelebrate(false)} title="First Code Created!" />
+      <CelebrationModal
+        open={celebrate}
+        onClose={() => setCelebrate(false)}
+        title="First Code Created!"
+      />
     </div>
   );
 }
@@ -494,8 +608,8 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-border bg-card p-5 shadow-sm transition">
-      <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+    <section className="plush p-5 transition">
+      <h2 className="mb-4 flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
         <span className="text-primary">{icon}</span>
         {title}
       </h2>

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * OmniSuite design system — warm plush, soft mineral, Gemini-material accents.
+ * OmniSuite design system — quiet mineral surfaces, blue-violet intelligence accents.
  * All colors use oklch. Never hardcode colors in components.
  */
 
@@ -64,28 +64,28 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --shadow-plush:
-    0 1px 2px oklch(0.32 0.03 262 / 0.05), 0 8px 24px -12px oklch(0.32 0.03 262 / 0.18),
-    0 24px 48px -32px oklch(0.32 0.03 262 / 0.22);
+    0 1px 2px oklch(0.32 0.03 262 / 0.04), 0 8px 24px -12px oklch(0.32 0.03 262 / 0.12),
+    0 24px 48px -32px oklch(0.32 0.03 262 / 0.16);
   --shadow-plush-lg:
-    0 2px 4px oklch(0.32 0.03 262 / 0.06), 0 16px 40px -16px oklch(0.32 0.03 262 / 0.22),
-    0 40px 80px -40px oklch(0.32 0.03 262 / 0.3);
+    0 2px 4px oklch(0.32 0.03 262 / 0.05), 0 16px 40px -16px oklch(0.32 0.03 262 / 0.16),
+    0 40px 80px -40px oklch(0.32 0.03 262 / 0.2);
   --shadow-inset-soft: inset 0 1px 0 oklch(1 0 0 / 0.7);
 }
 
 :root {
-  --radius: 1.125rem;
-  --background: oklch(0.978 0.004 255);
+  --radius: 1.25rem;
+  --background: oklch(0.976 0.006 255);
   --foreground: oklch(0.245 0.018 262);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.27 0.02 262);
-  --surface-1: oklch(0.966 0.006 255);
-  --surface-2: oklch(0.936 0.009 255);
-  --surface-3: oklch(0.902 0.012 255);
+  --surface-1: oklch(0.962 0.008 255);
+  --surface-2: oklch(0.936 0.012 255);
+  --surface-3: oklch(0.9 0.016 255);
   --popover: oklch(0.995 0.003 255);
   --popover-foreground: oklch(0.27 0.02 262);
-  --primary: oklch(0.55 0.115 258);
+  --primary: oklch(0.56 0.13 258);
   --primary-foreground: oklch(0.99 0.003 255);
-  --primary-container: oklch(0.91 0.045 258);
+  --primary-container: oklch(0.91 0.055 258);
   --primary-container-foreground: oklch(0.33 0.08 258);
   --secondary: oklch(0.942 0.009 255);
   --secondary-foreground: oklch(0.31 0.02 262);
@@ -185,6 +185,17 @@
       color 0.35s ease;
   }
 
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+    background-color: var(--color-surface-3);
+  }
+
   button,
   a,
   input,
@@ -207,23 +218,23 @@
 /* Plush frosted surface used across every module. */
 @utility plush {
   border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 90%, transparent);
-  backdrop-filter: blur(16px) saturate(1.25);
+  background-color: color-mix(in oklab, var(--color-card) 94%, transparent);
+  backdrop-filter: blur(14px) saturate(1.12);
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   box-shadow: var(--shadow-plush);
 }
 
 @utility plush-raised {
   border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 96%, transparent);
-  backdrop-filter: blur(20px) saturate(1.25);
+  background-color: color-mix(in oklab, var(--color-card) 97%, transparent);
+  backdrop-filter: blur(16px) saturate(1.12);
   border: 1px solid color-mix(in oklab, var(--color-border) 85%, transparent);
   box-shadow: var(--shadow-plush-lg);
 }
 
 @utility glass-bar {
-  background-color: color-mix(in oklab, var(--color-card) 68%, transparent);
-  backdrop-filter: blur(24px) saturate(1.6);
+  background-color: color-mix(in oklab, var(--color-card) 82%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
   border: 1px solid color-mix(in oklab, var(--color-border) 65%, transparent);
   box-shadow: var(--shadow-plush);
 }
@@ -305,14 +316,14 @@
 }
 
 @utility ambient-orb-a {
-  background: radial-gradient(circle, oklch(0.72 0.16 165 / 0.35), transparent 70%);
+  background: radial-gradient(circle, oklch(0.72 0.16 165 / 0.22), transparent 70%);
   filter: blur(90px);
   will-change: transform;
   animation: orb-drift-a 26s ease-in-out infinite;
 }
 
 @utility ambient-orb-b {
-  background: radial-gradient(circle, oklch(0.65 0.17 255 / 0.35), transparent 70%);
+  background: radial-gradient(circle, oklch(0.65 0.17 255 / 0.22), transparent 70%);
   filter: blur(90px);
   will-change: transform;
   animation: orb-drift-b 32s ease-in-out infinite;
@@ -323,5 +334,12 @@
   .ambient-orb-b,
   .animate-mesh {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .plush,
+  .plush-raised {
+    border-radius: 1.25rem;
   }
 }

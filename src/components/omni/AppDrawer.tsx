@@ -60,10 +60,13 @@ export function AppDrawer({
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", stiffness: 420, damping: 40 }}
-            className="fixed inset-y-3 left-3 z-[61] flex w-[86%] max-w-[340px] flex-col rounded-3xl border border-border bg-card/95 shadow-[var(--shadow-plush-lg)] backdrop-blur-xl"
+            className="fixed inset-y-3 left-3 z-[61] flex w-[86%] max-w-[340px] flex-col rounded-3xl border border-border bg-card/98 shadow-[var(--shadow-plush-lg)] backdrop-blur-xl"
           >
             <div className="flex items-center justify-between px-5 pb-2 pt-5">
-              <span className="text-xl font-extrabold tracking-[-0.04em]">OmniSuite</span>
+              <div>
+                <span className="text-xl font-extrabold tracking-[-0.04em]">OmniSuite</span>
+                <p className="mt-0.5 text-xs text-muted-foreground">Your private toolkit</p>
+              </div>
               <button
                 onClick={onClose}
                 aria-label="Close menu"
@@ -84,7 +87,7 @@ export function AppDrawer({
                 <MessageSquarePlus className="h-5 w-5" /> New chat
               </button>
               <Link to="/" onClick={onClose} className={rowClass(path === "/")}>
-                <Search className="h-5 w-5" /> Chat
+                <Search className="h-5 w-5" /> Ask Vladimir
               </Link>
 
               <p className="px-4 pb-2 pt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted-foreground">

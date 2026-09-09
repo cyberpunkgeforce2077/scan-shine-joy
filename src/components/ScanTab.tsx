@@ -91,7 +91,7 @@ export function ScanTab() {
 
       {result && (
         <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 p-6-sm"
+          className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm"
           onClick={closeResult}
         >
           <div
@@ -123,10 +123,7 @@ export function ScanTab() {
                 </a>
               )}
             </div>
-            <button
-              onClick={closeResult}
-              className="mt-3 w-full text-xs text-muted-foreground"
-            >
+            <button onClick={closeResult} className="mt-3 w-full text-xs text-muted-foreground">
               Scan again
             </button>
           </div>

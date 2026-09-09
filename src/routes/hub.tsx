@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { FileText, QrCode, ScanText, ArrowRight, Wand2, Download, BookOpen } from "lucide-react";
+import {
+  FileText,
+  QrCode,
+  ScanText,
+  ArrowRight,
+  Wand2,
+  Download,
+  BookOpen,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 import { PlushCard, SectionHeading } from "@/components/omni/primitives";
 
@@ -73,22 +83,23 @@ function Hub() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="plush-raised relative overflow-hidden p-7 sm:p-12"
       >
+        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
         <span className="inline-flex rounded-full border border-primary/10 bg-primary-container px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary-container-foreground">
-          Private by design
+          Your focused workspace
         </span>
-        <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.05em] sm:text-6xl">
-          A calm, private toolkit for your documents.
+        <h1 className="relative mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.06em] sm:text-6xl">
+          The right tool for the next thing.
         </h1>
-        <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
-          Scan pages, read text out of pictures and generate QR codes. Everything runs on your
-          device — nothing is uploaded anywhere.
+        <p className="relative mt-4 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+          A small set of thoughtful tools for writing, documents, QR codes, and everyday tech work.
+          Everything that can stay local, does.
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
           <Link
             to="/scanner"
             className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-plush)] transition-all hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
           >
-            Scan a document <ArrowRight className="h-4 w-4" />
+            Start with a document <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/ocr"
@@ -97,13 +108,21 @@ function Hub() {
             Extract text
           </Link>
         </div>
+        <div className="relative mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-border/70 pt-5 text-xs font-semibold text-muted-foreground">
+          <span className="inline-flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-sage-foreground" /> No account required
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" /> Designed for quick wins
+          </span>
+        </div>
       </motion.section>
 
       <SectionHeading
         className="mt-14"
         eyebrow="Tools"
-        title="One quiet place for every task"
-        description="Pick a tool and get started right away — no sign-up, no waiting."
+        title="Everything in one calm place"
+        description="Each tool makes one job clearer. Pick a starting point and keep moving."
       />
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,9 +132,9 @@ function Hub() {
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-container text-primary-container-foreground">
                 <tool.icon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 text-lg font-bold">{tool.name}</h3>
-              <p className="mt-2 flex-1 text-sm text-muted-foreground">{tool.desc}</p>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+              <h3 className="mt-4 text-lg font-bold tracking-[-0.02em]">{tool.name}</h3>
+              <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{tool.desc}</p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-primary transition-all group-hover:gap-2.5">
                 Open <ArrowRight className="h-4 w-4" />
               </span>
             </Link>
