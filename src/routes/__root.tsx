@@ -52,7 +52,7 @@ function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <ThemeProvider>
-      <div className="relative min-h-screen overflow-x-hidden bg-background">
+      <div className="relative min-h-screen overflow-x-hidden bg-surface-1">
         <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
           <span className="ambient-orb-a absolute -left-24 top-[-10%] h-[26rem] w-[26rem] rounded-full" />
           <span className="ambient-orb-b absolute -right-24 bottom-[-15%] h-[30rem] w-[30rem] rounded-full" />

@@ -80,7 +80,7 @@ export function ScanTab() {
           <div className="h-56 w-56 rounded-3xl border-2 border-primary/70 bg-primary/10 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
         </div>
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-card p-6 text-center text-sm text-muted-foreground">
+          <div className="absolute inset-0 mx-auto flex items-center justify-center bg-card p-6 text-center text-sm text-muted-foreground">
             {error}
           </div>
         )}
