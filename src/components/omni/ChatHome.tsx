@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner";
 import { askAssistant } from "@/lib/ask.functions";
 import { Sparkle } from "@/components/omni/Sparkle";
+import { useAuth } from "@/components/omni/AuthContext";
 import { cn } from "@/lib/utils";
 
 type Attachment = { data: string; mime: string };
@@ -81,6 +82,7 @@ interface SpeechRecognitionLike {
 export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const ask = useServerFn(askAssistant);
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -243,6 +245,11 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           <p className="mt-7 inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary">
             <ShieldCheck className="h-3.5 w-3.5" /> Private by design
           </p>
+          {profile && (
+            <p className="mt-2 text-sm font-semibold text-muted-foreground">
+              Welcome back, {profile.username}.
+            </p>
+          )}
           <h1 className="mt-3 max-w-xl text-3xl font-extrabold tracking-[-0.06em] sm:text-5xl">
             What are we building today?
           </h1>

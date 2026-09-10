@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AppDrawer } from "./AppDrawer";
 import { Sparkle } from "./Sparkle";
 import { useThemeMode } from "./ThemeProvider";
+import { ProfileMenu } from "./ProfileMenu";
 
 export function TopBar() {
   const [open, setOpen] = useState(false);
@@ -60,9 +61,7 @@ export function TopBar() {
           >
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-xs font-extrabold text-primary-foreground shadow-sm">
-            V
-          </span>
+          <ProfileMenu />
         </div>
       </header>
 

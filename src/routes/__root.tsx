@@ -8,9 +8,14 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
+import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/omni/ThemeProvider";
+import { AuthProvider, useAuth } from "@/components/omni/AuthContext";
+import { AuthScreen } from "@/components/omni/AuthScreen";
+import { OnboardingScreen } from "@/components/omni/OnboardingScreen";
 import { TopBar } from "@/components/omni/TopBar";
+import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 
@@ -48,34 +53,54 @@ function ErrorComponent({ error }: { error: Error }) {
   );
 }
 
+function AuthGate({ children }: { children: ReactNode }) {
+  const { loading, session, needsOnboarding } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!session) return <AuthScreen />;
+  if (needsOnboarding) return <OnboardingScreen />;
+  return <>{children}</>;
+}
+
 function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <ThemeProvider>
-      <div className="relative min-h-screen overflow-x-hidden bg-background">
-        <div
-          aria-hidden
-          className="personalized-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden"
-        >
-          <span className="ambient-orb-a absolute -left-24 top-[-10%] h-[26rem] w-[26rem] rounded-full" />
-          <span className="ambient-orb-b absolute -right-24 bottom-[-15%] h-[30rem] w-[30rem] rounded-full" />
-          <span className="ambient-orb-c absolute left-[38%] top-[34%] h-[24rem] w-[24rem] rounded-full" />
-        </div>
-        <div className="relative z-10">
-          <TopBar />
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={path}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      <AuthProvider>
+        <AuthGate>
+          <div className="relative min-h-screen overflow-x-hidden bg-background">
+            <div
+              aria-hidden
+              className="personalized-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden"
             >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
+              <span className="ambient-orb-a absolute -left-24 top-[-10%] h-[26rem] w-[26rem] rounded-full" />
+              <span className="ambient-orb-b absolute -right-24 bottom-[-15%] h-[30rem] w-[30rem] rounded-full" />
+              <span className="ambient-orb-c absolute left-[38%] top-[34%] h-[24rem] w-[24rem] rounded-full" />
+            </div>
+            <div className="relative z-10">
+              <TopBar />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={path}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Outlet />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </AuthGate>
+      </AuthProvider>
       <Toaster position="top-center" />
     </ThemeProvider>
   );
@@ -100,7 +125,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "OmniSuite — Private In-Browser Utility Platform" },
+      { title: "OmniSuite — Ask Vladimir, your AI tech navigator" },
       {
         name: "description",
         content:
