@@ -4,7 +4,6 @@ import { Camera, Check, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/components/omni/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
 
 function initialsFrom(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);

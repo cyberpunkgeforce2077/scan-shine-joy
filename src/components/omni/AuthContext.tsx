@@ -33,10 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let mounted = true;
+
     supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
       setSession(data.session);
       if (data.session) {
         fetchProfile(data.session.user.id).then((p) => {
+          if (!mounted) return;
           setProfile(p);
           setLoading(false);
         });
@@ -46,18 +50,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (!mounted) return;
       setSession(newSession);
       if (newSession) {
+        setLoading(true);
         (async () => {
           const p = await fetchProfile(newSession.user.id);
+          if (!mounted) return;
           setProfile(p);
+          setLoading(false);
         })();
       } else {
         setProfile(null);
+        setLoading(false);
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, [fetchProfile]);
 
   const signInWithGoogle = useCallback(async () => {
