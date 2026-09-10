@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Loader2, Mail, ShieldCheck } from "lucide-react";
+import { Loader2, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/components/omni/AuthContext";
 import { Sparkle } from "@/components/omni/Sparkle";
@@ -17,7 +17,7 @@ function GoogleIcon({ className = "h-5 w-5" }: { className?: string }) {
 }
 
 export function AuthScreen() {
-  const { signInWithGoogle, signInWithEmail } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signInAsGuest } = useAuth();
   const [busy, setBusy] = useState<"google" | "email" | null>(null);
   const [emailMode, setEmailMode] = useState(false);
   const [email, setEmail] = useState("");
@@ -116,6 +116,24 @@ export function AuthScreen() {
                 Continue with email
               </button>
             )}
+
+            <div className="relative pt-1">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-card px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">or</span>
+              </div>
+            </div>
+
+            <button
+              onClick={signInAsGuest}
+              disabled={busy !== null}
+              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-transparent px-5 py-3.5 text-sm font-bold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-[0.98] disabled:opacity-50"
+            >
+              <UserRound className="h-4 w-4" />
+              Continue as guest
+            </button>
           </div>
 
           <div className="mt-7 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground">

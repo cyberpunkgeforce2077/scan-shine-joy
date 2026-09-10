@@ -12,8 +12,17 @@ function initialsFrom(name: string) {
   return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
 }
 
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error("Could not read file."));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function OnboardingScreen() {
-  const { session, completeOnboarding } = useAuth();
+  const { session, isGuest, completeOnboarding } = useAuth();
   const [username, setUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,18 +37,23 @@ export function OnboardingScreen() {
       toast.error("Avatar must be under 2 MB.");
       return;
     }
-    if (!session) return;
     setBusy(true);
     try {
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
-      const path = `${session.user.id}/avatar.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, { upsert: true });
-      if (upErr) throw upErr;
-      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-      setAvatarUrl(urlData.publicUrl);
-      toast.success("Avatar uploaded.");
+      if (isGuest || !session) {
+        const dataUrl = await readFileAsDataURL(file);
+        setAvatarUrl(dataUrl);
+        toast.success("Avatar selected.");
+      } else {
+        const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
+        const path = `${session.user.id}/avatar.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("avatars")
+          .upload(path, file, { upsert: true });
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+        setAvatarUrl(urlData.publicUrl);
+        toast.success("Avatar uploaded.");
+      }
     } catch {
       toast.error("Could not upload avatar. You can skip this step.");
     } finally {

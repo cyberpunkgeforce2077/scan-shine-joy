@@ -12,6 +12,15 @@ function initials(name: string) {
   return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
 }
 
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error("Could not read file."));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function ProfileAvatar({ size = "md" }: { size?: "sm" | "md" }) {
   const { profile } = useAuth();
   const dims = size === "sm" ? "h-8 w-8 text-xs" : "h-9 w-9 text-xs";
@@ -54,7 +63,7 @@ export function ProfileMenu() {
         <div className="absolute right-0 top-12 z-50 w-60 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-plush-lg)] backdrop-blur-xl">
           <div className="border-b border-border px-4 py-3">
             <p className="truncate text-sm font-bold text-foreground">{profile?.username ?? "User"}</p>
-            <p className="truncate text-xs text-muted-foreground">{profile?.email ?? ""}</p>
+            <p className="truncate text-xs text-muted-foreground">{profile?.email ?? "Guest"}</p>
           </div>
           <div className="p-1.5">
             <button
@@ -137,7 +146,7 @@ export function ProfileMenu() {
   }
 
   function ChangeAvatarDialog({ onClose }: { onClose: () => void }) {
-    const { session } = useAuth();
+    const { session, isGuest } = useAuth();
     const [busy, setBusy] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
 
@@ -150,15 +159,19 @@ export function ProfileMenu() {
         toast.error("Avatar must be under 2 MB.");
         return;
       }
-      if (!session) return;
       setBusy(true);
       try {
-        const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
-        const path = `${session.user.id}/avatar.${ext}`;
-        const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-        if (upErr) throw upErr;
-        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-        await updateProfile({ avatar_url: urlData.publicUrl });
+        if (isGuest || !session) {
+          const dataUrl = await readFileAsDataURL(file);
+          await updateProfile({ avatar_url: dataUrl });
+        } else {
+          const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
+          const path = `${session.user.id}/avatar.${ext}`;
+          const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+          if (upErr) throw upErr;
+          const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+          await updateProfile({ avatar_url: urlData.publicUrl });
+        }
         toast.success("Avatar updated.");
         onClose();
       } catch {

@@ -54,7 +54,7 @@ function ErrorComponent({ error }: { error: Error }) {
 }
 
 function AuthGate({ children }: { children: ReactNode }) {
-  const { loading, session, needsOnboarding } = useAuth();
+  const { loading, session, profile, isGuest, needsOnboarding } = useAuth();
 
   if (loading) {
     return (
@@ -64,7 +64,8 @@ function AuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!session) return <AuthScreen />;
+  const authenticated = !!session || (isGuest && !!profile);
+  if (!authenticated) return <AuthScreen />;
   if (needsOnboarding) return <OnboardingScreen />;
   return <>{children}</>;
 }
