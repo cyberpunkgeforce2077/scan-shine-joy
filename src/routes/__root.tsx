@@ -64,7 +64,7 @@ function AuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  const authenticated = !!session || (isGuest && !!profile);
+  const authenticated = !!session || isGuest;
   if (!authenticated) return <AuthScreen />;
   if (needsOnboarding) return <OnboardingScreen />;
   return <>{children}</>;

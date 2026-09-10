@@ -25,6 +25,10 @@ jobs:
         run: |
           if [ -d "dist" ]; then
             echo "TARGET_DIR=dist" >> $GITHUB_ENV
+          elif [ -d ".vercel/output/public" ]; then
+            echo "TARGET_DIR=.vercel/output/public" >> $GITHUB_ENV
+          elif [ -d ".vercel/output" ]; then
+            echo "TARGET_DIR=.vercel/output" >> $GITHUB_ENV
           elif [ -d ".output/public" ]; then
             echo "TARGET_DIR=.output/public" >> $GITHUB_ENV
           elif [ -d ".output" ]; then

@@ -63,25 +63,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setSession(data.session);
-      if (data.session) {
-        setAuthMode("google");
-        fetchProfile(data.session.user.id).then((p) => {
-          if (!mounted) return;
-          setProfile(p);
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted) return;
+        setSession(data.session);
+        if (data.session) {
+          setAuthMode("google");
+          fetchProfile(data.session.user.id)
+            .then((p) => {
+              if (!mounted) return;
+              setProfile(p);
+              setLoading(false);
+            })
+            .catch(() => {
+              if (!mounted) return;
+              setLoading(false);
+            });
+        } else {
+          const guest = readGuestProfile();
+          if (guest) {
+            setAuthMode("guest");
+            setProfile(guest);
+          }
           setLoading(false);
-        });
-      } else {
-        const guest = readGuestProfile();
-        if (guest) {
-          setAuthMode("guest");
-          setProfile(guest);
         }
+      })
+      .catch(() => {
+        if (!mounted) return;
         setLoading(false);
-      }
-    });
+      });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (!mounted) return;
@@ -90,10 +101,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAuthMode("google");
         setLoading(true);
         (async () => {
-          const p = await fetchProfile(newSession.user.id);
-          if (!mounted) return;
-          setProfile(p);
-          setLoading(false);
+          try {
+            const p = await fetchProfile(newSession.user.id);
+            if (!mounted) return;
+            setProfile(p);
+          } finally {
+            if (!mounted) return;
+            setLoading(false);
+          }
         })();
       } else {
         setProfile(null);
