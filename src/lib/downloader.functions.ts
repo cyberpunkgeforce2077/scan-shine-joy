@@ -43,6 +43,9 @@ const DEFAULT_HEADERS = {
 
 // Cobalt v10 — all instances speak the same JSON protocol. We try the
 // official endpoint first, then roll through keyless public instances.
+// Instances moved to API-key auth in mid-2026 (YouTube scraping fallout);
+// set COBALT_API_KEY to use them (Authorization: Api-Key …) — without
+// a key, keyless instances are the only option.
 
 const COBALT_INSTANCES = [
   "https://dwnld.nichind.dev",
@@ -50,6 +53,10 @@ const COBALT_INSTANCES = [
   "https://cobalt-api.kwiatekmiki.com",
   "https://cobalt-backend.canine.tools",
 ];
+
+const COBALT_API_KEY = process.env["COBALT_API_KEY"];
+// https://github.com/imputnet/cobalt/blob/main/docs/api.md#authentication
+const AUTHORIZATION_HEADER = COBALT_API_KEY ? { Authorization: `Api-Key ${COBALT_API_KEY}` } : {};
 
 interface CobaltJson {
   status?: string;
@@ -70,7 +77,7 @@ function toCobaltQuality(raw: string | undefined): string {
 async function cobaltCall(base: string, url: string, quality: string, format: "video" | "audio") {
   const res = await fetch(base, {
     method: "POST",
-    headers: DEFAULT_HEADERS,
+    headers: { ...DEFAULT_HEADERS, ...AUTHORIZATION_HEADER },
     body: JSON.stringify({
       url,
       videoQuality: quality,
@@ -88,11 +95,15 @@ async function tryCobalt(
   platform: string,
   quality: string,
   format: "video" | "audio",
-): Promise<MediaResult | null> {
+): Promise<{ result: MediaResult | null; errorCode: string }> {
+  let lastErrorCode = "";
   for (const base of COBALT_INSTANCES) {
     try {
       const json = await cobaltCall(base, url, quality, format);
-      if (!json || json.status === "error") continue;
+      if (!json || json.status === "error") {
+        if (json?.error?.code) lastErrorCode = json.error.code;
+        continue;
+      }
 
       const formats: MediaFormat[] = [];
       if (format === "audio") {
@@ -121,12 +132,12 @@ async function tryCobalt(
 
       if (!formats.length) continue;
       const title = json.filename?.replace(/\.[a-z0-9]+$/i, "") || `${platform} media`;
-      return { platform, title, formats };
+      return { result: { platform, title, formats }, errorCode: "" };
     } catch {
       // try the next instance
     }
   }
-  return null;
+  return { result: null, errorCode: lastErrorCode };
 }
 
 export const resolveMedia = createServerFn({ method: "POST" })
@@ -139,22 +150,37 @@ export const resolveMedia = createServerFn({ method: "POST" })
       throw new Error("That link isn't supported. Use a YouTube, Instagram or TikTok link.");
 
     const format = data.format ?? "all";
+    const youTubeBlocked = (code: string) =>
+      code === "content.no_valid_content" || code === "error.api.auth.jwt.missing";
     if (format === "video" || format === "audio") {
-      const result = await tryCobalt(url, platform, toCobaltQuality(data.quality), format);
+      const { result, errorCode } = await tryCobalt(
+        url,
+        platform,
+        toCobaltQuality(data.quality),
+        format,
+      );
       if (result) return result;
+      if (platform === "YouTube" && youTubeBlocked(errorCode))
+        throw new Error(
+          "YouTube is currently blocking the free download instances. Add a COBALT_API_KEY environment variable (from an instance host who offers one) to restore YouTube downloads, or try again later.",
+        );
     } else {
       const [video, audio] = await Promise.all([
         tryCobalt(url, platform, toCobaltQuality(data.quality), "video"),
         tryCobalt(url, platform, toCobaltQuality(data.quality), "audio"),
       ]);
-      const formats = [...(video?.formats ?? []), ...(audio?.formats ?? [])];
+      const formats = [...(video?.result?.formats ?? []), ...(audio?.result?.formats ?? [])];
       if (formats.length) {
         return {
           platform,
-          title: video?.title ?? audio?.title ?? `${platform} media`,
+          title: video?.result?.title ?? audio?.result?.title ?? `${platform} media`,
           formats,
         };
       }
+      if (platform === "YouTube" && youTubeBlocked(video?.errorCode ?? audio?.errorCode ?? ""))
+        throw new Error(
+          "YouTube is currently blocking the free download instances. Add a COBALT_API_KEY environment variable (from an instance host who offers one) to restore YouTube downloads, or try again later.",
+        );
     }
     throw new Error("No downloadable media was found at that link.");
   });
