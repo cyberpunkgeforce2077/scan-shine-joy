@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase, type Profile } from "@/lib/supabase";
+import { supabase, isProviderEnabled, type Profile } from "@/lib/supabase";
 
 type AuthMode = "google" | "guest" | null;
 
@@ -124,6 +124,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signInWithGoogle = useCallback(async () => {
+    if (!(await isProviderEnabled("google"))) {
+      throw new Error(
+        "Google sign-in isn't enabled for this project yet. Enable the Google provider under Supabase Dashboard > Authentication > Sign In / Up, then try again.",
+      );
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin },
@@ -134,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithEmail = useCallback(async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { redirectTo: window.location.origin },
+      options: { emailRedirectTo: window.location.origin },
     });
     if (error) return { error: error.message };
     return { error: null };

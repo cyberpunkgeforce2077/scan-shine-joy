@@ -26,8 +26,8 @@ export function AuthScreen() {
     setBusy("google");
     try {
       await signInWithGoogle();
-    } catch {
-      toast.error("Google sign-in failed. Please try again.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
       setBusy(null);
     }
   }
