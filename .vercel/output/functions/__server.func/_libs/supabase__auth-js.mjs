@@ -1,4 +1,4 @@
-import { __rest } from "tslib";
+import { __rest } from "./tslib.mjs";
 //#region node_modules/@supabase/auth-js/dist/module/lib/version.js
 var version = "2.116.0";
 //#endregion
