@@ -9,7 +9,7 @@ function record(error) {
 }
 var CAUSE_DEPTH_LIMIT = 5;
 var DESCRIPTION_LENGTH_LIMIT = 8e3;
-function describeError(error) {
+function describeError$1(error) {
 	const parts = [];
 	let current = error;
 	for (let depth = 0; depth < CAUSE_DEPTH_LIMIT && current != null; depth++) {
@@ -44,7 +44,7 @@ console.error = (...args) => {
 	originalConsoleError(...args.map((arg) => {
 		if (!isErrorLike(arg)) return arg;
 		record(arg);
-		return describeError(arg);
+		return describeError$1(arg);
 	}));
 };
 if (typeof globalThis.addEventListener === "function") {
@@ -91,6 +91,12 @@ function renderErrorPage() {
   </body>
 </html>`;
 }
+function addDebugToErrorPage(error) {
+	return renderErrorPage() + `<pre id="debug-error">${escapeHtml(describeError(error))}</pre>`;
+}
+function escapeHtml(value) {
+	return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 var serverEntryPromise;
 async function getServerEntry() {
 	if (!serverEntryPromise) serverEntryPromise = import("./server-BUfHw60c.mjs").then((n) => n.t).then((m) => m.default ?? m);
@@ -101,8 +107,9 @@ async function normalizeCatastrophicSsrResponse(response) {
 	if (!(response.headers.get("content-type") ?? "").includes("application/json")) return response;
 	const body = await response.clone().text();
 	if (!isH3SwallowedErrorBody(body)) return response;
-	console.error(consumeLastCapturedError() ?? /* @__PURE__ */ new Error(`h3 swallowed SSR error: ${body}`));
-	return new Response(renderErrorPage(), {
+	const err = consumeLastCapturedError() ?? /* @__PURE__ */ new Error(`h3 swallowed SSR error: ${body}`);
+	console.error(err);
+	return new Response(addDebugToErrorPage(err), {
 		status: 500,
 		headers: { "content-type": "text/html; charset=utf-8" }
 	});
@@ -120,7 +127,7 @@ var server_default = { async fetch(request, env, ctx) {
 		return await normalizeCatastrophicSsrResponse(await (await getServerEntry()).fetch(request, env, ctx));
 	} catch (error) {
 		console.error(error);
-		return new Response(renderErrorPage(), {
+		return new Response(addDebugToErrorPage(error), {
 			status: 500,
 			headers: { "content-type": "text/html; charset=utf-8" }
 		});
