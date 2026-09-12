@@ -44,6 +44,37 @@ function writeGuestProfile(profile: Profile | null) {
   }
 }
 
+function googleAvatar(user: User): string | null {
+  const meta = user.user_metadata as Record<string, unknown> | undefined;
+  if (!meta) return null;
+  const raw = meta["avatar_url"] ?? meta["picture"];
+  return typeof raw === "string" && raw ? raw : null;
+}
+
+function googleUsername(user: User): string {
+  const meta = user.user_metadata as Record<string, unknown> | undefined;
+  for (const key of ["full_name", "name"] as const) {
+    const raw = meta?.[key];
+    if (typeof raw === "string" && raw.trim()) return raw.trim();
+  }
+  const local = user.email?.split("@")[0]?.trim();
+  return local ?? "";
+}
+
+// When no profiles row exists yet, derive a Profile from the authenticated
+// Supabase user so Google identity (name/email/avatar) shows immediately
+// instead of falling back to "Guest" or blocking on onboarding.
+function profileFromAuthUser(user: User): Profile {
+  const username = googleUsername(user);
+  return {
+    id: user.id,
+    email: user.email ?? null,
+    username,
+    avatar_url: googleAvatar(user),
+    onboarded: Boolean(username),
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -73,11 +104,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           fetchProfile(data.session.user.id)
             .then((p) => {
               if (!mounted) return;
-              setProfile(p);
+              setProfile(p ?? profileFromAuthUser(data.session!.user));
               setLoading(false);
             })
             .catch(() => {
               if (!mounted) return;
+              setProfile(profileFromAuthUser(data.session!.user));
               setLoading(false);
             });
         } else {
@@ -104,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           try {
             const p = await fetchProfile(newSession.user.id);
             if (!mounted) return;
-            setProfile(p);
+            setProfile(p ?? profileFromAuthUser(newSession.user));
           } finally {
             if (!mounted) return;
             setLoading(false);
@@ -191,8 +223,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!session) return;
       const { data, error } = await supabase
         .from("profiles")
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq("id", session.user.id)
+        .upsert({
+          id: session.user.id,
+          email: session.user.email ?? null,
+          username: updates.username ?? profile?.username ?? googleUsername(session.user),
+          avatar_url:
+            updates.avatar_url !== undefined
+              ? updates.avatar_url
+              : (profile?.avatar_url ?? googleAvatar(session.user)),
+          onboarded: true,
+          updated_at: new Date().toISOString(),
+        })
         .select("id, email, username, avatar_url, onboarded")
         .single();
       if (error) throw error;
@@ -216,8 +257,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isGuest = authMode === "guest";
   const needsOnboarding =
-    (authMode === "guest" && !profile?.onboarded) ||
-    (!!session && !!profile && !profile.onboarded);
+    (authMode === "guest" && !profile?.onboarded) || (!!session && !!profile && !profile.onboarded);
 
   return (
     <AuthContext.Provider
