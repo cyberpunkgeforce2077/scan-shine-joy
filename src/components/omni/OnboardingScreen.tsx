@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import { Camera, Check, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
@@ -21,10 +22,28 @@ function readFileAsDataURL(file: File): Promise<string> {
   });
 }
 
+function googleDisplayName(user: User | null): string {
+  const meta = user?.user_metadata as Record<string, unknown> | undefined;
+  for (const key of ["full_name", "name"] as const) {
+    const raw = meta?.[key];
+    if (typeof raw === "string" && raw.trim()) return raw.trim();
+  }
+  return user?.email?.split("@")[0]?.trim() ?? "";
+}
+
+function googleAvatarUrl(user: User | null): string | null {
+  const meta = user?.user_metadata as Record<string, unknown> | undefined;
+  for (const key of ["avatar_url", "picture"] as const) {
+    const raw = meta?.[key];
+    if (typeof raw === "string" && raw) return raw;
+  }
+  return null;
+}
+
 export function OnboardingScreen() {
-  const { session, isGuest, completeOnboarding } = useAuth();
-  const [username, setUsername] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { user, session, isGuest, completeOnboarding } = useAuth();
+  const [username, setUsername] = useState(() => googleDisplayName(user));
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => googleAvatarUrl(user));
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -117,12 +136,18 @@ export function OnboardingScreen() {
 
           <div className="mt-7">
             <label className="block text-sm font-bold text-foreground">Choose an avatar</label>
-            <p className="mt-1 text-xs text-muted-foreground">Optional — upload an image or use your initials.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Optional — upload an image or use your initials.
+            </p>
 
             <div className="mt-4 flex items-center gap-4">
               <div className="relative shrink-0">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar preview" className="h-20 w-20 rounded-2xl border border-border object-cover" />
+                  <img
+                    src={avatarUrl}
+                    alt="Avatar preview"
+                    className="h-20 w-20 rounded-2xl border border-border object-cover"
+                  />
                 ) : (
                   <div className="grid h-20 w-20 place-items-center rounded-2xl border border-border bg-primary-container text-xl font-extrabold text-primary-container-foreground">
                     {initialsFrom(username || "U")}
@@ -146,7 +171,11 @@ export function OnboardingScreen() {
                   disabled={busy}
                   className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition hover:bg-surface-2 active:scale-95 disabled:opacity-50"
                 >
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
                   Upload image
                 </button>
                 {!avatarUrl && (
