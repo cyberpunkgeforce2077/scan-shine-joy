@@ -62,8 +62,10 @@ function googleUsername(user: User): string {
 }
 
 // When no profiles row exists yet, derive a Profile from the authenticated
-// Supabase user so Google identity (name/email/avatar) shows immediately
-// instead of falling back to "Guest" or blocking on onboarding.
+// Supabase user so Google identity (name/email/avatar) can prefill the
+// onboarding screen instead of falling back to "Guest". Like guests, real
+// users go through onboarding once (onboarded flags the DB row afterward),
+// so keep it false until the step is completed.
 function profileFromAuthUser(user: User): Profile {
   const username = googleUsername(user);
   return {
@@ -71,7 +73,7 @@ function profileFromAuthUser(user: User): Profile {
     email: user.email ?? null,
     username,
     avatar_url: googleAvatar(user),
-    onboarded: Boolean(username),
+    onboarded: false,
   };
 }
 
