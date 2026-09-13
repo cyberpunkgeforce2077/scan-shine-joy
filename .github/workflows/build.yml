@@ -21,6 +21,15 @@ jobs:
       - name: Build Project
         run: npm run build
 
+      - name: Verify server function boots
+        run: |
+          FUNC=".vercel/output/functions/__server.func/index.mjs"
+          if [ -f "$FUNC" ]; then
+            node -e "import('./$FUNC').then(()=>console.log('BOOT OK')).catch(e=>{console.error('BOOT FAIL:', e.code, e.message.split('\n')[0]);process.exit(1)})"
+          else
+            echo "No .vercel/output function produced — skipping boot check"
+          fi
+
       - name: Find and Package Output Folder
         run: |
           if [ -d "dist" ]; then
