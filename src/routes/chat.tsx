@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ChatHome } from "@/components/omni/ChatHome";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/chat")({
   head: () => ({
     meta: [
       { title: "Assistant" },

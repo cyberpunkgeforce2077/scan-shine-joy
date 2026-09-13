@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DakphraserRouteImport } from './routes/dakphraser'
 import { Route as DownloaderRouteImport } from './routes/downloader'
 import { Route as GuidesRouteImport } from './routes/guides'
@@ -17,11 +18,18 @@ import { Route as HubRouteImport } from './routes/hub'
 import { Route as OcrRouteImport } from './routes/ocr'
 import { Route as QrRouteImport } from './routes/qr'
 import { Route as ScannerRouteImport } from './routes/scanner'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as GuidesSlugRouteImport } from './routes/guides_.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DakphraserRoute = DakphraserRouteImport.update({
@@ -59,6 +67,16 @@ const ScannerRoute = ScannerRouteImport.update({
   path: '/scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuidesSlugRoute = GuidesSlugRouteImport.update({
   id: '/guides_/$slug',
   path: '/guides/$slug',
@@ -67,6 +85,7 @@ const GuidesSlugRoute = GuidesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
@@ -74,10 +93,13 @@ export interface FileRoutesByFullPath {
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
+  '/settings': typeof SettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/guides/$slug': typeof GuidesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
@@ -85,11 +107,14 @@ export interface FileRoutesByTo {
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
+  '/settings': typeof SettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/guides/$slug': typeof GuidesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/dakphraser': typeof DakphraserRoute
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
@@ -97,12 +122,15 @@ export interface FileRoutesById {
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
+  '/settings': typeof SettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/guides_/$slug': typeof GuidesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/chat'
     | '/dakphraser'
     | '/downloader'
     | '/guides'
@@ -110,10 +138,13 @@ export interface FileRouteTypes {
     | '/ocr'
     | '/qr'
     | '/scanner'
+    | '/settings'
+    | '/auth/callback'
     | '/guides/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/chat'
     | '/dakphraser'
     | '/downloader'
     | '/guides'
@@ -121,10 +152,13 @@ export interface FileRouteTypes {
     | '/ocr'
     | '/qr'
     | '/scanner'
+    | '/settings'
+    | '/auth/callback'
     | '/guides/$slug'
   id:
     | '__root__'
     | '/'
+    | '/chat'
     | '/dakphraser'
     | '/downloader'
     | '/guides'
@@ -132,11 +166,14 @@ export interface FileRouteTypes {
     | '/ocr'
     | '/qr'
     | '/scanner'
+    | '/settings'
+    | '/auth/callback'
     | '/guides_/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChatRoute: typeof ChatRoute
   DakphraserRoute: typeof DakphraserRoute
   DownloaderRoute: typeof DownloaderRoute
   GuidesRoute: typeof GuidesRoute
@@ -144,6 +181,8 @@ export interface RootRouteChildren {
   OcrRoute: typeof OcrRoute
   QrRoute: typeof QrRoute
   ScannerRoute: typeof ScannerRoute
+  SettingsRoute: typeof SettingsRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
 }
 
@@ -154,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dakphraser': {
@@ -205,6 +251,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guides_/$slug': {
       id: '/guides_/$slug'
       path: '/guides/$slug'
@@ -217,6 +277,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChatRoute: ChatRoute,
   DakphraserRoute: DakphraserRoute,
   DownloaderRoute: DownloaderRoute,
   GuidesRoute: GuidesRoute,
@@ -224,6 +285,8 @@ const rootRouteChildren: RootRouteChildren = {
   OcrRoute: OcrRoute,
   QrRoute: QrRoute,
   ScannerRoute: ScannerRoute,
+  SettingsRoute: SettingsRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   GuidesSlugRoute: GuidesSlugRoute,
 }
 export const routeTree = rootRouteImport
