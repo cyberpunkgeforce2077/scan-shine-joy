@@ -8,7 +8,23 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { Loader2, Plus, Search, BookOpen, Settings, Menu, X, QrCode, Scan, Image as ImageIcon, Wand2, Download, LogOut, User as UserIcon } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  Search,
+  BookOpen,
+  Settings,
+  Menu,
+  X,
+  QrCode,
+  Scan,
+  Image as ImageIcon,
+  Wand2,
+  Download,
+  LogOut,
+  User as UserIcon,
+  MessageSquare,
+} from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/omni/ThemeProvider";
 import { AuthProvider, useAuth } from "@/components/omni/AuthContext";
@@ -27,12 +43,17 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
     function updateTitle() {
       const id = getActiveConversationId();
       if (id) {
-         const conv = getConversation(id);
-         if (conv && conv.messages.length > 0) {
-           // Basic heuristic for dynamic title based on the first message
-           setChatTitle(conv.title !== "Untitled Chat" ? conv.title : conv.messages[0].content.slice(0, 30) + (conv.messages[0].content.length > 30 ? "..." : ""));
-           return;
-         }
+        const conv = getConversation(id);
+        if (conv && conv.messages.length > 0) {
+          // Basic heuristic for dynamic title based on the first message
+          setChatTitle(
+            conv.title !== "Untitled Chat"
+              ? conv.title
+              : conv.messages[0].content.slice(0, 30) +
+                  (conv.messages[0].content.length > 30 ? "..." : ""),
+          );
+          return;
+        }
       }
       setChatTitle(null);
     }
@@ -44,21 +65,24 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
       window.removeEventListener("omni-conversations-updated", updateTitle);
     };
   }, []);
-  
+
   return (
     <header className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4 bg-[#000000]">
-      <button onClick={toggleDrawer} className="p-2 -ml-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97]">
+      <button
+        onClick={toggleDrawer}
+        className="p-2 -ml-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97]"
+      >
         <Menu className="h-6 w-6" />
       </button>
 
       <div className="flex-1 px-4 truncate text-center">
         <span className="text-base font-medium text-[#e3e3e3] opacity-90 truncate">
-          {chatTitle || profile?.username || "Vlad Bot"}
+          {chatTitle || "omnisuitè"}
         </span>
       </div>
-      
+
       <div className="flex items-center gap-2">
-        <Link 
+        <Link
           to="/settings"
           title="User Profile"
           className="grid h-8 w-8 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-sm transition-all duration-200 cursor-pointer active:scale-[0.97]"
@@ -70,76 +94,122 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
   );
 }
 
-function MobileDrawer({ isOpen, closeDrawer, openSettings }: { isOpen: boolean; closeDrawer: () => void, openSettings: () => void }) {
+function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: () => void }) {
   const { profile } = useAuth();
-  
+
   return (
     <>
       {/* Backdrop */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={closeDrawer}
-            className="fixed inset-0 bg-black/60 z-50 sm:hidden" 
+            className="fixed inset-0 bg-black/60 z-50 sm:hidden"
           />
         )}
       </AnimatePresence>
-      
+
       {/* Drawer */}
-      <div className={`fixed top-0 bottom-0 left-0 w-[300px] bg-[#000000] z-50 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div
+        className={`fixed top-0 bottom-0 left-0 w-[300px] bg-[#000000] z-50 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
         <div className="flex items-center justify-between p-4">
-          <span className="text-xl font-medium text-[#e3e3e3]">Assistant</span>
-          <button onClick={closeDrawer} className="p-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-colors">
+          <Link
+            to="/"
+            onClick={closeDrawer}
+            className="text-xl font-medium text-[#e3e3e3] hover:text-[#8ab4f8] transition-colors"
+          >
+            Assistant Hub
+          </Link>
+          <button
+            onClick={closeDrawer}
+            className="p-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-colors"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 pb-4">
-          <button 
-            onClick={() => { window.dispatchEvent(new Event("omni-new-chat")); closeDrawer(); }} 
+          <Link
+            to="/chat"
+            onClick={closeDrawer}
             className="w-full flex items-center gap-3 px-4 py-3 bg-[#1e1f20] hover:bg-[#2a2b2e] rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-2"
           >
             <Plus className="h-5 w-5" />
             New chat
-          </button>
-          
-          <button 
-            onClick={() => { window.dispatchEvent(new CustomEvent("omni-open-search")); closeDrawer(); }} 
+          </Link>
+
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent("omni-open-search"));
+              closeDrawer();
+            }}
             className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-6"
           >
             <Search className="h-5 w-5" />
             Search chats
           </button>
-          
+
           {/* Active Tools */}
           <div className="px-4 mb-2 text-sm font-semibold text-[#8e8e8e]">Active Tools</div>
           <div className="space-y-1 mb-6">
-            <Link to="/qr" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+            <Link
+              to="/chat"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <MessageSquare className="h-5 w-5" /> Vlad Bot
+            </Link>
+            <Link
+              to="/qr"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
               <QrCode className="h-5 w-5" /> QR Code Scanner
             </Link>
-            <Link to="/scanner" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+            <Link
+              to="/scanner"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
               <Scan className="h-5 w-5" /> Document Scanner
             </Link>
-            <Link to="/ocr" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+            <Link
+              to="/ocr"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
               <ImageIcon className="h-5 w-5" /> Image OCR
             </Link>
-            <Link to="/dakphraser" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+            <Link
+              to="/dakphraser"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
               <Wand2 className="h-5 w-5" /> DakPhraser
             </Link>
-            <Link to="/downloader" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+            <Link
+              to="/downloader"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
               <Download className="h-5 w-5" /> Media Downloader
             </Link>
-            <Link to="/guides" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+            <Link
+              to="/guides"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
               <BookOpen className="h-5 w-5" /> Field Guides
             </Link>
           </div>
         </div>
 
         {/* Footer */}
-        <Link 
+        <Link
           to="/settings"
           onClick={closeDrawer}
           title="User Profile"
@@ -148,7 +218,9 @@ function MobileDrawer({ isOpen, closeDrawer, openSettings }: { isOpen: boolean; 
           <div className="grid h-10 w-10 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-lg">
             {profile?.username?.charAt(0).toUpperCase() || "U"}
           </div>
-          <div className="flex-1 text-[#e3e3e3] font-medium truncate">{profile?.username || "Settings"}</div>
+          <div className="flex-1 text-[#e3e3e3] font-medium truncate">
+            {profile?.username || "Settings"}
+          </div>
           <Settings className="h-5 w-5 text-[#c4c7c5]" />
         </Link>
       </div>
@@ -211,7 +283,7 @@ function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  
+
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -224,15 +296,15 @@ function Shell() {
               <div
                 className="absolute inset-0"
                 style={{
-                  background: `linear-gradient(to bottom, #000000 60%, rgba(10, 25, 60, 0.4) 100%)`
+                  background: `linear-gradient(to bottom, #000000 60%, rgba(10, 25, 60, 0.4) 100%)`,
                 }}
               />
             </div>
-            
+
             <div className="relative z-10 flex min-h-screen flex-col">
               <MobileTopBar toggleDrawer={() => setDrawerOpen(true)} />
               <MobileDrawer isOpen={drawerOpen} closeDrawer={() => setDrawerOpen(false)} />
-              
+
               <div className="flex-1 relative mt-16">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -249,16 +321,20 @@ function Shell() {
               </div>
             </div>
           </div>
-          
-          <a
-            href="https://wa.me/2338723497"
+
+          <motion.a
+            drag
+            dragMomentum={false}
+            href="https://wa.me/233208723497"
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-6 right-6 z-50 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 active:scale-95 transition-transform"
             title="Contact on WhatsApp"
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-          </a>
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+            </svg>
+          </motion.a>
         </AuthGate>
       </AuthProvider>
       <Toaster position="top-center" />

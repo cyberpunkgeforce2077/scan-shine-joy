@@ -1,36 +1,134 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ChatHome } from "@/components/omni/ChatHome";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  MessageSquare,
+  QrCode,
+  Scan,
+  Image as ImageIcon,
+  Download,
+  Type,
+  BookOpen,
+} from "lucide-react";
+import { motion } from "motion/react";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Assistant" },
-      {
-        name: "description",
-        content:
-          "Chat with an AI tech navigator and jump into QR, document scanning, OCR and downloader tools — all in one dark, private workspace.",
-      },
-      { property: "og:title", content: "Assistant" },
-      {
-        property: "og:description",
-        content: "AI chat plus private in-browser tools for QR codes, documents, OCR and media.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: ChatRoute,
+  component: AppSelector,
 });
 
-function ChatRoute() {
-  const [resetKey, setResetKey] = useState(0);
+const tools = [
+  {
+    id: "chat",
+    name: "Vlad Bot",
+    description: "Chat with an advanced AI assistant.",
+    icon: MessageSquare,
+    href: "/chat",
+    color: "from-blue-500/20 to-purple-500/20",
+    iconColor: "text-blue-400",
+  },
+  {
+    id: "downloader",
+    name: "Media Downloader",
+    description: "Download videos from social media directly.",
+    icon: Download,
+    href: "/downloader",
+    color: "from-green-500/20 to-emerald-500/20",
+    iconColor: "text-green-400",
+  },
+  {
+    id: "scanner",
+    name: "Doc Scanner",
+    description: "Scan documents securely in browser.",
+    icon: Scan,
+    href: "/scanner",
+    color: "from-orange-500/20 to-amber-500/20",
+    iconColor: "text-orange-400",
+  },
+  {
+    id: "qr",
+    name: "QR Code",
+    description: "Generate styled QR codes instantly.",
+    icon: QrCode,
+    href: "/qr",
+    color: "from-pink-500/20 to-rose-500/20",
+    iconColor: "text-pink-400",
+  },
+  {
+    id: "ocr",
+    name: "OCR Extractor",
+    description: "Extract text from any image locally.",
+    icon: ImageIcon,
+    href: "/ocr",
+    color: "from-cyan-500/20 to-blue-500/20",
+    iconColor: "text-cyan-400",
+  },
+  {
+    id: "dakphraser",
+    name: "Dakphraser",
+    description: "Advanced text manipulation and phrasing.",
+    icon: Type,
+    href: "/dakphraser",
+    color: "from-purple-500/20 to-indigo-500/20",
+    iconColor: "text-purple-400",
+  },
+  {
+    id: "guides",
+    name: "Setup Guides",
+    description: "Configuration and setup walkthroughs.",
+    icon: BookOpen,
+    href: "/guides",
+    color: "from-yellow-500/20 to-orange-500/20",
+    iconColor: "text-yellow-400",
+  },
+];
 
-  useEffect(() => {
-    const handler = () => setResetKey((v) => v + 1);
-    window.addEventListener("omni-new-chat", handler);
-    return () => window.removeEventListener("omni-new-chat", handler);
-  }, []);
+function AppSelector() {
+  return (
+    <main className="flex min-h-screen w-full flex-col pt-12 pb-32 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-5xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12 mt-8"
+        >
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-[#e3e3e3] mb-4">
+            Welcome to the Hub
+          </h1>
+          <p className="text-[#8ab4f8] font-medium text-lg tracking-wide">
+            Select an app to get started
+          </p>
+        </motion.div>
 
-  return <ChatHome resetKey={resetKey} />;
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tools.map((tool, i) => {
+            const Icon = tool.icon;
+            return (
+              <motion.div
+                key={tool.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <Link
+                  to={tool.href}
+                  className="group relative flex flex-col items-center justify-center p-8 h-64 rounded-3xl bg-[#1e1f20] border border-white/10 hover:border-white/20 transition-all overflow-hidden cursor-pointer"
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${tool.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                  />
+                  <div className="relative z-10 flex flex-col items-center text-center gap-4">
+                    <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#000000] border border-white/10 group-hover:scale-110 transition-transform duration-300">
+                      <Icon className={`h-8 w-8 ${tool.iconColor}`} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-[#e3e3e3] mb-2">{tool.name}</h2>
+                      <p className="text-sm text-[#c4c7c5] line-clamp-2 px-2">{tool.description}</p>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </main>
+  );
 }

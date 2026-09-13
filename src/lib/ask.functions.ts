@@ -130,19 +130,22 @@ export const askTitle = createServerFn({ method: "POST" })
           messages: [
             {
               role: "system",
-              content: "You are a title generator. Return a very short, intriguing 2-4 word title for the user's query. Do not use quotes or formatting.",
+              content:
+                "You are a title generator. Return a very short, intriguing 2-4 word title for the user's query. Do not use quotes or formatting.",
             },
             {
               role: "user",
               content: data.prompt,
-            }
+            },
           ],
         }),
       });
 
       if (!res.ok) return { title: data.prompt.slice(0, 30) };
-      const json = await res.json() as any;
-      const title = json.choices?.[0]?.message?.content?.trim().replace(/^["']|["']$/g, '') ?? data.prompt.slice(0, 30);
+      const json = (await res.json()) as any;
+      const title =
+        json.choices?.[0]?.message?.content?.trim().replace(/^["']|["']$/g, "") ??
+        data.prompt.slice(0, 30);
       return { title };
     } catch {
       return { title: data.prompt.slice(0, 30) };

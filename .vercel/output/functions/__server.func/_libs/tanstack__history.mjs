@@ -147,7 +147,6 @@ function createHistory(opts) {
 	};
 }
 function assignKeyAndIndex(index, state) {
-	if (!state) state = {};
 	const key = createRandomKey();
 	return {
 		...state,
@@ -343,68 +342,67 @@ function createBrowserHistory(opts) {
 	};
 	return history;
 }
-/**
-* Create an in-memory history implementation.
-* Ideal for server rendering, tests, and non-DOM environments.
-* @link https://tanstack.com/router/latest/docs/framework/react/guide/history-types
-*/
-function createMemoryHistory(opts = { initialEntries: ["/"] }) {
-	const entries = opts.initialEntries;
-	let index = opts.initialIndex ? Math.min(Math.max(opts.initialIndex, 0), entries.length - 1) : entries.length - 1;
-	const states = entries.map((_entry, index) => assignKeyAndIndex(index, void 0));
-	const getLocation = () => parseHref(entries[index], states[index]);
-	let blockers = [];
-	const _getBlockers = () => blockers;
-	const _setBlockers = (newBlockers) => blockers = newBlockers;
-	return createHistory({
-		getLocation,
-		getLength: () => entries.length,
-		pushState: (path, state) => {
-			if (index < entries.length - 1) {
-				entries.splice(index + 1);
-				states.splice(index + 1);
-			}
-			states.push(state);
-			entries.push(path);
-			index = Math.max(entries.length - 1, 0);
-		},
-		replaceState: (path, state) => {
-			states[index] = state;
-			entries[index] = path;
-		},
-		back: () => {
-			index = Math.max(index - 1, 0);
-		},
-		forward: () => {
-			index = Math.min(index + 1, entries.length - 1);
-		},
-		go: (n) => {
-			index = Math.min(Math.max(index + n, 0), entries.length - 1);
-		},
-		createHref: (path) => path,
-		getBlockers: _getBlockers,
-		setBlockers: _setBlockers
-	});
+var noop = () => {};
+var ServerHistory = class {
+	constructor(location) {
+		this.location = location;
+	}
+	get length() {
+		return 1;
+	}
+	get subscribers() {
+		return this._subscribers ??= /* @__PURE__ */ new Set();
+	}
+	subscribe() {
+		return noop;
+	}
+	push() {}
+	replace() {}
+	go() {}
+	back() {}
+	forward() {}
+	canGoBack() {
+		return false;
+	}
+	createHref(href) {
+		return normalizeHref(href);
+	}
+	block() {
+		return noop;
+	}
+	flush() {}
+	destroy() {}
+	notify() {}
+	_getBlockers() {
+		return [];
+	}
+};
+/** A fixed request location; server navigation is a no-op. */
+function createServerHistory(href) {
+	return new ServerHistory(parseHref(href, void 0));
 }
 function parseHref(href, state) {
 	const sanitizedHref = normalizeHref(href);
 	const hashIndex = sanitizedHref.indexOf("#");
 	const searchIndex = sanitizedHref.indexOf("?");
-	const addedKey = createRandomKey();
+	if (!state) {
+		const key = createRandomKey();
+		state = {
+			[stateIndexKey]: 0,
+			key,
+			__TSR_key: key
+		};
+	}
 	return {
 		href: sanitizedHref,
 		pathname: sanitizedHref.substring(0, hashIndex > 0 ? searchIndex > 0 ? Math.min(hashIndex, searchIndex) : hashIndex : searchIndex > 0 ? searchIndex : sanitizedHref.length),
 		hash: hashIndex > -1 ? sanitizedHref.substring(hashIndex) : "",
 		search: searchIndex > -1 ? sanitizedHref.slice(searchIndex, hashIndex === -1 ? void 0 : hashIndex) : "",
-		state: state || {
-			[stateIndexKey]: 0,
-			key: addedKey,
-			__TSR_key: addedKey
-		}
+		state
 	};
 }
 function createRandomKey() {
 	return (Math.random() + 1).toString(36).substring(7);
 }
 //#endregion
-export { parseHref as i, createMemoryHistory as n, normalizeProtocolRelative as r, createBrowserHistory as t };
+export { parseHref as i, createServerHistory as n, normalizeProtocolRelative as r, createBrowserHistory as t };

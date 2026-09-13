@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase, type Profile } from "@/lib/supabase";
+import { toast } from "sonner";
 
 type AuthMode = "google" | "guest" | null;
 
@@ -105,6 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const p = await fetchProfile(newSession.user.id);
             if (!mounted) return;
             setProfile(p);
+            // Sync conversations after login
+            import("@/lib/conversationStore").then((m) => m.syncConversationsWithSupabase());
           } finally {
             if (mounted) {
               setLoading(false);
@@ -125,11 +128,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signInWithGoogle = useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    // In iframe environments, redirect-based OAuth often fails. We use skipBrowserRedirect and open a popup.
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        skipBrowserRedirect: true,
+      },
     });
     if (error) throw error;
+    if (data?.url) {
+      const authWindow = window.open(data.url, "oauth_popup", "width=600,height=700");
+      if (!authWindow) {
+        toast.error("Please allow popups to sign in with Google");
+      }
+    }
   }, []);
 
   const signInWithEmail = useCallback(async (email: string) => {

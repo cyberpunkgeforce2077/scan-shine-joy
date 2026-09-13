@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 export interface Attachment {
   data: string;
   mime: string;
@@ -36,9 +38,88 @@ function deriveTitle(messages: Msg[]): string {
   const firstUser = messages.find((m) => m.role === "user");
   if (!firstUser || !firstUser.content.trim()) return "Untitled Chat";
   // The user requested to replace personal chat logs with generic placeholders.
-  // Instead of using the message content which might contain PII, 
+  // Instead of using the message content which might contain PII,
   // we'll just use a generic title format.
   return "Untitled Chat";
+}
+
+export async function syncConversationsWithSupabase(): Promise<void> {
+  if (typeof window === "undefined") return;
+
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData?.session?.user;
+    if (!user) return;
+
+    const { data: cloudConvs, error: pullError } = await supabase
+      .from("conversations")
+      .select("local_id, title, messages, created_at, updated_at");
+
+    if (pullError) {
+      console.warn("Sync skipped: Conversations table might not exist yet.", pullError.message);
+      return;
+    }
+
+    const localConvs = listConversations();
+    const localMap = new Map(localConvs.map((c) => [c.id, c]));
+
+    let hasChanges = false;
+
+    if (cloudConvs && cloudConvs.length > 0) {
+      for (const row of cloudConvs) {
+        const remoteConv: Conversation = {
+          id: row.local_id,
+          title: row.title,
+          createdAt: new Date(row.created_at).getTime(),
+          updatedAt: new Date(row.updated_at).getTime(),
+          messages: row.messages as Msg[],
+        };
+
+        const local = localMap.get(remoteConv.id);
+        if (!local || local.updatedAt < remoteConv.updatedAt) {
+          localMap.set(remoteConv.id, remoteConv);
+          hasChanges = true;
+        }
+      }
+    }
+
+    const toPush = Array.from(localMap.values());
+    for (const conv of toPush) {
+      const remote = cloudConvs?.find((c) => c.local_id === conv.id);
+      const remoteUpdated = remote ? new Date(remote.updated_at).getTime() : 0;
+
+      if (conv.updatedAt > remoteUpdated) {
+        await supabase.from("conversations").upsert(
+          {
+            user_id: user.id,
+            local_id: conv.id,
+            title: conv.title,
+            messages: conv.messages,
+            created_at: new Date(conv.createdAt).toISOString(),
+            updated_at: new Date(conv.updatedAt).toISOString(),
+          },
+          { onConflict: "user_id, local_id" },
+        );
+      }
+    }
+
+    if (hasChanges) {
+      const merged = Array.from(localMap.values())
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .slice(0, 100);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      window.dispatchEvent(new CustomEvent("omni-conversations-updated"));
+
+      const activeId = getActiveConversationId();
+      if (activeId) {
+        window.dispatchEvent(
+          new CustomEvent("omni-conversation-changed", { detail: { id: activeId } }),
+        );
+      }
+    }
+  } catch (err) {
+    console.error("Error syncing conversations:", err);
+  }
 }
 
 export function listConversations(): Conversation[] {
@@ -52,7 +133,6 @@ export function listConversations(): Conversation[] {
       }
     }
 
-    // Auto-migrate from legacy omni-ask-history if present
     const legacyRaw = localStorage.getItem(LEGACY_KEY);
     if (legacyRaw) {
       const legacyMsgs = JSON.parse(legacyRaw) as Msg[];
@@ -69,9 +149,7 @@ export function listConversations(): Conversation[] {
         return [initialConv];
       }
     }
-  } catch {
-    /* ignore parse errors */
-  }
+  } catch {}
   return [];
 }
 
@@ -112,13 +190,31 @@ export function saveConversation(conversation: Conversation): void {
       all.unshift(updated);
     }
 
-    // Retain up to 100 recent conversations
     const trimmed = all.slice(0, 100);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
     window.dispatchEvent(new CustomEvent("omni-conversations-updated"));
-  } catch {
-    /* storage limit handling */
-  }
+
+    // Sync to cloud in background
+    void supabase.auth.getSession().then(({ data }) => {
+      const user = data?.session?.user;
+      if (user) {
+        supabase
+          .from("conversations")
+          .upsert(
+            {
+              user_id: user.id,
+              local_id: updated.id,
+              title: updated.title,
+              messages: updated.messages,
+              created_at: new Date(updated.createdAt).toISOString(),
+              updated_at: new Date(updated.updatedAt).toISOString(),
+            },
+            { onConflict: "user_id, local_id" },
+          )
+          .then();
+      }
+    });
+  } catch {}
 }
 
 export function deleteConversation(id: string): void {
@@ -130,9 +226,15 @@ export function deleteConversation(id: string): void {
       setActiveConversationId(all[0]?.id ?? null);
     }
     window.dispatchEvent(new CustomEvent("omni-conversations-updated"));
-  } catch {
-    /* ignore */
-  }
+
+    // Sync deletion to cloud in background
+    void supabase.auth.getSession().then(({ data }) => {
+      const user = data?.session?.user;
+      if (user) {
+        supabase.from("conversations").delete().eq("local_id", id).then();
+      }
+    });
+  } catch {}
 }
 
 export function createNewConversation(initialPrompt?: string): Conversation {
@@ -165,9 +267,7 @@ export function searchConversations(query: string, sourceList?: Conversation[]):
   }
 
   const results: SearchResult[] = [];
-
   for (const conv of all) {
-    // 1. Check title
     if (conv.title.toLowerCase().includes(q)) {
       const firstMsg = conv.messages[0]?.content ?? "";
       results.push({
@@ -177,8 +277,6 @@ export function searchConversations(query: string, sourceList?: Conversation[]):
       });
       continue;
     }
-
-    // 2. Check message contents
     const matchedMsg = conv.messages.find((m) => m.content.toLowerCase().includes(q));
     if (matchedMsg) {
       const idx = matchedMsg.content.toLowerCase().indexOf(q);
@@ -187,7 +285,6 @@ export function searchConversations(query: string, sourceList?: Conversation[]):
       const snippet = `${start > 0 ? "…" : ""}${matchedMsg.content.slice(start, end)}${
         end < matchedMsg.content.length ? "…" : ""
       }`;
-
       results.push({
         conversation: conv,
         matchedField: "message",
@@ -195,6 +292,5 @@ export function searchConversations(query: string, sourceList?: Conversation[]):
       });
     }
   }
-
   return results;
 }

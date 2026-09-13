@@ -999,6 +999,26 @@ var Trash2 = createLucideIcon("trash-2", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Type = createLucideIcon("type", [
+	["path", {
+		d: "M12 4v16",
+		key: "1654pz"
+	}],
+	["path", {
+		d: "M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2",
+		key: "e0r10z"
+	}],
+	["path", {
+		d: "M9 20h6",
+		key: "s66wpe"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Upload = createLucideIcon("upload", [
 	["path", {
 		d: "M12 3v12",
@@ -1106,4 +1126,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { Image as A, Camera as B, MemoryStick as C, Link2 as D, LoaderCircle as E, DatabaseBackup as F, ArrowLeft as G, BookOpen as H, Copy as I, Clock as L, Fish as M, ExternalLink as N, Lightbulb as O, Download as P, ClipboardPaste as R, Menu as S, LogOut as T, BatteryCharging as U, Bot as V, ArrowRight as W, Plus as _, Upload as a, MicOff as b, Sparkles as c, SendHorizontal as d, Search as f, QrCode as g, RefreshCw as h, UserRound as i, Gauge as j, Laptop as k, ShieldCheck as l, Scan as m, Wifi as n, Trash2 as o, SearchX as p, WandSparkles as r, Thermometer as s, X as t, Settings as u, Music4 as v, Mail as w, MessageSquare as x, Mic as y, Check as z };
+export { Laptop as A, Check as B, Menu as C, LoaderCircle as D, LogOut as E, Download as F, ArrowRight as G, Bot as H, DatabaseBackup as I, ArrowLeft as K, Copy as L, Gauge as M, Fish as N, Link2 as O, ExternalLink as P, Clock as R, MessageSquare as S, Mail as T, BookOpen as U, Camera as V, BatteryCharging as W, QrCode as _, Upload as a, Mic as b, Thermometer as c, Settings as d, SendHorizontal as f, RefreshCw as g, Scan as h, UserRound as i, Image as j, Lightbulb as k, Sparkles as l, SearchX as m, Wifi as n, Type as o, Search as p, WandSparkles as r, Trash2 as s, X as t, ShieldCheck as u, Plus as v, MemoryStick as w, MicOff as x, Music4 as y, ClipboardPaste as z };

@@ -74,10 +74,8 @@ export function PillButton({
   variant?: "primary" | "tonal" | "ghost" | "outline";
 }) {
   const variants = {
-    primary:
-      "bg-[#e3e3e3] text-[#1e1f20] shadow-sm hover:brightness-105 active:scale-[0.97]",
-    tonal:
-      "bg-[#1e1f20] text-[#e3e3e3] hover:brightness-[1.03] active:scale-[0.97]",
+    primary: "bg-[#e3e3e3] text-[#1e1f20] shadow-sm hover:brightness-105 active:scale-[0.97]",
+    tonal: "bg-[#1e1f20] text-[#e3e3e3] hover:brightness-[1.03] active:scale-[0.97]",
     ghost: "text-[#c4c7c5] hover:bg-white/10 hover:text-[#e3e3e3] active:scale-[0.97]",
     outline:
       "border border-white/10 bg-[#1e1f20] text-[#e3e3e3] hover:bg-white/10 active:scale-[0.97]",
