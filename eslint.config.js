@@ -16,6 +16,8 @@ export default tseslint.config(
       "node_modules/**",
       "**/node_modules/**",
       "scripts/**",
+      "public/tesseract/**",
+      "public/tessdata/**",
     ],
   },
   {

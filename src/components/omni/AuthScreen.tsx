@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Loader2, Mail, ShieldCheck, UserRound } from "lucide-react";
+import { Loader2, Mail, ShieldCheck, UserRound, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/components/omni/AuthContext";
 import { StudioMark } from "@/components/omni/Sparkle";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 function GoogleIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
@@ -30,11 +31,18 @@ function GoogleIcon({ className = "h-5 w-5" }: { className?: string }) {
 
 export function AuthScreen() {
   const { signInWithGoogle, signInWithEmail, signInAsGuest } = useAuth();
+  const { isOnline } = useNetworkStatus();
   const [busy, setBusy] = useState<"google" | "email" | null>(null);
   const [emailMode, setEmailMode] = useState(false);
   const [email, setEmail] = useState("");
 
   async function handleGoogle() {
+    if (!isOnline) {
+      toast.error(
+        "Internet connection required for Google sign-in. Use Continue as Guest to use offline tools.",
+      );
+      return;
+    }
     setBusy("google");
     try {
       await signInWithGoogle();
@@ -46,6 +54,12 @@ export function AuthScreen() {
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
+    if (!isOnline) {
+      toast.error(
+        "Internet connection required for Email sign-in. Use Continue as Guest to use offline tools.",
+      );
+      return;
+    }
     if (!email.trim()) return;
     setBusy("email");
     const { error } = await signInWithEmail(email.trim());
@@ -81,14 +95,38 @@ export function AuthScreen() {
             </p>
           </div>
 
-          <div className="mt-9 space-y-3">
+          {!isOnline && (
+            <div className="mt-6 flex items-start gap-2.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-200">
+              <WifiOff className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
+              <div>
+                <strong className="font-semibold text-amber-300">Offline Mode Active:</strong> You
+                can continue as a guest to use on-device tools (QR Studio, Doc Scanner, Local OCR,
+                and Field Guides) without internet.
+              </div>
+            </div>
+          )}
+
+          <div className="mt-7 space-y-3">
+            {!isOnline ? (
+              <button
+                onClick={signInAsGuest}
+                disabled={busy !== null}
+                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-amber-400 px-5 py-3.5 text-sm font-bold text-[#1e1f20] shadow-md transition hover:bg-amber-300 active:scale-[0.98]"
+              >
+                <UserRound className="h-4 w-4" />
+                Continue in Offline Mode (Guest)
+              </button>
+            ) : null}
+
             <button
               onClick={handleGoogle}
-              disabled={busy !== null}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-5 py-3.5 text-sm font-bold text-foreground shadow-sm transition hover:bg-surface-2 hover:shadow-[var(--shadow-plush)] active:scale-[0.98] disabled:opacity-50"
+              disabled={busy !== null || !isOnline}
+              className={`flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-5 py-3.5 text-sm font-bold text-foreground shadow-sm transition hover:bg-surface-2 hover:shadow-[var(--shadow-plush)] active:scale-[0.98] ${
+                !isOnline ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {busy === "google" ? <Loader2 className="h-5 w-5 animate-spin" /> : <GoogleIcon />}
-              Continue with Google
+              Continue with Google {!isOnline && "(Online only)"}
             </button>
 
             {emailMode ? (
@@ -97,13 +135,14 @@ export function AuthScreen() {
                   type="email"
                   required
                   value={email}
+                  disabled={!isOnline}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-2xl border border-border bg-card px-5 py-3.5 text-sm text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/15 placeholder:text-muted-foreground"
+                  className="w-full rounded-2xl border border-border bg-card px-5 py-3.5 text-sm text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/15 placeholder:text-muted-foreground disabled:opacity-50"
                 />
                 <button
                   type="submit"
-                  disabled={busy !== null}
+                  disabled={busy !== null || !isOnline}
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3.5 text-sm font-bold text-primary-foreground shadow-sm transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
                 >
                   {busy === "email" ? (
@@ -117,33 +156,39 @@ export function AuthScreen() {
             ) : (
               <button
                 onClick={() => setEmailMode(true)}
-                disabled={busy !== null}
-                className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-transparent px-5 py-3.5 text-sm font-bold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-[0.98] disabled:opacity-50"
+                disabled={busy !== null || !isOnline}
+                className={`flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-transparent px-5 py-3.5 text-sm font-bold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-[0.98] ${
+                  !isOnline ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 <Mail className="h-4 w-4" />
-                Continue with email
+                Continue with email {!isOnline && "(Online only)"}
               </button>
             )}
 
-            <div className="relative pt-1">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-card px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  or
-                </span>
-              </div>
-            </div>
+            {isOnline && (
+              <>
+                <div className="relative pt-1">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-card px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      or
+                    </span>
+                  </div>
+                </div>
 
-            <button
-              onClick={signInAsGuest}
-              disabled={busy !== null}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-transparent px-5 py-3.5 text-sm font-bold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-[0.98] disabled:opacity-50"
-            >
-              <UserRound className="h-4 w-4" />
-              Continue as guest
-            </button>
+                <button
+                  onClick={signInAsGuest}
+                  disabled={busy !== null}
+                  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-transparent px-5 py-3.5 text-sm font-bold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground active:scale-[0.98] disabled:opacity-50"
+                >
+                  <UserRound className="h-4 w-4" />
+                  Continue as guest
+                </button>
+              </>
+            )}
           </div>
 
           <div className="mt-7 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground">

@@ -48,10 +48,12 @@ const DEFAULT_HEADERS = {
 // a key, keyless instances are the only option.
 
 const COBALT_INSTANCES = [
-  "https://dwnld.nichind.dev",
-  "https://api.cobalt.tools",
-  "https://cobalt-api.kwiatekmiki.com",
+  "https://cobalt.canine.tools",
+  "https://cobalt.meowing.de",
   "https://cobalt-backend.canine.tools",
+  "https://dwnld.nichind.dev",
+  "https://cobalt-api.kwiatekmiki.com",
+  "https://api.cobalt.tools",
 ];
 
 const COBALT_API_KEY = process.env["COBALT_API_KEY"];

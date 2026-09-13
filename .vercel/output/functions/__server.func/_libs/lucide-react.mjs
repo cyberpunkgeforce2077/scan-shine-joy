@@ -1094,6 +1094,42 @@ var WandSparkles = createLucideIcon("wand-sparkles", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var WifiOff = createLucideIcon("wifi-off", [
+	["path", {
+		d: "M12 20h.01",
+		key: "zekei9"
+	}],
+	["path", {
+		d: "M8.5 16.429a5 5 0 0 1 7 0",
+		key: "1bycff"
+	}],
+	["path", {
+		d: "M5 12.859a10 10 0 0 1 5.17-2.69",
+		key: "1dl1wf"
+	}],
+	["path", {
+		d: "M19 12.859a10 10 0 0 0-2.007-1.523",
+		key: "4k23kn"
+	}],
+	["path", {
+		d: "M2 8.82a15 15 0 0 1 4.177-2.643",
+		key: "1grhjp"
+	}],
+	["path", {
+		d: "M22 8.82a15 15 0 0 0-11.288-3.764",
+		key: "z3jwby"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Wifi = createLucideIcon("wifi", [
 	["path", {
 		d: "M12 20h.01",
@@ -1126,4 +1162,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { Laptop as A, Check as B, Menu as C, LoaderCircle as D, LogOut as E, Download as F, ArrowRight as G, Bot as H, DatabaseBackup as I, ArrowLeft as K, Copy as L, Gauge as M, Fish as N, Link2 as O, ExternalLink as P, Clock as R, MessageSquare as S, Mail as T, BookOpen as U, Camera as V, BatteryCharging as W, QrCode as _, Upload as a, Mic as b, Thermometer as c, Settings as d, SendHorizontal as f, RefreshCw as g, Scan as h, UserRound as i, Image as j, Lightbulb as k, Sparkles as l, SearchX as m, Wifi as n, Type as o, Search as p, WandSparkles as r, Trash2 as s, X as t, ShieldCheck as u, Plus as v, MemoryStick as w, MicOff as x, Music4 as y, ClipboardPaste as z };
+export { Lightbulb as A, ClipboardPaste as B, MessageSquare as C, LogOut as D, Mail as E, ExternalLink as F, BatteryCharging as G, Camera as H, Download as I, ArrowRight as K, DatabaseBackup as L, Image as M, Gauge as N, LoaderCircle as O, Fish as P, Copy as R, MicOff as S, MemoryStick as T, Bot as U, Check as V, BookOpen as W, RefreshCw as _, UserRound as a, Music4 as b, Trash2 as c, ShieldCheck as d, Settings as f, Scan as g, SearchX as h, WandSparkles as i, Laptop as j, Link2 as k, Thermometer as l, Search as m, Wifi as n, Upload as o, SendHorizontal as p, ArrowLeft as q, WifiOff as r, Type as s, X as t, Sparkles as u, QrCode as v, Menu as w, Mic as x, Plus as y, Clock as z };

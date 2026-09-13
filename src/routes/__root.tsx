@@ -30,6 +30,7 @@ import { ThemeProvider } from "@/components/omni/ThemeProvider";
 import { AuthProvider, useAuth } from "@/components/omni/AuthContext";
 import { AuthScreen } from "@/components/omni/AuthScreen";
 import { OnboardingScreen } from "@/components/omni/OnboardingScreen";
+import { NetworkBadge } from "@/components/omni/NetworkBadge";
 import { getActiveConversationId, getConversation } from "@/lib/conversationStore";
 import { useState, useEffect, type ReactNode } from "react";
 
@@ -67,21 +68,23 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4 bg-[#000000]">
+    <header className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4 bg-[#000000] border-b border-white/5">
       <button
         onClick={toggleDrawer}
         className="p-2 -ml-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97]"
+        aria-label="Toggle navigation drawer"
       >
         <Menu className="h-6 w-6" />
       </button>
 
-      <div className="flex-1 px-4 truncate text-center">
+      <div className="flex-1 px-3 truncate text-center">
         <span className="text-base font-medium text-[#e3e3e3] opacity-90 truncate">
-          {chatTitle || "omnisuitè"}
+          {chatTitle || "OmniSuite"}
         </span>
       </div>
 
       <div className="flex items-center gap-2">
+        <NetworkBadge />
         <Link
           to="/settings"
           title="User Profile"
@@ -153,57 +156,108 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
             Search chats
           </button>
 
-          {/* Active Tools */}
-          <div className="px-4 mb-2 text-sm font-semibold text-[#8e8e8e]">Active Tools</div>
-          <div className="space-y-1 mb-6">
-            <Link
-              to="/chat"
-              onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <MessageSquare className="h-5 w-5" /> Vlad Bot
-            </Link>
+          {/* Offline Tools Section */}
+          <div className="px-4 mb-2 flex items-center justify-between text-xs font-semibold text-[#8e8e8e] uppercase tracking-wider">
+            <span>Offline Tools (Local)</span>
+            <span className="text-[10px] text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded-full font-medium">
+              4 Ready
+            </span>
+          </div>
+          <div className="space-y-1 mb-5">
             <Link
               to="/qr"
               onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <QrCode className="h-5 w-5" /> QR Code Scanner
+              <div className="flex items-center gap-3">
+                <QrCode className="h-5 w-5 text-emerald-400" />
+                <span>QR Code Studio</span>
+              </div>
+              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
+                Offline
+              </span>
             </Link>
             <Link
               to="/scanner"
               onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <Scan className="h-5 w-5" /> Document Scanner
+              <div className="flex items-center gap-3">
+                <Scan className="h-5 w-5 text-emerald-400" />
+                <span>Doc Scanner</span>
+              </div>
+              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
+                Offline
+              </span>
             </Link>
             <Link
               to="/ocr"
               onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <ImageIcon className="h-5 w-5" /> Image OCR
-            </Link>
-            <Link
-              to="/dakphraser"
-              onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <Wand2 className="h-5 w-5" /> DakPhraser
-            </Link>
-            <Link
-              to="/downloader"
-              onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <Download className="h-5 w-5" /> Media Downloader
+              <div className="flex items-center gap-3">
+                <ImageIcon className="h-5 w-5 text-emerald-400" />
+                <span>Local OCR</span>
+              </div>
+              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
+                Offline
+              </span>
             </Link>
             <Link
               to="/guides"
               onClick={closeDrawer}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <BookOpen className="h-5 w-5" /> Field Guides
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-emerald-400" />
+                <span>Field Guides</span>
+              </div>
+              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
+                Offline
+              </span>
+            </Link>
+          </div>
+
+          {/* Online Tools Section */}
+          <div className="px-4 mb-2 flex items-center justify-between text-xs font-semibold text-[#8e8e8e] uppercase tracking-wider">
+            <span>Online Tools (Cloud/AI)</span>
+            <span className="text-[10px] text-sky-400 bg-sky-500/15 px-1.5 py-0.5 rounded-full font-medium">
+              Network
+            </span>
+          </div>
+          <div className="space-y-1 mb-6">
+            <Link
+              to="/chat"
+              onClick={closeDrawer}
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <div className="flex items-center gap-3">
+                <MessageSquare className="h-5 w-5 text-sky-400" />
+                <span>Vlad Bot</span>
+              </div>
+              <span className="text-[10px] text-sky-400/80 font-semibold uppercase">Online</span>
+            </Link>
+            <Link
+              to="/downloader"
+              onClick={closeDrawer}
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <div className="flex items-center gap-3">
+                <Download className="h-5 w-5 text-sky-400" />
+                <span>Media Downloader</span>
+              </div>
+              <span className="text-[10px] text-sky-400/80 font-semibold uppercase">Online</span>
+            </Link>
+            <Link
+              to="/dakphraser"
+              onClick={closeDrawer}
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <div className="flex items-center gap-3">
+                <Wand2 className="h-5 w-5 text-sky-400" />
+                <span>DakPhraser</span>
+              </div>
+              <span className="text-[10px] text-sky-400/80 font-semibold uppercase">Online</span>
             </Link>
           </div>
         </div>
@@ -284,6 +338,22 @@ function Shell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  // Register offline Service Worker in browser
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((reg) => {
+            console.log("[OmniSuite] ServiceWorker registered with scope:", reg.scope);
+          })
+          .catch((err) => {
+            console.warn("[OmniSuite] ServiceWorker registration skipped/failed:", err);
+          });
+      });
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -328,7 +398,7 @@ function Shell() {
             href="https://wa.me/233208723497"
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-50 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 active:scale-95 transition-transform"
+            className="fixed bottom-[calc(1.5rem+2in)] right-6 z-50 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 active:scale-95 transition-transform"
             title="Contact on WhatsApp"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7">
@@ -360,13 +430,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
-      { title: "Assistant" },
-      { name: "description", content: "Assistant" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no",
+      },
+      { title: "OmniSuite" },
+      {
+        name: "description",
+        content:
+          "AI tech navigator and private in-browser offline tools for QR codes, document scanning, OCR, and media downloading.",
+      },
+      { property: "og:title", content: "OmniSuite" },
+      {
+        property: "og:description",
+        content:
+          "AI tech navigator and private in-browser offline tools for QR codes, document scanning, OCR, and media downloading.",
+      },
       { property: "og:type", content: "website" },
+      { name: "theme-color", content: "#000000" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "icon", type: "image/svg+xml", href: "/icon.svg" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

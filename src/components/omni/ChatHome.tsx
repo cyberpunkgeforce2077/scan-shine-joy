@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { askAssistant, askTitle } from "@/lib/ask.functions";
 import { FormattedText } from "@/components/omni/FormattedText";
 import { ConversationSearchModal } from "@/components/omni/ConversationSearchModal";
+import { OnlineRequiredBanner } from "@/components/omni/OnlineRequiredBanner";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import {
   getConversation,
   saveConversation,
@@ -20,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
+  const { isOnline, checkConnection } = useNetworkStatus();
   const ask = useServerFn(askAssistant);
   const getTitle = useServerFn(askTitle);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
@@ -145,6 +148,13 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
     const question = text.trim();
     if (!question || busy) return;
 
+    if (!isOnline) {
+      toast.error(
+        "Vlad Bot requires an active internet connection. Please check your network or use offline tools.",
+      );
+      return;
+    }
+
     const userMsg: Msg = {
       role: "user",
       content: question,
@@ -220,6 +230,16 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
 
   return (
     <main className="flex min-h-screen w-full flex-col pt-12 pb-32">
+      {!isOnline && (
+        <div className="mx-auto w-full max-w-2xl px-4 pt-2 pb-4">
+          <OnlineRequiredBanner
+            featureName="Vlad Bot"
+            offlineAlternative="Your offline chat history is still available, and you can freely use on-device tools (QR Code Studio, Document Scanner, Local OCR)."
+            onRetry={() => void checkConnection()}
+          />
+        </div>
+      )}
+
       {empty ? (
         <div className="flex flex-1 flex-col items-center justify-center -mt-20">
           {/* Main Greeting */}

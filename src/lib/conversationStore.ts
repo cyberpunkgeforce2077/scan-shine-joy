@@ -149,7 +149,9 @@ export function listConversations(): Conversation[] {
         return [initialConv];
       }
     }
-  } catch {}
+  } catch {
+    // Ignore storage parse errors
+  }
   return [];
 }
 
@@ -214,7 +216,9 @@ export function saveConversation(conversation: Conversation): void {
           .then();
       }
     });
-  } catch {}
+  } catch {
+    // Ignore local persistence sync errors
+  }
 }
 
 export function deleteConversation(id: string): void {
@@ -234,7 +238,9 @@ export function deleteConversation(id: string): void {
         supabase.from("conversations").delete().eq("local_id", id).then();
       }
     });
-  } catch {}
+  } catch {
+    // Ignore local persistence delete errors
+  }
 }
 
 export function createNewConversation(initialPrompt?: string): Conversation {

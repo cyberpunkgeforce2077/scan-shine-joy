@@ -1,10 +1,6 @@
 {
   "name": "OmniSuite",
   "description": "AI tech navigator and private in-browser tools for QR codes, document scanning, OCR, and media downloading.",
-  "requestFramePermissions": [
-    "camera"
-  ],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

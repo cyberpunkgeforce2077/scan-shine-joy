@@ -142,7 +142,9 @@ export const askTitle = createServerFn({ method: "POST" })
       });
 
       if (!res.ok) return { title: data.prompt.slice(0, 30) };
-      const json = (await res.json()) as any;
+      const json = (await res.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
       const title =
         json.choices?.[0]?.message?.content?.trim().replace(/^["']|["']$/g, "") ??
         data.prompt.slice(0, 30);

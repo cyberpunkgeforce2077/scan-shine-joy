@@ -163,6 +163,10 @@ export function OcrStudio() {
     if (workerRef.current) return workerRef.current;
     const { createWorker } = await import("tesseract.js");
     const worker = await createWorker("eng", 1, {
+      workerPath: "/tesseract/worker.min.js",
+      corePath: "/tesseract",
+      langPath: "/tessdata",
+      gzip: true,
       logger: (m: { status: string; progress: number }) => {
         setPhase(PHASES[m.status] ?? "Working");
         setProgress(Math.round((m.progress ?? 0) * 100));

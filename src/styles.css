@@ -292,32 +292,16 @@
 @utility gemini-canvas-backdrop {
   background-color: #131314;
   background-image:
-    radial-gradient(
-      1200px 750px at 50% 68%,
-      rgba(26, 40, 72, 0.42) 0%,
-      rgba(19, 19, 20, 0) 72%
-    ),
-    radial-gradient(
-      800px 480px at 50% 50%,
-      rgba(35, 52, 90, 0.22) 0%,
-      rgba(19, 19, 20, 0) 65%
-    );
+    radial-gradient(1200px 750px at 50% 68%, rgba(26, 40, 72, 0.42) 0%, rgba(19, 19, 20, 0) 72%),
+    radial-gradient(800px 480px at 50% 50%, rgba(35, 52, 90, 0.22) 0%, rgba(19, 19, 20, 0) 65%);
   background-attachment: fixed;
 }
 
 @utility warm-canvas-backdrop {
   background-color: #131314;
   background-image:
-    radial-gradient(
-      1200px 750px at 50% 68%,
-      rgba(26, 40, 72, 0.42) 0%,
-      rgba(19, 19, 20, 0) 72%
-    ),
-    radial-gradient(
-      800px 480px at 50% 50%,
-      rgba(35, 52, 90, 0.22) 0%,
-      rgba(19, 19, 20, 0) 65%
-    );
+    radial-gradient(1200px 750px at 50% 68%, rgba(26, 40, 72, 0.42) 0%, rgba(19, 19, 20, 0) 72%),
+    radial-gradient(800px 480px at 50% 50%, rgba(35, 52, 90, 0.22) 0%, rgba(19, 19, 20, 0) 65%);
   background-attachment: fixed;
 }
 
