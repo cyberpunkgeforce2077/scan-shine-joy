@@ -189,7 +189,11 @@ export function DakPhraser() {
                 onClick={() => copy(r, i)}
                 className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3.5 py-2 text-xs font-semibold transition active:scale-95"
               >
-                {copied === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied === i ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
                 {copied === i ? "Copied" : "Copy"}
               </button>
             </div>

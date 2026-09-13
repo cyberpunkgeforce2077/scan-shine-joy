@@ -57,7 +57,7 @@ export const paraphrase = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "You are DakPhraser, an expert rewriting engine. Rewrite the user's text without changing its meaning, never adding facts, and preserving the original language. Reply as json matching {\"variants\": string[]}.",
+              'You are DakPhraser, an expert rewriting engine. Rewrite the user\'s text without changing its meaning, never adding facts, and preserving the original language. Reply as json matching {"variants": string[]}.',
           },
           {
             role: "user",

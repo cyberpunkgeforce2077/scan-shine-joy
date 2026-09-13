@@ -11,14 +11,14 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void; tog
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    let initial: Theme = "light";
+    let initial: Theme = "dark";
     try {
       const stored = localStorage.getItem(KEY) as Theme | null;
       if (stored === "light" || stored === "dark") initial = stored;
-      else if (window.matchMedia("(prefers-color-scheme: light)").matches) initial = "light";
+      else initial = "dark";
     } catch {
       /* ignore */
     }

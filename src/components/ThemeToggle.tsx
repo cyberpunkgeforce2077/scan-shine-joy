@@ -7,8 +7,7 @@ export function useTheme() {
   useEffect(() => {
     const stored = localStorage.getItem("qrm-theme") as "light" | "dark" | null;
     const initial =
-      stored ??
-      (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+      stored ?? (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
     setTheme(initial);
   }, []);
 

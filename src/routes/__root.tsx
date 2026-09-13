@@ -8,28 +8,165 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Search, BookOpen, Settings, Menu, X, QrCode, Scan, Image as ImageIcon, Wand2, Download, LogOut, User as UserIcon } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/omni/ThemeProvider";
 import { AuthProvider, useAuth } from "@/components/omni/AuthContext";
 import { AuthScreen } from "@/components/omni/AuthScreen";
 import { OnboardingScreen } from "@/components/omni/OnboardingScreen";
-import { TopBar } from "@/components/omni/TopBar";
-import type { ReactNode } from "react";
+import { getActiveConversationId, getConversation } from "@/lib/conversationStore";
+import { useState, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 
+function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
+  const { profile } = useAuth();
+  const [chatTitle, setChatTitle] = useState<string | null>(null);
+
+  useEffect(() => {
+    function updateTitle() {
+      const id = getActiveConversationId();
+      if (id) {
+         const conv = getConversation(id);
+         if (conv && conv.messages.length > 0) {
+           // Basic heuristic for dynamic title based on the first message
+           setChatTitle(conv.title !== "Untitled Chat" ? conv.title : conv.messages[0].content.slice(0, 30) + (conv.messages[0].content.length > 30 ? "..." : ""));
+           return;
+         }
+      }
+      setChatTitle(null);
+    }
+    updateTitle();
+    window.addEventListener("omni-conversation-changed", updateTitle);
+    window.addEventListener("omni-conversations-updated", updateTitle);
+    return () => {
+      window.removeEventListener("omni-conversation-changed", updateTitle);
+      window.removeEventListener("omni-conversations-updated", updateTitle);
+    };
+  }, []);
+  
+  return (
+    <header className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4 bg-[#000000]">
+      <button onClick={toggleDrawer} className="p-2 -ml-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97]">
+        <Menu className="h-6 w-6" />
+      </button>
+
+      <div className="flex-1 px-4 truncate text-center">
+        <span className="text-base font-medium text-[#e3e3e3] opacity-90 truncate">
+          {chatTitle || profile?.username || "Vlad Bot"}
+        </span>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Link 
+          to="/settings"
+          title="User Profile"
+          className="grid h-8 w-8 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-sm transition-all duration-200 cursor-pointer active:scale-[0.97]"
+        >
+          {profile?.username?.charAt(0).toUpperCase() || "U"}
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+function MobileDrawer({ isOpen, closeDrawer, openSettings }: { isOpen: boolean; closeDrawer: () => void, openSettings: () => void }) {
+  const { profile } = useAuth();
+  
+  return (
+    <>
+      {/* Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            onClick={closeDrawer}
+            className="fixed inset-0 bg-black/60 z-50 sm:hidden" 
+          />
+        )}
+      </AnimatePresence>
+      
+      {/* Drawer */}
+      <div className={`fixed top-0 bottom-0 left-0 w-[300px] bg-[#000000] z-50 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between p-4">
+          <span className="text-xl font-medium text-[#e3e3e3]">Assistant</span>
+          <button onClick={closeDrawer} className="p-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-colors">
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-3 pb-4">
+          <button 
+            onClick={() => { window.dispatchEvent(new Event("omni-new-chat")); closeDrawer(); }} 
+            className="w-full flex items-center gap-3 px-4 py-3 bg-[#1e1f20] hover:bg-[#2a2b2e] rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-2"
+          >
+            <Plus className="h-5 w-5" />
+            New chat
+          </button>
+          
+          <button 
+            onClick={() => { window.dispatchEvent(new CustomEvent("omni-open-search")); closeDrawer(); }} 
+            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-6"
+          >
+            <Search className="h-5 w-5" />
+            Search chats
+          </button>
+          
+          {/* Active Tools */}
+          <div className="px-4 mb-2 text-sm font-semibold text-[#8e8e8e]">Active Tools</div>
+          <div className="space-y-1 mb-6">
+            <Link to="/qr" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+              <QrCode className="h-5 w-5" /> QR Code Scanner
+            </Link>
+            <Link to="/scanner" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+              <Scan className="h-5 w-5" /> Document Scanner
+            </Link>
+            <Link to="/ocr" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+              <ImageIcon className="h-5 w-5" /> Image OCR
+            </Link>
+            <Link to="/dakphraser" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+              <Wand2 className="h-5 w-5" /> DakPhraser
+            </Link>
+            <Link to="/downloader" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+              <Download className="h-5 w-5" /> Media Downloader
+            </Link>
+            <Link to="/guides" onClick={closeDrawer} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]">
+              <BookOpen className="h-5 w-5" /> Field Guides
+            </Link>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <Link 
+          to="/settings"
+          onClick={closeDrawer}
+          title="User Profile"
+          className="p-3 border-t border-white/10 flex items-center gap-3 hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-[0.97] mx-2 mb-2 rounded-xl"
+        >
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-lg">
+            {profile?.username?.charAt(0).toUpperCase() || "U"}
+          </div>
+          <div className="flex-1 text-[#e3e3e3] font-medium truncate">{profile?.username || "Settings"}</div>
+          <Settings className="h-5 w-5 text-[#c4c7c5]" />
+        </Link>
+      </div>
+    </>
+  );
+}
+
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <div className="plush max-w-md p-10 text-center">
+    <div className="flex min-h-screen items-center justify-center px-6 bg-[#000000]">
+      <div className="max-w-md p-10 text-center text-[#e3e3e3]">
         <h1 className="text-4xl font-extrabold">404</h1>
-        <p className="mt-2 text-muted-foreground">This tool doesn&apos;t exist yet.</p>
+        <p className="mt-2 text-[#c4c7c5]">This page doesn&apos;t exist yet.</p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+          className="mt-6 inline-block rounded-full bg-[#1e1f20] hover:bg-[#333538] px-5 py-2.5 text-sm font-semibold text-[#e3e3e3] transition-colors"
         >
-          Back to Ask Vladimir
+          Back to Home
         </Link>
       </div>
     </div>
@@ -38,15 +175,15 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error }: { error: Error }) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <div className="plush max-w-md p-10 text-center">
+    <div className="flex min-h-screen items-center justify-center px-6 bg-[#000000]">
+      <div className="max-w-md p-10 text-center text-[#e3e3e3]">
         <h1 className="text-3xl font-extrabold">Something broke</h1>
-        <p className="mt-2 break-words text-sm text-muted-foreground">{error.message}</p>
+        <p className="mt-2 break-words text-sm text-[#c4c7c5]">{error.message}</p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+          className="mt-6 inline-block rounded-full bg-[#1e1f20] hover:bg-[#333538] px-5 py-2.5 text-sm font-semibold text-[#e3e3e3] transition-colors"
         >
-          Back to Ask Vladimir
+          Back to Home
         </Link>
       </div>
     </div>
@@ -54,12 +191,12 @@ function ErrorComponent({ error }: { error: Error }) {
 }
 
 function AuthGate({ children }: { children: ReactNode }) {
-  const { loading, session, profile, isGuest, needsOnboarding } = useAuth();
+  const { loading, session, isGuest, needsOnboarding } = useAuth();
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex min-h-screen items-center justify-center bg-[#000000]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#c4c7c5]" />
       </div>
     );
   }
@@ -72,34 +209,56 @@ function AuthGate({ children }: { children: ReactNode }) {
 
 function Shell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  
   return (
     <ThemeProvider>
       <AuthProvider>
         <AuthGate>
-          <div className="relative min-h-screen overflow-x-hidden bg-background">
+          <div className="relative min-h-screen overflow-x-hidden bg-[#000000] text-[#e3e3e3] font-sans">
             <div
-              aria-hidden
-              className="personalized-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden"
+              aria-hidden="true"
+              className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
             >
-              <span className="ambient-orb-a absolute -left-24 top-[-10%] h-[26rem] w-[26rem] rounded-full" />
-              <span className="ambient-orb-b absolute -right-24 bottom-[-15%] h-[30rem] w-[30rem] rounded-full" />
-              <span className="ambient-orb-c absolute left-[38%] top-[34%] h-[24rem] w-[24rem] rounded-full" />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(to bottom, #000000 60%, rgba(10, 25, 60, 0.4) 100%)`
+                }}
+              />
             </div>
-            <div className="relative z-10">
-              <TopBar />
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={path}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <Outlet />
-                </motion.div>
-              </AnimatePresence>
+            
+            <div className="relative z-10 flex min-h-screen flex-col">
+              <MobileTopBar toggleDrawer={() => setDrawerOpen(true)} />
+              <MobileDrawer isOpen={drawerOpen} closeDrawer={() => setDrawerOpen(false)} />
+              
+              <div className="flex-1 relative mt-16">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={path}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    className="h-full"
+                  >
+                    <Outlet />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
           </div>
+          
+          <a
+            href="https://wa.me/2338723497"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="fixed bottom-6 right-6 z-50 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 active:scale-95 transition-transform"
+            title="Contact on WhatsApp"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          </a>
         </AuthGate>
       </AuthProvider>
       <Toaster position="top-center" />
@@ -125,13 +284,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "OmniSuite — Ask Vladimir, your AI tech navigator" },
-      {
-        name: "description",
-        content:
-          "OmniSuite is a premium in-browser toolkit: QR studio, document scanner, media compressor, background remover, object eraser and OCR.",
-      },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
+      { title: "Assistant" },
+      { name: "description", content: "Assistant" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

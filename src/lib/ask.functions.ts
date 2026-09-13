@@ -94,3 +94,57 @@ export const askAssistant = createServerFn({ method: "POST" })
     if (!reply) throw new Error("The assistant returned an empty answer. Try again.");
     return { reply };
   });
+
+const TitleInput = z.object({
+  prompt: z.string().min(1).max(1000),
+});
+
+export const askTitle = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => TitleInput.parse(data))
+  .handler(async ({ data }): Promise<{ title: string }> => {
+    const geminiKey = process.env["GEMINI_API_KEY"];
+    const genericKey = process.env["AI_API_KEY"];
+    const lovableKey = process.env["LOVABLE_API_KEY"];
+    const key = geminiKey || genericKey || lovableKey;
+    if (!key) return { title: data.prompt.slice(0, 30) };
+
+    const defaultBase = geminiKey
+      ? "https://generativelanguage.googleapis.com/v1beta/openai"
+      : "https://ai.gateway.lovable.dev/v1";
+    const baseUrl = (process.env["AI_BASE_URL"] || defaultBase).replace(/\/$/, "");
+    const model =
+      process.env["AI_MODEL"] || (geminiKey ? "gemini-3.6-flash" : "google/gemini-3.7-flash");
+    const usingLovable = baseUrl.includes("ai.gateway.lovable.dev");
+
+    try {
+      const res = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(usingLovable
+            ? { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch" }
+            : { Authorization: `Bearer ${key}` }),
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            {
+              role: "system",
+              content: "You are a title generator. Return a very short, intriguing 2-4 word title for the user's query. Do not use quotes or formatting.",
+            },
+            {
+              role: "user",
+              content: data.prompt,
+            }
+          ],
+        }),
+      });
+
+      if (!res.ok) return { title: data.prompt.slice(0, 30) };
+      const json = await res.json() as any;
+      const title = json.choices?.[0]?.message?.content?.trim().replace(/^["']|["']$/g, '') ?? data.prompt.slice(0, 30);
+      return { title };
+    } catch {
+      return { title: data.prompt.slice(0, 30) };
+    }
+  });

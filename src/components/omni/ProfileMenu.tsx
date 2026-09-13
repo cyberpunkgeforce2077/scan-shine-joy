@@ -28,7 +28,12 @@ export function ProfileAvatar({ size = "md" }: { size?: "sm" | "md" }) {
     return <img src={profile.avatar_url} alt="" className={cn("rounded-xl object-cover", dims)} />;
   }
   return (
-    <span className={cn("grid place-items-center rounded-xl bg-primary font-extrabold text-primary-foreground shadow-sm", dims)}>
+    <span
+      className={cn(
+        "grid place-items-center rounded-xl bg-primary font-extrabold text-primary-foreground shadow-sm",
+        dims,
+      )}
+    >
       {initials(profile?.username ?? "U")}
     </span>
   );
@@ -62,24 +67,35 @@ export function ProfileMenu() {
       {open && (
         <div className="absolute right-0 top-12 z-50 w-60 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-plush-lg)] backdrop-blur-xl">
           <div className="border-b border-border px-4 py-3">
-            <p className="truncate text-sm font-bold text-foreground">{profile?.username ?? "User"}</p>
+            <p className="truncate text-sm font-bold text-foreground">
+              {profile?.username ?? "User"}
+            </p>
             <p className="truncate text-xs text-muted-foreground">{profile?.email ?? "Guest"}</p>
           </div>
           <div className="p-1.5">
             <button
-              onClick={() => { setEditOpen(true); setOpen(false); }}
+              onClick={() => {
+                setEditOpen(true);
+                setOpen(false);
+              }}
               className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground"
             >
               <Pencil className="h-4 w-4" /> Edit profile
             </button>
             <button
-              onClick={() => { setAvatarOpen(true); setOpen(false); }}
+              onClick={() => {
+                setAvatarOpen(true);
+                setOpen(false);
+              }}
               className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground"
             >
               <Camera className="h-4 w-4" /> Change avatar
             </button>
             <button
-              onClick={() => { void signOut(); setOpen(false); }}
+              onClick={() => {
+                void signOut();
+                setOpen(false);
+              }}
               className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground transition hover:bg-surface-2 hover:text-foreground"
             >
               <LogOut className="h-4 w-4" /> Sign out
@@ -116,11 +132,21 @@ export function ProfileMenu() {
     }
 
     return (
-      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm" onClick={onClose}>
-        <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-plush-lg)]" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <div
+          className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-plush-lg)]"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-foreground">Edit profile</h2>
-            <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2 hover:text-foreground">
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -167,7 +193,9 @@ export function ProfileMenu() {
         } else {
           const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
           const path = `${session.user.id}/avatar.${ext}`;
-          const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+          const { error: upErr } = await supabase.storage
+            .from("avatars")
+            .upload(path, file, { upsert: true });
           if (upErr) throw upErr;
           const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
           await updateProfile({ avatar_url: urlData.publicUrl });
@@ -195,11 +223,21 @@ export function ProfileMenu() {
     }
 
     return (
-      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm" onClick={onClose}>
-        <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-plush-lg)]" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <div
+          className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-plush-lg)]"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-foreground">Change avatar</h2>
-            <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2 hover:text-foreground">
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -211,7 +249,11 @@ export function ProfileMenu() {
                 disabled={busy}
                 className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface-1 px-4 py-2.5 text-xs font-bold text-foreground transition hover:bg-surface-2 active:scale-95 disabled:opacity-50"
               >
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
                 Upload new
               </button>
               {profile?.avatar_url && (

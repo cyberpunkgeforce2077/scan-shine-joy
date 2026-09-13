@@ -106,8 +106,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (!mounted) return;
             setProfile(p);
           } finally {
-            if (!mounted) return;
-            setLoading(false);
+            if (mounted) {
+              setLoading(false);
+            }
           }
         })();
       } else {
@@ -216,8 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isGuest = authMode === "guest";
   const needsOnboarding =
-    (authMode === "guest" && !profile?.onboarded) ||
-    (!!session && !!profile && !profile.onboarded);
+    (authMode === "guest" && !profile?.onboarded) || (!!session && !!profile && !profile.onboarded);
 
   return (
     <AuthContext.Provider

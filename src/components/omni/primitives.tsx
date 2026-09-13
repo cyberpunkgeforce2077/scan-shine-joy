@@ -26,7 +26,7 @@ export function PlushCard({
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={interactive ? { y: -4, scale: 1.008 } : {}}
       className={cn(
-        "plush group p-5 transition-[box-shadow,transform,border-color] duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-plush-lg)]",
+        "rounded-[24px] bg-[#1e1f20] group p-5 transition-[box-shadow,transform,border-color] duration-300 border border-transparent hover:border-white/10 shadow-sm",
         className,
       )}
     >
@@ -49,15 +49,15 @@ export function SectionHeading({
   return (
     <div className={cn("max-w-2xl", className)}>
       {eyebrow && (
-        <span className="inline-flex rounded-full border border-primary/10 bg-primary-container px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary-container-foreground">
+        <span className="inline-flex rounded-full bg-[#1e1f20] px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#8ab4f8]">
           {eyebrow}
         </span>
       )}
-      <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-foreground sm:text-4xl">
+      <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-[#e3e3e3] sm:text-4xl">
         {title}
       </h2>
       {description && (
-        <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#c4c7c5] sm:text-[15px]">
           {description}
         </p>
       )}
@@ -74,16 +74,19 @@ export function PillButton({
   variant?: "primary" | "tonal" | "ghost" | "outline";
 }) {
   const variants = {
-    primary: "bg-primary text-primary-foreground shadow-[var(--shadow-plush)] hover:brightness-105",
-    tonal: "bg-primary-container text-primary-container-foreground hover:brightness-[1.03]",
-    ghost: "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-    outline: "border border-border bg-card/70 text-foreground hover:bg-surface-2",
+    primary:
+      "bg-[#e3e3e3] text-[#1e1f20] shadow-sm hover:brightness-105 active:scale-[0.97]",
+    tonal:
+      "bg-[#1e1f20] text-[#e3e3e3] hover:brightness-[1.03] active:scale-[0.97]",
+    ghost: "text-[#c4c7c5] hover:bg-white/10 hover:text-[#e3e3e3] active:scale-[0.97]",
+    outline:
+      "border border-white/10 bg-[#1e1f20] text-[#e3e3e3] hover:bg-white/10 active:scale-[0.97]",
   } as const;
   return (
     <button
       {...props}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold tracking-[-0.01em] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold tracking-[-0.01em] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50",
         variants[variant],
         className,
       )}
@@ -105,7 +108,7 @@ export function PageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-32 pt-28 sm:px-6 sm:pt-32 lg:px-8">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-32 pt-16 sm:px-6 lg:px-8">
       <motion.header
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -114,9 +117,9 @@ export function PageShell({
       >
         <Link
           to="/"
-          className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition hover:text-foreground"
+          className="mb-6 inline-flex min-h-8 items-center gap-2 rounded-full border border-white/10 bg-[#1e1f20] px-3.5 py-1 text-xs font-semibold text-[#c4c7c5] transition hover:border-white/20 hover:bg-white/10 hover:text-[#e3e3e3]"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Ask Vladimir
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to Home
         </Link>
         <SectionHeading eyebrow={eyebrow} title={title} description={description} />
       </motion.header>

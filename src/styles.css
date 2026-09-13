@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * OmniSuite design system — quiet mineral surfaces, blue-violet intelligence accents.
+ * OmniSuite design system — warm plush surfaces, grounded terracotta and amber accents.
  * All colors use oklch. Never hardcode colors in components.
  */
 
@@ -64,111 +64,105 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --shadow-plush:
-    0 1px 2px oklch(0.32 0.03 262 / 0.04), 0 8px 24px -12px oklch(0.32 0.03 262 / 0.12),
-    0 24px 48px -32px oklch(0.32 0.03 262 / 0.16);
+    0 1px 3px oklch(0.2 0.04 255 / 0.04), 0 8px 20px -8px oklch(0.2 0.04 255 / 0.08),
+    0 20px 40px -24px oklch(0.2 0.04 255 / 0.09);
   --shadow-plush-lg:
-    0 2px 4px oklch(0.32 0.03 262 / 0.05), 0 16px 40px -16px oklch(0.32 0.03 262 / 0.16),
-    0 40px 80px -40px oklch(0.32 0.03 262 / 0.2);
+    0 2px 6px oklch(0.2 0.04 255 / 0.05), 0 16px 36px -10px oklch(0.2 0.04 255 / 0.11),
+    0 32px 64px -24px oklch(0.2 0.04 255 / 0.13);
   --shadow-inset-soft: inset 0 1px 0 oklch(1 0 0 / 0.7);
 }
 
 :root {
-  --radius: 1.25rem;
-  --background: oklch(0.976 0.006 255);
-  --foreground: oklch(0.245 0.018 262);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.27 0.02 262);
-  --surface-1: oklch(0.962 0.008 255);
-  --surface-2: oklch(0.936 0.012 255);
-  --surface-3: oklch(0.9 0.016 255);
-  --popover: oklch(0.995 0.003 255);
-  --popover-foreground: oklch(0.27 0.02 262);
-  --primary: oklch(0.56 0.13 258);
-  --primary-foreground: oklch(0.99 0.003 255);
-  --primary-container: oklch(0.91 0.055 258);
-  --primary-container-foreground: oklch(0.33 0.08 258);
-  --secondary: oklch(0.942 0.009 255);
-  --secondary-foreground: oklch(0.31 0.02 262);
-  --muted: oklch(0.942 0.009 255);
-  --muted-foreground: oklch(0.52 0.016 258);
-  --accent: oklch(0.9 0.05 258);
-  --accent-foreground: oklch(0.33 0.08 258);
-  --amber: oklch(0.78 0.085 205);
-  --amber-foreground: oklch(0.3 0.05 205);
-  --sage: oklch(0.77 0.055 172);
-  --sage-foreground: oklch(0.3 0.045 172);
-  --rose: oklch(0.78 0.06 300);
-  --rose-foreground: oklch(0.35 0.055 300);
-  --destructive: oklch(0.58 0.15 25);
-  --destructive-foreground: oklch(0.99 0.003 255);
-  --border: oklch(0.885 0.009 255);
-  --input: oklch(0.885 0.009 255);
-  --ring: oklch(0.55 0.115 258);
-  --chart-1: oklch(0.55 0.115 258);
-  --chart-2: oklch(0.77 0.055 172);
-  --chart-3: oklch(0.78 0.085 205);
-  --chart-4: oklch(0.78 0.06 300);
-  --chart-5: oklch(0.64 0.07 235);
-  --sidebar: oklch(0.968 0.007 255);
-  --sidebar-foreground: oklch(0.27 0.02 262);
-  --sidebar-primary: oklch(0.55 0.115 258);
-  --sidebar-primary-foreground: oklch(0.99 0.003 255);
-  --sidebar-accent: oklch(0.942 0.009 255);
-  --sidebar-accent-foreground: oklch(0.31 0.02 262);
-  --sidebar-border: oklch(0.898 0.009 255);
-  --sidebar-ring: oklch(0.55 0.115 258);
-  --backdrop-lavender: oklch(0.72 0.14 300);
-  --backdrop-cyan: oklch(0.76 0.12 205);
-  --backdrop-peach: oklch(0.82 0.1 55);
+  --radius: 1.125rem;
+  --background: oklch(0.978 0.012 250);
+  --foreground: oklch(0.19 0.038 255);
+  --card: oklch(0.995 0.005 250);
+  --card-foreground: oklch(0.2 0.035 255);
+  --surface-1: oklch(0.965 0.014 250);
+  --surface-2: oklch(0.938 0.02 252);
+  --surface-3: oklch(0.895 0.025 252);
+  --popover: oklch(0.995 0.005 250);
+  --popover-foreground: oklch(0.2 0.035 255);
+  --primary: oklch(0.52 0.165 254);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --primary-container: oklch(0.935 0.04 252);
+  --primary-container-foreground: oklch(0.26 0.11 254);
+  --secondary: oklch(0.942 0.016 250);
+  --secondary-foreground: oklch(0.25 0.03 255);
+  --muted: oklch(0.942 0.016 250);
+  --muted-foreground: oklch(0.48 0.03 255);
+  --accent: oklch(0.92 0.038 250);
+  --accent-foreground: oklch(0.28 0.1 254);
+  --amber: oklch(0.74 0.13 75);
+  --amber-foreground: oklch(0.28 0.06 75);
+  --sage: oklch(0.68 0.075 160);
+  --sage-foreground: oklch(0.27 0.045 160);
+  --rose: oklch(0.66 0.11 25);
+  --rose-foreground: oklch(0.3 0.06 25);
+  --destructive: oklch(0.58 0.16 28);
+  --destructive-foreground: oklch(0.99 0.005 60);
+  --border: oklch(0.89 0.02 250);
+  --input: oklch(0.89 0.02 250);
+  --ring: oklch(0.52 0.165 254);
+  --chart-1: oklch(0.52 0.165 254);
+  --chart-2: oklch(0.68 0.075 160);
+  --chart-3: oklch(0.74 0.13 75);
+  --chart-4: oklch(0.66 0.11 25);
+  --chart-5: oklch(0.6 0.08 240);
+  --sidebar: oklch(0.97 0.012 250);
+  --sidebar-foreground: oklch(0.2 0.035 255);
+  --sidebar-primary: oklch(0.52 0.165 254);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.942 0.016 250);
+  --sidebar-accent-foreground: oklch(0.25 0.03 255);
+  --sidebar-border: oklch(0.89 0.02 250);
+  --sidebar-ring: oklch(0.52 0.165 254);
 }
 
 .dark {
-  --background: oklch(0 0 0);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0.19 0.014 265);
-  --card-foreground: oklch(1 0 0);
-  --surface-1: oklch(0.16 0.01 265);
-  --surface-2: oklch(0.245 0 0);
-  --surface-3: oklch(0.3 0 0);
-  --popover: oklch(0.19 0.014 265);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.62 0.16 262);
-  --primary-foreground: oklch(1 0 0);
-  --primary-container: oklch(0.32 0.09 262);
-  --primary-container-foreground: oklch(0.95 0.02 262);
-  --secondary: oklch(0.245 0 0);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.245 0 0);
-  --muted-foreground: oklch(0.71 0.019 261);
-  --accent: oklch(0.28 0.02 262);
-  --accent-foreground: oklch(1 0 0);
-  --amber: oklch(0.8 0.08 205);
-  --amber-foreground: oklch(0.25 0.045 205);
-  --sage: oklch(0.79 0.05 172);
-  --sage-foreground: oklch(0.24 0.04 172);
-  --rose: oklch(0.79 0.055 300);
-  --rose-foreground: oklch(0.27 0.05 300);
-  --destructive: oklch(0.68 0.13 25);
-  --destructive-foreground: oklch(0.2 0.02 25);
-  --border: oklch(1 0 0 / 0.1);
-  --input: oklch(1 0 0 / 0.14);
-  --ring: oklch(0.62 0.16 262);
-  --chart-1: oklch(0.78 0.085 258);
-  --chart-2: oklch(0.79 0.05 172);
-  --chart-3: oklch(0.8 0.08 205);
-  --chart-4: oklch(0.79 0.055 300);
-  --chart-5: oklch(0.72 0.06 235);
-  --sidebar: oklch(0.24 0.012 262);
-  --sidebar-foreground: oklch(0.93 0.006 255);
-  --sidebar-primary: oklch(0.78 0.085 258);
-  --sidebar-primary-foreground: oklch(0.23 0.05 258);
-  --sidebar-accent: oklch(0.295 0.014 262);
-  --sidebar-accent-foreground: oklch(0.93 0.006 255);
-  --sidebar-border: oklch(0.335 0.014 262);
-  --sidebar-ring: oklch(0.78 0.085 258);
-  --backdrop-lavender: oklch(0.38 0.12 300);
-  --backdrop-cyan: oklch(0.4 0.1 205);
-  --backdrop-peach: oklch(0.44 0.08 55);
+  --background: #000000;
+  --foreground: #e3e3e3;
+  --card: #1e1f20;
+  --card-foreground: #e3e3e3;
+  --surface-1: #1e1f20;
+  --surface-2: #282a2c;
+  --surface-3: #333538;
+  --popover: #1e1f20;
+  --popover-foreground: #e3e3e3;
+  --primary: #8ab4f8;
+  --primary-foreground: #041e49;
+  --primary-container: #1b283d;
+  --primary-container-foreground: #d3e3fd;
+  --secondary: #282a2c;
+  --secondary-foreground: #e3e3e3;
+  --muted: #1e1f20;
+  --muted-foreground: #c4c7c5;
+  --accent: #282a2c;
+  --accent-foreground: #8ab4f8;
+  --amber: #f9ab00;
+  --amber-foreground: #202124;
+  --sage: #81c995;
+  --sage-foreground: #202124;
+  --rose: #f28b82;
+  --rose-foreground: #202124;
+  --destructive: #f28b82;
+  --destructive-foreground: #202124;
+  --border: #3c4043;
+  --input: #1e1f20;
+  --ring: #8ab4f8;
+  --chart-1: #8ab4f8;
+  --chart-2: #81c995;
+  --chart-3: #f9ab00;
+  --chart-4: #f28b82;
+  --chart-5: #c58af9;
+  --sidebar: #131314;
+  --sidebar-foreground: #e3e3e3;
+  --sidebar-primary: #8ab4f8;
+  --sidebar-primary-foreground: #041e49;
+  --sidebar-accent: #282a2c;
+  --sidebar-accent-foreground: #e3e3e3;
+  --sidebar-border: #3c4043;
+  --sidebar-ring: #8ab4f8;
 }
 
 @layer base {
@@ -223,48 +217,45 @@
 
 /* Plush frosted surface used across every module. */
 @utility plush {
-  border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 94%, transparent);
-  backdrop-filter: blur(14px) saturate(1.12);
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  box-shadow: var(--shadow-plush);
+  border-radius: var(--radius-2xl);
+  background-color: #1e1f20;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 @utility plush-raised {
-  border-radius: var(--radius-3xl);
-  background-color: color-mix(in oklab, var(--color-card) 97%, transparent);
-  backdrop-filter: blur(16px) saturate(1.12);
-  border: 1px solid color-mix(in oklab, var(--color-border) 85%, transparent);
-  box-shadow: var(--shadow-plush-lg);
+  border-radius: var(--radius-2xl);
+  background-color: #1e1f20;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 @utility glass-bar {
-  background-color: color-mix(in oklab, var(--color-card) 82%, transparent);
-  backdrop-filter: blur(18px) saturate(1.2);
-  border: 1px solid color-mix(in oklab, var(--color-border) 65%, transparent);
-  box-shadow: var(--shadow-plush);
+  background-color: #1e1f20;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 @utility mesh-hero {
   background-image:
     radial-gradient(
       42rem 26rem at 12% 6%,
-      color-mix(in oklab, var(--color-primary) 26%, transparent),
+      color-mix(in oklab, var(--color-primary) 12%, transparent),
       transparent 70%
     ),
     radial-gradient(
       36rem 24rem at 88% 0%,
-      color-mix(in oklab, var(--color-amber) 34%, transparent),
+      color-mix(in oklab, var(--color-amber) 14%, transparent),
       transparent 70%
     ),
     radial-gradient(
       40rem 28rem at 70% 92%,
-      color-mix(in oklab, var(--color-sage) 30%, transparent),
+      color-mix(in oklab, var(--color-sage) 12%, transparent),
       transparent 72%
     ),
     radial-gradient(
       34rem 22rem at 24% 96%,
-      color-mix(in oklab, var(--color-rose) 30%, transparent),
+      color-mix(in oklab, var(--color-rose) 10%, transparent),
       transparent 72%
     );
 }
@@ -272,18 +263,15 @@
 @keyframes mesh-drift {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1.05);
+    transform: translate3d(0, 0, 0) scale(1.02);
   }
-  33% {
-    transform: translate3d(-2%, 2%, 0) scale(1.12);
-  }
-  66% {
-    transform: translate3d(2%, -1.5%, 0) scale(1.08);
+  50% {
+    transform: translate3d(-1%, 1%, 0) scale(1.04);
   }
 }
 
 @utility animate-mesh {
-  animation: mesh-drift 22s ease-in-out infinite;
+  animation: mesh-drift 26s ease-in-out infinite;
 }
 
 @keyframes sparkle-spin {
@@ -300,60 +288,85 @@
   scrollbar-color: var(--color-surface-3) transparent;
 }
 
-/* Ambient slow-drifting glow orbs behind the app shell. GPU-friendly. */
-@keyframes orb-drift-a {
-  0%,
-  100% {
-    transform: translate3d(-6%, -4%, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(8%, 6%, 0) scale(1.15);
-  }
+/* Authentic Google Gemini dark canvas with ambient indigo glow as in image.png */
+@utility gemini-canvas-backdrop {
+  background-color: #131314;
+  background-image:
+    radial-gradient(
+      1200px 750px at 50% 68%,
+      rgba(26, 40, 72, 0.42) 0%,
+      rgba(19, 19, 20, 0) 72%
+    ),
+    radial-gradient(
+      800px 480px at 50% 50%,
+      rgba(35, 52, 90, 0.22) 0%,
+      rgba(19, 19, 20, 0) 65%
+    );
+  background-attachment: fixed;
 }
 
-@keyframes orb-drift-b {
-  0%,
-  100% {
-    transform: translate3d(6%, 5%, 0) scale(1.1);
-  }
-  50% {
-    transform: translate3d(-7%, -6%, 0) scale(0.95);
-  }
+@utility warm-canvas-backdrop {
+  background-color: #131314;
+  background-image:
+    radial-gradient(
+      1200px 750px at 50% 68%,
+      rgba(26, 40, 72, 0.42) 0%,
+      rgba(19, 19, 20, 0) 72%
+    ),
+    radial-gradient(
+      800px 480px at 50% 50%,
+      rgba(35, 52, 90, 0.22) 0%,
+      rgba(19, 19, 20, 0) 65%
+    );
+  background-attachment: fixed;
 }
 
 @utility personalized-backdrop {
-  background:
-    radial-gradient(circle at 18% 12%, color-mix(in oklab, var(--backdrop-lavender) 8%, transparent), transparent 30%),
-    radial-gradient(circle at 86% 16%, color-mix(in oklab, var(--backdrop-cyan) 7%, transparent), transparent 28%),
-    radial-gradient(circle at 52% 92%, color-mix(in oklab, var(--backdrop-peach) 6%, transparent), transparent 32%);
-  opacity: 0.88;
+  background-image:
+    radial-gradient(
+      100% 60% at 50% 0%,
+      color-mix(in oklab, var(--color-primary) 12%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      70% 45% at 95% 85%,
+      color-mix(in oklab, var(--color-amber) 7%, transparent),
+      transparent 65%
+    );
+  opacity: 0.95;
 }
 
 @utility ambient-orb-a {
-  background: radial-gradient(circle, color-mix(in oklab, var(--backdrop-lavender) 18%, transparent), transparent 70%);
-  filter: blur(110px);
-  will-change: transform;
-  animation: orb-drift-a 26s ease-in-out infinite;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-primary) 8%, transparent),
+    transparent 70%
+  );
+  filter: blur(90px);
+  opacity: 0.5;
 }
 
 @utility ambient-orb-b {
-  background: radial-gradient(circle, color-mix(in oklab, var(--backdrop-cyan) 17%, transparent), transparent 70%);
-  filter: blur(110px);
-  will-change: transform;
-  animation: orb-drift-b 32s ease-in-out infinite;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-amber) 6%, transparent),
+    transparent 70%
+  );
+  filter: blur(90px);
+  opacity: 0.45;
 }
 
 @utility ambient-orb-c {
-  background: radial-gradient(circle, color-mix(in oklab, var(--backdrop-peach) 14%, transparent), transparent 70%);
-  filter: blur(120px);
-  will-change: transform;
-  animation: orb-drift-a 30s ease-in-out infinite reverse;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-rose) 5%, transparent),
+    transparent 70%
+  );
+  filter: blur(100px);
+  opacity: 0.4;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ambient-orb-a,
-  .ambient-orb-b,
-  .ambient-orb-c,
   .animate-mesh {
     animation: none;
   }
@@ -362,6 +375,6 @@
 @media (max-width: 640px) {
   .plush,
   .plush-raised {
-    border-radius: 1.25rem;
+    border-radius: 1rem;
   }
 }

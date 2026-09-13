@@ -260,7 +260,7 @@ export function MediaDownloader() {
               {chosen && (
                 <a
                   href={chosen.url}
-                  target="_blank"
+                  
                   rel="noreferrer"
                   download
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-plush)] transition-transform active:scale-95"
@@ -273,7 +273,7 @@ export function MediaDownloader() {
               {audio && (
                 <a
                   href={audio.url}
-                  target="_blank"
+                  
                   rel="noreferrer"
                   download
                   className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-5 py-3 text-sm font-semibold transition active:scale-95"
@@ -292,7 +292,7 @@ export function MediaDownloader() {
                   <a
                     key={i}
                     href={f.url}
-                    target="_blank"
+                    
                     rel="noreferrer"
                     download
                     className="flex items-center justify-between rounded-2xl bg-surface-2/70 px-4 py-2.5 text-sm font-medium transition hover:bg-surface-2"

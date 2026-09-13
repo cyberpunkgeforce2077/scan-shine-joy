@@ -5,13 +5,13 @@ import { ChatHome } from "@/components/omni/ChatHome";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "OmniSuite — Ask Vladimir, your AI tech navigator" },
+      { title: "Assistant" },
       {
         name: "description",
         content:
           "Chat with an AI tech navigator and jump into QR, document scanning, OCR and downloader tools — all in one dark, private workspace.",
       },
-      { property: "og:title", content: "OmniSuite — Ask Vladimir, your AI tech navigator" },
+      { property: "og:title", content: "Assistant" },
       {
         property: "og:description",
         content: "AI chat plus private in-browser tools for QR codes, documents, OCR and media.",

@@ -150,7 +150,9 @@ export function FileScanTab() {
         <p className="mt-4 text-sm font-semibold text-foreground">
           {loading ? "Scanning file…" : "Drag & drop a file here"}
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">PNG, JPG, WEBP or PDF — scanned locally on your device</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          PNG, JPG, WEBP or PDF — scanned locally on your device
+        </p>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -186,7 +188,11 @@ export function FileScanTab() {
             <FileImage className="h-4 w-4 text-muted-foreground" />
             <span className="truncate text-xs text-muted-foreground">{fileName}</span>
           </div>
-          <img src={preview} alt={`Preview of ${fileName}`} className="max-h-80 w-full object-contain bg-secondary" />
+          <img
+            src={preview}
+            alt={`Preview of ${fileName}`}
+            className="max-h-80 w-full object-contain bg-secondary"
+          />
         </div>
       )}
 
@@ -210,7 +216,9 @@ export function FileScanTab() {
 
       {result && (
         <div className="rounded-3xl border border-border bg-card p-5">
-          <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Scan result</h3>
+          <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Scan result
+          </h3>
           <p className="mt-3 break-all text-sm text-foreground">{result}</p>
           <div className="mt-5 flex gap-3">
             <button
@@ -239,7 +247,11 @@ export function FileScanTab() {
         </div>
       )}
 
-      <CelebrationModal open={celebrate} onClose={() => setCelebrate(false)} title="First File Scanned!" />
+      <CelebrationModal
+        open={celebrate}
+        onClose={() => setCelebrate(false)}
+        title="First File Scanned!"
+      />
     </div>
   );
 }

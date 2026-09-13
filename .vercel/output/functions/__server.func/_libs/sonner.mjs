@@ -1,4 +1,4 @@
-import { i as __toESM } from "../_ssr/rolldown-runtime-D7D4PA-g.mjs";
+import { r as __toESM } from "../_runtime.mjs";
 import { G as require_react, l as require_react_dom } from "./@tanstack/react-router+[...].mjs";
 //#region node_modules/sonner/dist/index.mjs
 var import_react = /* @__PURE__ */ __toESM(require_react(), 1);

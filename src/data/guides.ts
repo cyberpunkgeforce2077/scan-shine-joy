@@ -213,9 +213,7 @@ export const guides: Guide[] = [
           "Email first — it's the master key that resets every other password. Then banking, cloud storage, and social accounts. An authenticator app (or built-in passkeys) beats SMS codes, but SMS beats nothing.",
           "2FA is the single highest-value security move that exists. It stops password thieves cold even when your password leaks.",
         ],
-        tips: [
-          "Save the backup codes somewhere offline — a note in a drawer works.",
-        ],
+        tips: ["Save the backup codes somewhere offline — a note in a drawer works."],
       },
       {
         heading: "Use a password manager (yes, really)",
