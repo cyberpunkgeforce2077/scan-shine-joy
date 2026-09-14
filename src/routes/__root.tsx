@@ -24,13 +24,15 @@ import {
   LogOut,
   User as UserIcon,
   MessageSquare,
+  Music,
+  Video,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/omni/ThemeProvider";
+import { ThemeToggle } from "@/components/omni/ThemeToggle";
 import { AuthProvider, useAuth } from "@/components/omni/AuthContext";
 import { AuthScreen } from "@/components/omni/AuthScreen";
 import { OnboardingScreen } from "@/components/omni/OnboardingScreen";
-import { NetworkBadge } from "@/components/omni/NetworkBadge";
 import { getActiveConversationId, getConversation } from "@/lib/conversationStore";
 import { useState, useEffect, type ReactNode } from "react";
 
@@ -68,23 +70,23 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4 bg-[#000000] border-b border-white/5">
+    <header className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4 bg-background/95 backdrop-blur-md border-b border-black/10 dark:border-white/10">
       <button
         onClick={toggleDrawer}
-        className="p-2 -ml-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97]"
+        className="p-2 -ml-2 text-foreground hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97]"
         aria-label="Toggle navigation drawer"
       >
         <Menu className="h-6 w-6" />
       </button>
 
       <div className="flex-1 px-3 truncate text-center">
-        <span className="text-base font-medium text-[#e3e3e3] opacity-90 truncate">
+        <span className="text-base font-semibold text-foreground truncate">
           {chatTitle || "OmniSuite"}
         </span>
       </div>
 
       <div className="flex items-center gap-2">
-        <NetworkBadge />
+        <ThemeToggle variant="icon" />
         <Link
           to="/settings"
           title="User Profile"
@@ -117,19 +119,19 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 bottom-0 left-0 w-[300px] bg-[#000000] z-50 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 bottom-0 left-0 w-[300px] bg-card border-r border-black/10 dark:border-white/10 z-50 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between p-4">
           <Link
             to="/"
             onClick={closeDrawer}
-            className="text-xl font-medium text-[#e3e3e3] hover:text-[#8ab4f8] transition-colors"
+            className="text-xl font-bold text-foreground hover:text-primary transition-colors"
           >
-            Assistant Hub
+            OmniSuite
           </Link>
           <button
             onClick={closeDrawer}
-            className="p-2 text-[#e3e3e3] hover:bg-white/10 rounded-full transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors cursor-pointer"
           >
             <X className="h-6 w-6" />
           </button>
@@ -139,9 +141,9 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
           <Link
             to="/chat"
             onClick={closeDrawer}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-[#1e1f20] hover:bg-[#2a2b2e] rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-2"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-surface-1 hover:bg-surface-2 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-2"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-5 w-5 text-primary" />
             New chat
           </Link>
 
@@ -150,133 +152,125 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
               window.dispatchEvent(new CustomEvent("omni-open-search"));
               closeDrawer();
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-6"
+            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-muted-foreground hover:text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97] mb-4"
           >
             <Search className="h-5 w-5" />
             Search chats
           </button>
 
-          {/* Offline Tools Section */}
-          <div className="px-4 mb-2 flex items-center justify-between text-xs font-semibold text-[#8e8e8e] uppercase tracking-wider">
-            <span>Offline Tools (Local)</span>
-            <span className="text-[10px] text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded-full font-medium">
-              4 Ready
+          {/* Headliner Tool: Text to Music */}
+          <Link
+            to="/music"
+            onClick={closeDrawer}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-500/15 via-pink-500/10 to-transparent border border-purple-500/25 hover:border-purple-500/50 rounded-2xl text-foreground font-semibold transition-all duration-200 cursor-pointer active:scale-[0.97] mb-2 shadow-xs"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-8 w-8 place-items-center rounded-xl bg-purple-500/20 text-purple-400">
+                <Music className="h-4 w-4" />
+              </div>
+              <span className="font-semibold">Text to Music</span>
+            </div>
+            <span className="text-[10px] font-bold tracking-wider uppercase text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded-full">
+              Headliner
             </span>
-          </div>
-          <div className="space-y-1 mb-5">
-            <Link
-              to="/qr"
-              onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <div className="flex items-center gap-3">
-                <QrCode className="h-5 w-5 text-emerald-400" />
-                <span>QR Code Studio</span>
-              </div>
-              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
-                Offline
-              </span>
-            </Link>
-            <Link
-              to="/scanner"
-              onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <div className="flex items-center gap-3">
-                <Scan className="h-5 w-5 text-emerald-400" />
-                <span>Doc Scanner</span>
-              </div>
-              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
-                Offline
-              </span>
-            </Link>
-            <Link
-              to="/ocr"
-              onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <div className="flex items-center gap-3">
-                <ImageIcon className="h-5 w-5 text-emerald-400" />
-                <span>Local OCR</span>
-              </div>
-              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
-                Offline
-              </span>
-            </Link>
-            <Link
-              to="/guides"
-              onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
-            >
-              <div className="flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-emerald-400" />
-                <span>Field Guides</span>
-              </div>
-              <span className="text-[10px] text-emerald-400/80 font-semibold uppercase">
-                Offline
-              </span>
-            </Link>
-          </div>
+          </Link>
 
-          {/* Online Tools Section */}
-          <div className="px-4 mb-2 flex items-center justify-between text-xs font-semibold text-[#8e8e8e] uppercase tracking-wider">
-            <span>Online Tools (Cloud/AI)</span>
-            <span className="text-[10px] text-sky-400 bg-sky-500/15 px-1.5 py-0.5 rounded-full font-medium">
-              Network
+          {/* Headliner Tool: Text to Video */}
+          <Link
+            to="/video"
+            onClick={closeDrawer}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-500/15 via-cyan-500/10 to-transparent border border-blue-500/25 hover:border-blue-500/50 rounded-2xl text-foreground font-semibold transition-all duration-200 cursor-pointer active:scale-[0.97] mb-4 shadow-xs"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-8 w-8 place-items-center rounded-xl bg-blue-500/20 text-blue-400">
+                <Video className="h-4 w-4" />
+              </div>
+              <span className="font-semibold">Text to Video</span>
+            </div>
+            <span className="text-[10px] font-bold tracking-wider uppercase text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded-full">
+              New
             </span>
-          </div>
-          <div className="space-y-1 mb-6">
+          </Link>
+
+          {/* Unified Navigation List */}
+          <div className="space-y-1">
             <Link
               to="/chat"
               onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <div className="flex items-center gap-3">
-                <MessageSquare className="h-5 w-5 text-sky-400" />
-                <span>Vlad Bot</span>
-              </div>
-              <span className="text-[10px] text-sky-400/80 font-semibold uppercase">Online</span>
+              <MessageSquare className="h-5 w-5 text-primary" />
+              <span>Vlad Bot</span>
             </Link>
             <Link
               to="/downloader"
               onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <div className="flex items-center gap-3">
-                <Download className="h-5 w-5 text-sky-400" />
-                <span>Media Downloader</span>
-              </div>
-              <span className="text-[10px] text-sky-400/80 font-semibold uppercase">Online</span>
+              <Download className="h-5 w-5 text-emerald-400" />
+              <span>Media Downloader</span>
+            </Link>
+            <Link
+              to="/scanner"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <Scan className="h-5 w-5 text-amber-400" />
+              <span>Doc Scanner</span>
+            </Link>
+            <Link
+              to="/qr"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <QrCode className="h-5 w-5 text-pink-400" />
+              <span>QR Code Studio</span>
+            </Link>
+            <Link
+              to="/ocr"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <ImageIcon className="h-5 w-5 text-cyan-400" />
+              <span>Local OCR</span>
             </Link>
             <Link
               to="/dakphraser"
               onClick={closeDrawer}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 rounded-full text-[#e3e3e3] font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
-              <div className="flex items-center gap-3">
-                <Wand2 className="h-5 w-5 text-sky-400" />
-                <span>DakPhraser</span>
-              </div>
-              <span className="text-[10px] text-sky-400/80 font-semibold uppercase">Online</span>
+              <Wand2 className="h-5 w-5 text-purple-400" />
+              <span>DakPhraser</span>
+            </Link>
+            <Link
+              to="/guides"
+              onClick={closeDrawer}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl text-foreground font-medium transition-all duration-200 cursor-pointer active:scale-[0.97]"
+            >
+              <BookOpen className="h-5 w-5 text-orange-400" />
+              <span>Field Guides</span>
             </Link>
           </div>
         </div>
 
-        {/* Footer */}
-        <Link
-          to="/settings"
-          onClick={closeDrawer}
-          title="User Profile"
-          className="p-3 border-t border-white/10 flex items-center gap-3 hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-[0.97] mx-2 mb-2 rounded-xl"
-        >
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-lg">
-            {profile?.username?.charAt(0).toUpperCase() || "U"}
-          </div>
-          <div className="flex-1 text-[#e3e3e3] font-medium truncate">
-            {profile?.username || "Settings"}
-          </div>
-          <Settings className="h-5 w-5 text-[#c4c7c5]" />
-        </Link>
+        {/* Theme Switch & Profile Footer */}
+        <div className="p-3 border-t border-black/10 dark:border-white/10 space-y-2">
+          <ThemeToggle variant="labeled" />
+          <Link
+            to="/settings"
+            onClick={closeDrawer}
+            title="User Profile"
+            className="flex items-center gap-3 p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.97]"
+          >
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-lg">
+              {profile?.username?.charAt(0).toUpperCase() || "U"}
+            </div>
+            <div className="flex-1 text-foreground font-medium truncate">
+              {profile?.username || "Settings"}
+            </div>
+            <Settings className="h-5 w-5 text-muted-foreground" />
+          </Link>
+        </div>
       </div>
     </>
   );
@@ -358,15 +352,15 @@ function Shell() {
     <ThemeProvider>
       <AuthProvider>
         <AuthGate>
-          <div className="relative min-h-screen overflow-x-hidden bg-[#000000] text-[#e3e3e3] font-sans">
+          <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground font-sans">
             <div
               aria-hidden="true"
               className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
             >
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 dark:opacity-100 opacity-60 transition-opacity duration-300"
                 style={{
-                  background: `linear-gradient(to bottom, #000000 60%, rgba(10, 25, 60, 0.4) 100%)`,
+                  background: `linear-gradient(to bottom, var(--background) 60%, var(--surface-2) 100%)`,
                 }}
               />
             </div>

@@ -1,4 +1,4 @@
-import { r as __toESM } from "../_runtime.mjs";
+import { o as __toESM } from "../_runtime.mjs";
 import { G as require_react } from "./@tanstack/react-router+[...].mjs";
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
@@ -696,6 +696,16 @@ var Mic = createLucideIcon("mic", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Moon = createLucideIcon("moon", [["path", {
+	d: "M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401",
+	key: "kfwtm"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Music4 = createLucideIcon("music-4", [
 	["path", {
 		d: "M9 18V5l12-2v13",
@@ -704,6 +714,30 @@ var Music4 = createLucideIcon("music-4", [
 	["path", {
 		d: "m9 9 12-2",
 		key: "1e64n2"
+	}],
+	["circle", {
+		cx: "6",
+		cy: "18",
+		r: "3",
+		key: "fqmcym"
+	}],
+	["circle", {
+		cx: "18",
+		cy: "16",
+		r: "3",
+		key: "1hluhg"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Music = createLucideIcon("music", [
+	["path", {
+		d: "M9 18V5l12-2v13",
+		key: "1jmyc2"
 	}],
 	["circle", {
 		cx: "6",
@@ -961,6 +995,52 @@ var Sparkles = createLucideIcon("sparkles", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Sun = createLucideIcon("sun", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "4",
+		key: "4exip2"
+	}],
+	["path", {
+		d: "M12 2v2",
+		key: "tus03m"
+	}],
+	["path", {
+		d: "M12 20v2",
+		key: "1lh1kg"
+	}],
+	["path", {
+		d: "m4.93 4.93 1.41 1.41",
+		key: "149t6j"
+	}],
+	["path", {
+		d: "m17.66 17.66 1.41 1.41",
+		key: "ptbguv"
+	}],
+	["path", {
+		d: "M2 12h2",
+		key: "1t8f8n"
+	}],
+	["path", {
+		d: "M20 12h2",
+		key: "1q8mjw"
+	}],
+	["path", {
+		d: "m6.34 17.66-1.41 1.41",
+		key: "1m8zz5"
+	}],
+	["path", {
+		d: "m19.07 4.93-1.41 1.41",
+		key: "1shlcs"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Thermometer = createLucideIcon("thermometer", [["path", {
 	d: "M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z",
 	key: "17jzev"
@@ -1162,4 +1242,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { Lightbulb as A, ClipboardPaste as B, MessageSquare as C, LogOut as D, Mail as E, ExternalLink as F, BatteryCharging as G, Camera as H, Download as I, ArrowRight as K, DatabaseBackup as L, Image as M, Gauge as N, LoaderCircle as O, Fish as P, Copy as R, MicOff as S, MemoryStick as T, Bot as U, Check as V, BookOpen as W, RefreshCw as _, UserRound as a, Music4 as b, Trash2 as c, ShieldCheck as d, Settings as f, Scan as g, SearchX as h, WandSparkles as i, Laptop as j, Link2 as k, Thermometer as l, Search as m, Wifi as n, Upload as o, SendHorizontal as p, ArrowLeft as q, WifiOff as r, Type as s, X as t, Sparkles as u, QrCode as v, Menu as w, Mic as x, Plus as y, Clock as z };
+export { LogOut as A, DatabaseBackup as B, Moon as C, Menu as D, MessageSquare as E, Image as F, Camera as G, Clock as H, Gauge as I, BatteryCharging as J, Bot as K, Fish as L, Link2 as M, Lightbulb as N, MemoryStick as O, Laptop as P, ExternalLink as R, Music4 as S, MicOff as T, ClipboardPaste as U, Copy as V, Check as W, ArrowLeft as X, ArrowRight as Y, Scan as _, UserRound as a, Plus as b, Trash2 as c, Sparkles as d, ShieldCheck as f, SearchX as g, Search as h, WandSparkles as i, LoaderCircle as j, Mail as k, Thermometer as l, SendHorizontal as m, Wifi as n, Upload as o, Settings as p, BookOpen as q, WifiOff as r, Type as s, X as t, Sun as u, RefreshCw as v, Mic as w, Music as x, QrCode as y, Download as z };

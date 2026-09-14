@@ -14,7 +14,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { detectPlatform, resolveMedia, type MediaResult } from "@/lib/downloader.functions";
-import { OnlineRequiredBanner } from "@/components/omni/OnlineRequiredBanner";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cn } from "@/lib/utils";
 
@@ -154,14 +153,6 @@ export function MediaDownloader() {
 
   return (
     <div className="space-y-4">
-      {!isOnline && (
-        <OnlineRequiredBanner
-          featureName="Media Downloader"
-          offlineAlternative="Fetching online video streams requires network access. You can use on-device tools like QR Studio, Doc Scanner, and Local OCR while offline."
-          onRetry={() => void checkConnection()}
-        />
-      )}
-
       <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
         <div className="plush-raised p-5 sm:p-6">
           <h2 className="text-base font-bold">Paste a link</h2>

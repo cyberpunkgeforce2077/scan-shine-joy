@@ -3,7 +3,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
 import { Check, Copy, Loader2, RefreshCw, Sparkles, Trash2, Wand2 } from "lucide-react";
 import { paraphrase } from "@/lib/dakphraser.functions";
-import { OnlineRequiredBanner } from "@/components/omni/OnlineRequiredBanner";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cn } from "@/lib/utils";
 
@@ -63,13 +62,6 @@ export function DakPhraser() {
 
   return (
     <div className="space-y-4">
-      {!isOnline && (
-        <OnlineRequiredBanner
-          featureName="DakPhraser"
-          offlineAlternative="AI text rewriting requires network access. You can use on-device Document Scanner or Local OCR while offline."
-          onRetry={() => void checkConnection()}
-        />
-      )}
       <div className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
         <div className="plush-raised p-5 sm:p-6">
           <div className="flex items-center justify-between gap-3">
