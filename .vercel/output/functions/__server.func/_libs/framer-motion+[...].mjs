@@ -1,5 +1,6 @@
-import { r as __toESM } from "../_runtime.mjs";
-import { C as require_jsx_runtime, G as require_react } from "./@tanstack/react-router+[...].mjs";
+import { o as __toESM } from "../_runtime.mjs";
+import { u as require_react } from "./@floating-ui/react-dom+[...].mjs";
+import { o as require_jsx_runtime } from "./@radix-ui/react-collection+[...].mjs";
 //#region node_modules/framer-motion/dist/es/context/LayoutGroupContext.mjs
 var import_jsx_runtime = require_jsx_runtime();
 var import_react = /* @__PURE__ */ __toESM(require_react(), 1);
@@ -98,7 +99,10 @@ var SubscriptionManager = class {
 	}
 	add(handler) {
 		addUniqueItem(this.subscriptions, handler);
-		return () => removeItem(this.subscriptions, handler);
+		return () => this.remove(handler);
+	}
+	remove(handler) {
+		removeItem(this.subscriptions, handler);
 	}
 	notify(a, b, c) {
 		const numSubscriptions = this.subscriptions.length;
@@ -250,8 +254,11 @@ function createRenderStep(runNextFrame) {
 	let flushNextFrame = false;
 	/**
 	* A set of processes which were marked keepAlive when scheduled.
+	* A keepAlive process is always also held by a frame queue until
+	* it's cancelled, so a Set has the same lifetime semantics as a
+	* WeakSet here while being considerably faster to query every frame.
 	*/
-	const toKeepAlive = /* @__PURE__ */ new WeakSet();
+	const toKeepAlive = /* @__PURE__ */ new Set();
 	let latestFrameData = {
 		delta: 0,
 		timestamp: 0,
@@ -259,7 +266,7 @@ function createRenderStep(runNextFrame) {
 	};
 	function triggerCallback(callback) {
 		if (toKeepAlive.has(callback)) {
-			step.schedule(callback);
+			nextFrame.add(callback);
 			runNextFrame();
 		}
 		callback(latestFrameData);
@@ -399,6 +406,9 @@ var time = {
 	}
 };
 //#endregion
+//#region node_modules/motion-dom/dist/es/value/types/utils/sanitize.mjs
+var sanitize = (v) => Math.round(v * 1e5) / 1e5;
+//#endregion
 //#region node_modules/motion-dom/dist/es/animation/utils/is-css-variable.mjs
 var checkStringStartsWith = (token) => (key) => typeof key === "string" && key.startsWith(token);
 var isCSSVariableName = /*@__PURE__*/ checkStringStartsWith("--");
@@ -432,9 +442,6 @@ var scale = {
 	...number,
 	default: 1
 };
-//#endregion
-//#region node_modules/motion-dom/dist/es/value/types/utils/sanitize.mjs
-var sanitize = (v) => Math.round(v * 1e5) / 1e5;
 //#endregion
 //#region node_modules/motion-dom/dist/es/value/types/utils/float-regex.mjs
 var floatRegex = /-?(?:\d+(?:\.\d+)?|\.\d+)/gu;
@@ -560,8 +567,14 @@ var color = {
 var colorRegex = /(?:#[\da-f]{3,8}|(?:rgb|hsl)a?\((?:-?[\d.]+%?[,\s]+){2}-?[\d.]+%?\s*(?:[,/]\s*)?(?:\b\d+(?:\.\d+)?|\.\d+)?%?\))/giu;
 //#endregion
 //#region node_modules/motion-dom/dist/es/value/types/complex/index.mjs
+/**
+* Non-global copies of the token regexes so test() can use .test()
+* (no match array, stops at the first token) without lastIndex state.
+*/
+var hasFloat = /*@__PURE__*/ new RegExp(floatRegex.source);
+var hasColor = /*@__PURE__*/ new RegExp(colorRegex.source, "i");
 function test(v) {
-	return isNaN(v) && typeof v === "string" && (v.match(floatRegex)?.length || 0) + (v.match(colorRegex)?.length || 0) > 0;
+	return isNaN(v) && typeof v === "string" && (hasFloat.test(v) || hasColor.test(v));
 }
 var NUMBER_TOKEN = "number";
 var COLOR_TOKEN = "color";
@@ -569,6 +582,15 @@ var VAR_TOKEN = "var";
 var VAR_FUNCTION_TOKEN = "var(";
 var SPLIT_TOKEN = "${}";
 var complexRegex = /var\s*\(\s*--(?:[\w-]+\s*|[\w-]+\s*,(?:\s*[^)(\s]|\s*\((?:[^)(]|\([^)(]*\))*\))+\s*)\)|#[\da-f]{3,8}|(?:rgb|hsl)a?\((?:-?[\d.]+%?[,\s]+){2}-?[\d.]+%?\s*(?:[,/]\s*)?(?:\b\d+(?:\.\d+)?|\.\d+)?%?\)|-?(?:\d+(?:\.\d+)?|\.\d+)/giu;
+/**
+* Whether analyseComplexValue(value) would find any values, without
+* tokenising the string. CSS variables are resolved before this is
+* used, so it's enough to look for a number or a color.
+*/
+function hasComplexValues(value) {
+	const asString = value.toString();
+	return hasFloat.test(asString) || hasColor.test(asString);
+}
 function analyseComplexValue(value) {
 	const originalValue = value.toString();
 	const values = [];
@@ -710,8 +732,10 @@ var colorTypes = [
 var getColorType = (v) => colorTypes.find((type) => type.test(v));
 function asRGBA(color) {
 	const type = getColorType(color);
-	`${color}`;
-	if (!Boolean(type)) return false;
+	if (!type) {
+		`${color}`;
+		return false;
+	}
 	let model = type.parse(color);
 	if (type === hsla) model = hslaToRgba(model);
 	return model;
@@ -804,8 +828,32 @@ var mixComplex = (origin, target) => {
 };
 //#endregion
 //#region node_modules/motion-dom/dist/es/utils/mix/index.mjs
+/**
+* A single number with an optional unit, e.g. "50%", "-10px", ".5em".
+* Exponents don't match, so they fall through to the complex mixer.
+*/
+var unitValue = /^(-?(?:\d+(?:\.\d*)?|\.\d+))([a-z%]*)$/iu;
+/**
+* Most CSS values Motion mixes are a single number with a unit. Mixing
+* these directly produces the same output as the complex mixer
+* ("25%", "0.33333px") without tokenising both strings.
+*/
+function mixUnit(from, to) {
+	const a = unitValue.exec(from);
+	if (!a) return;
+	const b = unitValue.exec(to);
+	if (!b || a[2] !== b[2]) return;
+	const unit = a[2];
+	const origin = parseFloat(a[1]);
+	const target = parseFloat(b[1]);
+	return (p) => sanitize(mixNumber$1(origin, target, p)) + unit;
+}
 function mix(from, to, p) {
 	if (typeof from === "number" && typeof to === "number" && typeof p === "number") return mixNumber$1(from, to, p);
+	if (typeof from === "string" && typeof to === "string") {
+		const mixer = mixUnit(from, to);
+		if (mixer) return mixer;
+	}
 	return getMixer(from)(from, to);
 }
 //#endregion
@@ -1013,7 +1061,6 @@ function spring(optionsOrVisualDuration = springDefaults.visualDuration, bounce 
 		keyframes: [0, 1],
 		bounce
 	} : optionsOrVisualDuration;
-	let { restSpeed, restDelta } = options;
 	const origin = options.keyframes[0];
 	const target = options.keyframes[options.keyframes.length - 1];
 	/**
@@ -1028,11 +1075,23 @@ function spring(optionsOrVisualDuration = springDefaults.visualDuration, bounce 
 		...options,
 		velocity: -/* @__PURE__ */ millisecondsToSeconds(options.velocity || 0)
 	});
-	const initialVelocity = velocity || 0;
 	const dampingRatio = damping / (2 * Math.sqrt(stiffness * mass));
-	const initialDelta = target - origin;
 	const undampedAngularFreq = /* @__PURE__ */ millisecondsToSeconds(Math.sqrt(stiffness / mass));
 	const decay = dampingRatio * undampedAngularFreq;
+	/**
+	* Everything that changes when the spring is retargeted: written by
+	* retarget() and update(), read by the resolvers. Grouped on one object,
+	* like the coefficients (c) below. Writing doubles to object fields
+	* measured marginally faster than to captured let variables in optimised
+	* code; neither allocates, so this is a grouping choice, not a GC one.
+	*/
+	const s = {
+		target,
+		delta: target - origin,
+		velocity: velocity || 0,
+		restSpeed: 0,
+		restDelta: 0
+	};
 	/**
 	* If we're working on a granular scale, use smaller defaults for determining
 	* when the spring is finished.
@@ -1040,78 +1099,123 @@ function spring(optionsOrVisualDuration = springDefaults.visualDuration, bounce 
 	* These defaults have been selected emprically based on what strikes a good
 	* ratio between feeling good and finishing as soon as changes are imperceptible.
 	*/
-	const isGranularScale = Math.abs(initialDelta) < 5;
-	restSpeed || (restSpeed = isGranularScale ? springDefaults.restSpeed.granular : springDefaults.restSpeed.default);
-	restDelta || (restDelta = isGranularScale ? springDefaults.restDelta.granular : springDefaults.restDelta.default);
+	const setRestThresholds = () => {
+		const isGranularScale = Math.abs(s.delta) < 5;
+		s.restSpeed = options.restSpeed || (isGranularScale ? springDefaults.restSpeed.granular : springDefaults.restSpeed.default);
+		s.restDelta = options.restDelta || (isGranularScale ? springDefaults.restDelta.granular : springDefaults.restDelta.default);
+	};
+	setRestThresholds();
 	let resolveSpring;
 	let resolveVelocity;
+	/**
+	* Derives the coefficients that depend on origin, target and initial
+	* velocity. Called once now and again whenever the spring is retargeted.
+	*/
+	let update;
 	if (dampingRatio < 1) {
 		const angularFreq = calcAngularFreq(undampedAngularFreq, dampingRatio);
-		const A = (initialVelocity + decay * initialDelta) / angularFreq;
-		const sinCoeff = decay * A + initialDelta * angularFreq;
-		const cosCoeff = decay * initialDelta - A * angularFreq;
 		/**
-		* The underdamped hot path needs both position and velocity every
-		* frame and they share the same exp/sin/cos terms, so sample both
-		* at once, memoized by t, to only calculate them once per frame.
+		* A is the position coefficient, sinC/cosC the coefficients of the
+		* analytical derivative (px/ms). The exp/sin/cos terms depend only
+		* on t, so they're memoized by t independently of the target: a
+		* spring retargeted every frame samples the same t each frame and
+		* skips the transcendentals entirely.
 		*/
-		let sampledT = -1;
-		let position = 0;
-		let velocityAtT = 0;
+		const c = {
+			A: 0,
+			sinC: 0,
+			cosC: 0,
+			t: -1,
+			env: 0,
+			sin: 0,
+			cos: 0
+		};
+		update = () => {
+			c.A = (s.velocity + decay * s.delta) / angularFreq;
+			c.sinC = decay * c.A + s.delta * angularFreq;
+			c.cosC = decay * s.delta - c.A * angularFreq;
+		};
 		const sample = (t) => {
-			if (t !== sampledT) {
-				sampledT = t;
-				const envelope = Math.exp(-decay * t);
-				const sin = Math.sin(angularFreq * t);
-				const cos = Math.cos(angularFreq * t);
-				position = target - envelope * (A * sin + initialDelta * cos);
-				velocityAtT = envelope * (sinCoeff * sin + cosCoeff * cos);
+			if (t !== c.t) {
+				c.t = t;
+				c.env = Math.exp(-decay * t);
+				c.sin = Math.sin(angularFreq * t);
+				c.cos = Math.cos(angularFreq * t);
 			}
 		};
 		resolveSpring = (t) => {
 			sample(t);
-			return position;
+			return s.target - c.env * (c.A * c.sin + s.delta * c.cos);
 		};
 		resolveVelocity = (t) => {
 			sample(t);
-			return velocityAtT;
+			return c.env * (c.sinC * c.sin + c.cosC * c.cos);
 		};
 	} else if (dampingRatio === 1) {
-		resolveSpring = (t) => target - Math.exp(-undampedAngularFreq * t) * (initialDelta + (initialVelocity + undampedAngularFreq * initialDelta) * t);
-		const C = initialVelocity + undampedAngularFreq * initialDelta;
-		resolveVelocity = (t) => Math.exp(-undampedAngularFreq * t) * (undampedAngularFreq * C * t - initialVelocity);
+		resolveSpring = (t) => s.target - Math.exp(-undampedAngularFreq * t) * (s.delta + (s.velocity + undampedAngularFreq * s.delta) * t);
+		const c = { C: 0 };
+		update = () => {
+			c.C = s.velocity + undampedAngularFreq * s.delta;
+		};
+		resolveVelocity = (t) => Math.exp(-undampedAngularFreq * t) * (undampedAngularFreq * c.C * t - s.velocity);
 	} else {
 		const dampedAngularFreq = undampedAngularFreq * Math.sqrt(dampingRatio * dampingRatio - 1);
 		resolveSpring = (t) => {
 			const envelope = Math.exp(-decay * t);
 			const freqForT = Math.min(dampedAngularFreq * t, 300);
-			return target - envelope * ((initialVelocity + decay * initialDelta) * Math.sinh(freqForT) + dampedAngularFreq * initialDelta * Math.cosh(freqForT)) / dampedAngularFreq;
+			return s.target - envelope * ((s.velocity + decay * s.delta) * Math.sinh(freqForT) + dampedAngularFreq * s.delta * Math.cosh(freqForT)) / dampedAngularFreq;
 		};
-		const P = (initialVelocity + decay * initialDelta) / dampedAngularFreq;
-		const sinhCoeff = decay * P - initialDelta * dampedAngularFreq;
-		const coshCoeff = decay * initialDelta - P * dampedAngularFreq;
+		const c = {
+			P: 0,
+			sinh: 0,
+			cosh: 0
+		};
+		update = () => {
+			c.P = (s.velocity + decay * s.delta) / dampedAngularFreq;
+			c.sinh = decay * c.P - s.delta * dampedAngularFreq;
+			c.cosh = decay * s.delta - c.P * dampedAngularFreq;
+		};
 		resolveVelocity = (t) => {
 			const envelope = Math.exp(-decay * t);
 			const freqForT = Math.min(dampedAngularFreq * t, 300);
-			return envelope * (sinhCoeff * Math.sinh(freqForT) + coshCoeff * Math.cosh(freqForT));
+			return envelope * (c.sinh * Math.sinh(freqForT) + c.cosh * Math.cosh(freqForT));
 		};
 	}
+	update();
+	/**
+	* Time-defined springs ignore inherited velocity, see getSpringOptions.
+	*/
+	const ignoreVelocity = !isSpringType(options, physicsKeys) && isSpringType(options, durationKeys);
+	const calculatedDuration = isResolvedFromDuration ? duration || null : null;
 	const generator = {
-		calculatedDuration: isResolvedFromDuration ? duration || null : null,
+		calculatedDuration,
+		/**
+		* Aim the spring at a new target from its current position and
+		* velocity, reusing the resolved physics and closures.
+		*/
+		retarget: (keyframes, newVelocity) => {
+			s.target = keyframes[keyframes.length - 1];
+			s.delta = s.target - keyframes[0];
+			s.velocity = ignoreVelocity ? 0 : -/* @__PURE__ */ millisecondsToSeconds(newVelocity);
+			if (!(options.restSpeed && options.restDelta)) setRestThresholds();
+			generator.calculatedDuration = calculatedDuration;
+			state.done = false;
+			update();
+		},
 		velocity: (t) => /* @__PURE__ */ secondsToMilliseconds(resolveVelocity(t)),
 		next: (t) => {
 			const current = resolveSpring(t);
 			if (!isResolvedFromDuration) {
 				const currentVelocity = /* @__PURE__ */ secondsToMilliseconds(resolveVelocity(t));
-				state.done = Math.abs(currentVelocity) <= restSpeed && Math.abs(target - current) <= restDelta;
+				state.done = Math.abs(currentVelocity) <= s.restSpeed && Math.abs(s.target - current) <= s.restDelta;
 			} else state.done = t >= duration;
-			state.value = state.done ? target : current;
+			state.value = state.done ? s.target : current;
 			return state;
 		},
 		toString: () => {
-			const calculatedDuration = Math.min(calcGeneratorDuration(generator), maxGeneratorDuration);
-			const easing = generateLinearEasing((progress) => generator.next(calculatedDuration * progress).value, calculatedDuration, 30);
-			return calculatedDuration + "ms " + easing;
+			const easingDuration = Math.min(calcGeneratorDuration(generator), maxGeneratorDuration);
+			const easing = generateLinearEasing((progress) => generator.next(easingDuration * progress).value, easingDuration, 30);
+			return easingDuration + "ms " + easing;
 		},
 		toTransition: () => {}
 	};
@@ -1304,6 +1408,21 @@ function keyframes({ duration = 300, keyframes: keyframeValues, times, ease = "e
 		done: false,
 		value: keyframeValues[0]
 	};
+	/**
+	* Fast setup path for two keyframes one easing.
+	*/
+	if (keyframeValues.length === 2 && !Array.isArray(easingFunctions) && (!times || times.length !== 2 || times[0] === 0 && times[1] === 1)) {
+		const [origin, target] = keyframeValues;
+		const mixer = origin === target ? void 0 : (MotionGlobalConfig.mix || mix)(origin, target);
+		return {
+			calculatedDuration: duration,
+			next: (t) => {
+				state.value = mixer ? mixer(easingFunctions(duration > 0 ? clamp(0, 1, t / duration) : 1)) : target;
+				state.done = t >= duration;
+				return state;
+			}
+		};
+	}
 	const mapTimeToKeyframe = interpolate(convertOffsetToTimes(times && times.length === keyframeValues.length ? times : defaultOffset(keyframeValues), duration), keyframeValues, { ease: Array.isArray(easingFunctions) ? easingFunctions : defaultEasing(keyframeValues, easingFunctions) });
 	return {
 		calculatedDuration: duration,
@@ -1320,6 +1439,15 @@ var velocitySampleDuration = 5;
 function getGeneratorVelocity(resolveValue, t, current) {
 	const prevT = Math.max(t - velocitySampleDuration, 0);
 	return /* @__PURE__ */ velocityPerSecond(current - resolveValue(prevT), t - prevT);
+}
+/**
+* A generator's velocity at time t in units/second: analytical where the
+* generator provides it (springs), otherwise by finite difference. Before
+* the animation has started this is its initial velocity.
+*/
+function calcGeneratorVelocity(generator, t, initialVelocity = 0) {
+	if (t <= 0) return initialVelocity;
+	return generator.velocity ? generator.velocity(t) : getGeneratorVelocity((s) => generator.next(s).value, t, generator.next(t).value);
 }
 //#endregion
 //#region node_modules/motion-dom/dist/es/animation/keyframes/get-final.mjs
@@ -1342,21 +1470,75 @@ function replaceTransitionType(transition) {
 	if (typeof transition.type === "string") transition.type = transitionTypeMap[transition.type];
 }
 //#endregion
+//#region node_modules/motion-dom/dist/es/animation/utils/notify-inspector.mjs
+function baseRecord(kind, animation) {
+	return {
+		kind,
+		animation,
+		timestamp: time.now(),
+		frameTimestamp: frameData.timestamp,
+		frameIsProcessing: frameData.isProcessing
+	};
+}
+/**
+* Notify an optional inspector without adding a public Motion API.
+*
+* The record is a raw firehose: the live animation handle, the concrete
+* animation's internal options object untouched (timing fields in
+* internal milliseconds, name/keyframes/element/motionValue still
+* attached), a timestamp and the raw frameloop state at notify time.
+* All interpretation belongs to the consumer behind
+* globalThis.__MOTION_INSPECT__.
+*/
+function notifyAnimationStart(animation, options, transition) {
+	const notify = globalThis.__MOTION_INSPECT__;
+	if (!notify) return;
+	try {
+		notify({
+			...baseRecord("animation-start", animation),
+			options: transition ? {
+				...options,
+				...transition
+			} : options
+		});
+	} catch {}
+}
+/**
+* Layout animations drive a projection node's progress rather than a
+* property, so the record forwards the live node itself: it carries the
+* DOM instance, the layout options (layoutId) and the progress handle.
+* Fired inside the frame.update that starts the animation, so nodes
+* animating in the same layout commit share frameTimestamp.
+*/
+function notifyLayoutAnimationStart(animation, node) {
+	const notify = globalThis.__MOTION_INSPECT__;
+	if (!notify) return;
+	try {
+		notify({
+			...baseRecord("layout-animation-start", animation),
+			node
+		});
+	} catch {}
+}
+//#endregion
 //#region node_modules/motion-dom/dist/es/animation/utils/WithPromise.mjs
 var WithPromise = class {
 	constructor() {
-		this.updateFinished();
+		this.isResolved = false;
 	}
 	get finished() {
+		if (!this._finished) this._finished = this.isResolved ? Promise.resolve() : new Promise((resolve) => {
+			this._resolve = resolve;
+		});
 		return this._finished;
 	}
 	updateFinished() {
-		this._finished = new Promise((resolve) => {
-			this.resolve = resolve;
-		});
+		this._finished = this._resolve = void 0;
+		this.isResolved = false;
 	}
 	notifyFinished() {
-		this.resolve();
+		this.isResolved = true;
+		this._resolve?.();
 	}
 	/**
 	* Allows the animation to be awaited.
@@ -1412,6 +1594,7 @@ var JSAnimation = class extends WithPromise {
 		this.initAnimation();
 		this.play();
 		if (options.autoplay === false) this.pause();
+		notifyAnimationStart(this, this.options);
 	}
 	initAnimation() {
 		const { options } = this;
@@ -1423,7 +1606,7 @@ var JSAnimation = class extends WithPromise {
 			this.mixKeyframes = pipe(percentToProgress, mix(keyframes$1[0], keyframes$1[1]));
 			keyframes$1 = [0, 100];
 		}
-		const generator = generatorFactory({
+		const generator = generatorFactory(keyframes$1 === options.keyframes ? options : {
 			...options,
 			keyframes: keyframes$1
 		});
@@ -1564,11 +1747,7 @@ var JSAnimation = class extends WithPromise {
 	* the MotionValue's frame-dependent velocity estimation.
 	*/
 	getGeneratorVelocity() {
-		const t = this.currentTime;
-		if (t <= 0) return this.options.velocity || 0;
-		if (this.generator.velocity) return this.generator.velocity(t);
-		const current = this.generator.next(t).value;
-		return getGeneratorVelocity((s) => this.generator.next(s).value, t, current);
+		return calcGeneratorVelocity(this.generator, this.currentTime, this.options.velocity);
 	}
 	get speed() {
 		return this.playbackSpeed;
@@ -1646,6 +1825,175 @@ var JSAnimation = class extends WithPromise {
 		return timeline.observe(this);
 	}
 };
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/complex/filter.mjs
+/**
+* Properties that should default to 1 or 100%
+*/
+var maxDefaults = /* @__PURE__ */ new Set([
+	"brightness",
+	"contrast",
+	"saturate",
+	"opacity"
+]);
+function applyDefaultFilter(v) {
+	const [name, value] = v.slice(0, -1).split("(");
+	if (name === "drop-shadow") return v;
+	const [number] = value.match(floatRegex) || [];
+	if (!number) return v;
+	const unit = value.replace(number, "");
+	let defaultValue = maxDefaults.has(name) ? 1 : 0;
+	if (number !== value) defaultValue *= 100;
+	return name + "(" + defaultValue + unit + ")";
+}
+var functionRegex = /\b([a-z-]*)\(.*?\)/gu;
+var filter = {
+	...complex,
+	getAnimatableNone: (v) => {
+		const functions = v.match(functionRegex);
+		return functions ? functions.map(applyDefaultFilter).join(" ") : v;
+	}
+};
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/complex/mask.mjs
+var mask = {
+	...complex,
+	getAnimatableNone: (v) => {
+		const parsed = complex.parse(v);
+		return complex.createTransformer(v)(parsed.map((v) => typeof v === "number" ? 0 : typeof v === "object" ? {
+			...v,
+			alpha: 1
+		} : v));
+	}
+};
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/int.mjs
+var int = {
+	...number,
+	transform: Math.round
+};
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/maps/number.mjs
+var numberValueTypes = {
+	borderWidth: px,
+	borderTopWidth: px,
+	borderRightWidth: px,
+	borderBottomWidth: px,
+	borderLeftWidth: px,
+	borderRadius: px,
+	borderTopLeftRadius: px,
+	borderTopRightRadius: px,
+	borderBottomRightRadius: px,
+	borderBottomLeftRadius: px,
+	width: px,
+	maxWidth: px,
+	height: px,
+	maxHeight: px,
+	top: px,
+	right: px,
+	bottom: px,
+	left: px,
+	inset: px,
+	insetBlock: px,
+	insetBlockStart: px,
+	insetBlockEnd: px,
+	insetInline: px,
+	insetInlineStart: px,
+	insetInlineEnd: px,
+	padding: px,
+	paddingTop: px,
+	paddingRight: px,
+	paddingBottom: px,
+	paddingLeft: px,
+	paddingBlock: px,
+	paddingBlockStart: px,
+	paddingBlockEnd: px,
+	paddingInline: px,
+	paddingInlineStart: px,
+	paddingInlineEnd: px,
+	margin: px,
+	marginTop: px,
+	marginRight: px,
+	marginBottom: px,
+	marginLeft: px,
+	marginBlock: px,
+	marginBlockStart: px,
+	marginBlockEnd: px,
+	marginInline: px,
+	marginInlineStart: px,
+	marginInlineEnd: px,
+	fontSize: px,
+	backgroundPositionX: px,
+	backgroundPositionY: px,
+	rotate: degrees,
+	/**
+	* Internal channel for `transition.path` orientToPath. Composed onto
+	* `rotate` at the transform-build sites so the user's `rotate` is
+	* never read or overwritten. Not part of `transformPropOrder`.
+	*/
+	pathRotation: degrees,
+	rotateX: degrees,
+	rotateY: degrees,
+	rotateZ: degrees,
+	scale,
+	scaleX: scale,
+	scaleY: scale,
+	scaleZ: scale,
+	skew: degrees,
+	skewX: degrees,
+	skewY: degrees,
+	distance: px,
+	translateX: px,
+	translateY: px,
+	translateZ: px,
+	x: px,
+	y: px,
+	z: px,
+	perspective: px,
+	transformPerspective: px,
+	opacity: alpha,
+	originX: progressPercentage,
+	originY: progressPercentage,
+	originZ: px,
+	zIndex: int,
+	fillOpacity: alpha,
+	strokeOpacity: alpha,
+	numOctaves: int
+};
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/maps/defaults.mjs
+/**
+* A map of default value types for common values
+*/
+var defaultValueTypes = {
+	...numberValueTypes,
+	color,
+	backgroundColor: color,
+	outlineColor: color,
+	fill: color,
+	stroke: color,
+	borderColor: color,
+	borderTopColor: color,
+	borderRightColor: color,
+	borderBottomColor: color,
+	borderLeftColor: color,
+	filter,
+	WebkitFilter: filter,
+	mask,
+	WebkitMask: mask
+};
+/**
+* Gets the default ValueType for the provided value key
+*/
+var getDefaultValueType = (key) => defaultValueTypes[key];
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/utils/animatable-none.mjs
+var customTypes = /*@__PURE__*/ new Set([filter, mask]);
+function getAnimatableNone(key, value) {
+	let defaultValueType = getDefaultValueType(key);
+	if (!customTypes.has(defaultValueType)) defaultValueType = complex;
+	return defaultValueType.getAnimatableNone ? defaultValueType.getAnimatableNone(value) : void 0;
+}
 //#endregion
 //#region node_modules/motion-dom/dist/es/animation/keyframes/utils/fill-wildcards.mjs
 function fillWildcards(keyframes) {
@@ -1769,32 +2117,58 @@ var transformKeys = /* @__PURE__ */ new Set([
 	"z"
 ]);
 var nonTranslationalTransformKeys = transformPropOrder.filter((key) => !transformKeys.has(key));
+/**
+* Reset any bounding box-changing transforms so the element can be
+* measured. Returns the values to restore. Values already at their
+* default don't change the box, so they're left alone: an element with
+* only `rotate: 0` doesn't need to be re-rendered before measuring.
+*/
 function removeNonTranslationalTransform(visualElement) {
 	const removedTransforms = [];
 	nonTranslationalTransformKeys.forEach((key) => {
 		const value = visualElement.getValue(key);
 		if (value !== void 0) {
-			removedTransforms.push([key, value.get()]);
-			value.set(key.startsWith("scale") ? 1 : 0);
+			const current = value.get();
+			const reset = key.startsWith("scale") ? 1 : 0;
+			if (current === reset) return;
+			removedTransforms.push([key, current]);
+			value.set(reset);
 		}
 	});
 	return removedTransforms;
 }
+/**
+* Values that can only be measured from the bounding box. Elements with
+* these values need bounding box-changing transforms removed first.
+*/
+var boxDependentValues = /* @__PURE__ */ new Set(["bottom", "right"]);
+/**
+* Computed width/height is already in pixels and unaffected by
+* transforms. It's "auto" for elements without a layout box (e.g. inline),
+* in which case we fall back to measuring the bounding box.
+*/
+function measureDimension(computed, measureBox, axis, paddingStart, paddingEnd, boxSizing) {
+	const px = parseFloat(computed);
+	if (!isNaN(px)) return px;
+	const { min, max } = measureBox()[axis];
+	const size = max - min;
+	return boxSizing === "border-box" ? size : size - parseFloat(paddingStart) - parseFloat(paddingEnd);
+}
 var positionalValues = {
-	width: ({ x }, { paddingLeft = "0", paddingRight = "0", boxSizing }) => {
-		const width = x.max - x.min;
-		return boxSizing === "border-box" ? width : width - parseFloat(paddingLeft) - parseFloat(paddingRight);
+	width: ({ width, paddingLeft = "0", paddingRight = "0", boxSizing }, measureBox) => measureDimension(width, measureBox, "x", paddingLeft, paddingRight, boxSizing),
+	height: ({ height, paddingTop = "0", paddingBottom = "0", boxSizing }, measureBox) => measureDimension(height, measureBox, "y", paddingTop, paddingBottom, boxSizing),
+	top: ({ top }) => parseFloat(top),
+	left: ({ left }) => parseFloat(left),
+	bottom: ({ top }, measureBox) => {
+		const { y } = measureBox();
+		return parseFloat(top) + (y.max - y.min);
 	},
-	height: ({ y }, { paddingTop = "0", paddingBottom = "0", boxSizing }) => {
-		const height = y.max - y.min;
-		return boxSizing === "border-box" ? height : height - parseFloat(paddingTop) - parseFloat(paddingBottom);
+	right: ({ left }, measureBox) => {
+		const { x } = measureBox();
+		return parseFloat(left) + (x.max - x.min);
 	},
-	top: (_bbox, { top }) => parseFloat(top),
-	left: (_bbox, { left }) => parseFloat(left),
-	bottom: ({ y }, { top }) => parseFloat(top) + (y.max - y.min),
-	right: ({ x }, { left }) => parseFloat(left) + (x.max - x.min),
-	x: (_bbox, { transform }) => parseValueFromTransform(transform, "x"),
-	y: (_bbox, { transform }) => parseValueFromTransform(transform, "y")
+	x: ({ transform }) => parseValueFromTransform(transform, "x"),
+	y: ({ transform }) => parseValueFromTransform(transform, "y")
 };
 positionalValues.translateX = positionalValues.x;
 positionalValues.translateY = positionalValues.y;
@@ -1806,14 +2180,22 @@ var anyNeedsMeasurement = false;
 var isForced = false;
 function measureAllKeyframes() {
 	if (anyNeedsMeasurement) {
-		const resolversToMeasure = Array.from(toResolve).filter((resolver) => resolver.needsMeasurement);
-		const elementsToMeasure = new Set(resolversToMeasure.map((resolver) => resolver.element));
+		const resolversToMeasure = [];
+		const elementsToMeasure = /* @__PURE__ */ new Set();
+		const elementsToUntransform = /* @__PURE__ */ new Set();
+		toResolve.forEach((resolver) => {
+			if (!resolver.needsMeasurement) return;
+			resolversToMeasure.push(resolver);
+			elementsToMeasure.add(resolver.element);
+			if (boxDependentValues.has(resolver.name)) elementsToUntransform.add(resolver.element);
+		});
 		const transformsToRestore = /* @__PURE__ */ new Map();
 		/**
 		* Write pass
-		* If we're measuring elements we want to remove bounding box-changing transforms.
+		* Values measured from the bounding box need bounding box-changing
+		* transforms removed first. Values read from computed style don't.
 		*/
-		elementsToMeasure.forEach((element) => {
+		elementsToUntransform.forEach((element) => {
 			const removedTransforms = removeNonTranslationalTransform(element);
 			if (!removedTransforms.length) return;
 			transformsToRestore.set(element, removedTransforms);
@@ -1848,6 +2230,19 @@ function flushKeyframeResolvers() {
 	readAllKeyframes();
 	measureAllKeyframes();
 	isForced = false;
+}
+/**
+* Normalise a value read from the subject into an animation origin: a
+* number read as a string ("0", "200") becomes a number, and a value
+* that isn't animatable (e.g. "none") but whose target is becomes an
+* animatable zero in the shape of the target.
+*/
+function readOrigin(value, name, target) {
+	if (typeof value === "string") {
+		if (isNumericalString(value) || isZeroValueString(value)) return parseFloat(value);
+		else if (!complex.test(value) && complex.test(target)) return getAnimatableNone(name, target);
+	}
+	return value ?? void 0;
 }
 var KeyframeResolver = class {
 	constructor(unresolvedKeyframes, onComplete, name, motionValue, element, isAsync = false) {
@@ -1891,8 +2286,8 @@ var KeyframeResolver = class {
 			const finalKeyframe = unresolvedKeyframes[unresolvedKeyframes.length - 1];
 			if (currentValue !== void 0) unresolvedKeyframes[0] = currentValue;
 			else if (element && name) {
-				const valueAsRead = element.readValue(name, finalKeyframe);
-				if (valueAsRead !== void 0 && valueAsRead !== null) unresolvedKeyframes[0] = valueAsRead;
+				const valueAsRead = readOrigin(element.readValue(name, finalKeyframe), name, finalKeyframe);
+				if (valueAsRead !== void 0) unresolvedKeyframes[0] = valueAsRead;
 			}
 			if (unresolvedKeyframes[0] === void 0) unresolvedKeyframes[0] = finalKeyframe;
 			if (motionValue && currentValue === void 0) motionValue.set(unresolvedKeyframes[0]);
@@ -2076,6 +2471,7 @@ var NativeAnimation = class extends WithPromise {
 			onComplete?.();
 			this.notifyFinished();
 		};
+		notifyAnimationStart(this, options, transition);
 	}
 	play() {
 		if (this.isStopped) return;
@@ -2300,8 +2696,10 @@ function canAnimate(keyframes, name, type, velocity) {
 	const targetKeyframe = keyframes[keyframes.length - 1];
 	const isOriginAnimatable = isAnimatable(originKeyframe, name);
 	const isTargetAnimatable = isAnimatable(targetKeyframe, name);
-	`${name}${originKeyframe}${targetKeyframe}${isOriginAnimatable ? targetKeyframe : originKeyframe}`;
-	if (!isOriginAnimatable || !isTargetAnimatable) return false;
+	if (!isOriginAnimatable || !isTargetAnimatable) {
+		isOriginAnimatable !== isTargetAnimatable && `${name}${originKeyframe}${targetKeyframe}${isOriginAnimatable ? targetKeyframe : originKeyframe}`;
+		return false;
+	}
 	return hasKeyframesChanged(keyframes) || (type === "spring" || isGenerator(type)) && velocity;
 }
 //#endregion
@@ -2346,6 +2744,11 @@ var colorProperties = /* @__PURE__ */ new Set([
 var supportsWaapi = /*@__PURE__*/ memo(() => Object.hasOwnProperty.call(Element.prototype, "animate"));
 function supportsBrowserAnimation(options) {
 	const { motionValue, name, repeatDelay, repeatType, damping, type, keyframes } = options;
+	/**
+	* Most values can't be accelerated at all, so check the name before
+	* looking at the element or its props.
+	*/
+	if (!name || !(acceleratedValues.has(name) || colorProperties.has(name))) return false;
 	const subject = motionValue?.owner?.current;
 	/**
 	* We use instanceof checks instead of isHTMLElement()/isSVGElement()
@@ -2356,7 +2759,7 @@ function supportsBrowserAnimation(options) {
 	*/
 	if (!(subject instanceof HTMLElement) && !(subject instanceof SVGElement)) return false;
 	const { onUpdate, transformTemplate } = motionValue.owner.getProps();
-	return supportsWaapi() && name && (acceleratedValues.has(name) || colorProperties.has(name) && hasBrowserOnlyColors(keyframes)) && (name !== "transform" || !transformTemplate) && !onUpdate && !repeatDelay && repeatType !== "mirror" && damping !== 0 && type !== "inertia";
+	return supportsWaapi() && (acceleratedValues.has(name) || colorProperties.has(name) && hasBrowserOnlyColors(keyframes)) && (name !== "transform" || !transformTemplate) && !onUpdate && !repeatDelay && repeatType !== "mirror" && damping !== 0 && type !== "inertia";
 }
 //#endregion
 //#region node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs
@@ -2370,7 +2773,7 @@ function supportsBrowserAnimation(options) {
 */
 var MAX_RESOLVE_DELAY = 40;
 var AsyncMotionValueAnimation = class extends WithPromise {
-	constructor({ autoplay = true, delay = 0, type = "keyframes", repeat = 0, repeatDelay = 0, repeatType = "loop", keyframes, name, motionValue, element, ...options }) {
+	constructor(options) {
 		super();
 		/**
 		* Bound to support return animation.stop pattern
@@ -2383,18 +2786,18 @@ var AsyncMotionValueAnimation = class extends WithPromise {
 			this.keyframeResolver?.cancel();
 		};
 		this.createdAt = time.now();
-		const optionsWithDefaults = {
-			autoplay,
-			delay,
-			type,
-			repeat,
-			repeatDelay,
-			repeatType,
-			name,
-			motionValue,
-			element,
-			...options
-		};
+		const { keyframes, name, motionValue, element } = options;
+		/**
+		* animateMotionValue builds a fresh options object per value, so
+		* it's completed in place as keyframes resolve rather than copied.
+		*/
+		const optionsWithDefaults = options;
+		optionsWithDefaults.autoplay ?? (optionsWithDefaults.autoplay = true);
+		optionsWithDefaults.delay ?? (optionsWithDefaults.delay = 0);
+		optionsWithDefaults.type ?? (optionsWithDefaults.type = "keyframes");
+		optionsWithDefaults.repeat ?? (optionsWithDefaults.repeat = 0);
+		optionsWithDefaults.repeatDelay ?? (optionsWithDefaults.repeatDelay = 0);
+		optionsWithDefaults.repeatType ?? (optionsWithDefaults.repeatType = "loop");
 		const KeyframeResolver$1 = element?.KeyframeResolver || KeyframeResolver;
 		this.keyframeResolver = new KeyframeResolver$1(keyframes, (resolvedKeyframes, finalKeyframe, forced) => this.onKeyframesResolved(resolvedKeyframes, finalKeyframe, optionsWithDefaults, !forced), name, motionValue, element);
 		this.keyframeResolver?.scheduleResolve();
@@ -2415,11 +2818,35 @@ var AsyncMotionValueAnimation = class extends WithPromise {
 			makeAnimationInstant(options);
 			options.repeat = 0;
 		}
-		const resolvedOptions = {
-			startTime: sync ? !this.resolvedAt ? this.createdAt : this.resolvedAt - this.createdAt > MAX_RESOLVE_DELAY ? this.resolvedAt : this.createdAt : void 0,
-			finalKeyframe,
-			...options,
-			keyframes
+		/**
+		* Resolve startTime for the animation.
+		*
+		* This method uses the createdAt and resolvedAt to calculate the
+		* animation startTime. *Ideally*, we would use the createdAt time as t=0
+		* as the following frame would then be the first frame of the animation in
+		* progress, which would feel snappier.
+		*
+		* However, if there's a delay (main thread work) between the creation of
+		* the animation and the first committed frame, we prefer to use resolvedAt
+		* to avoid a sudden jump into the animation.
+		*/
+		const startTime = sync ? !this.resolvedAt ? this.createdAt : this.resolvedAt - this.createdAt > MAX_RESOLVE_DELAY ? this.resolvedAt : this.createdAt : void 0;
+		const { onComplete } = options;
+		/**
+		* A startTime passed in options (an optimised appear handoff syncing
+		* to its WAAPI animation) takes precedence over the derived one.
+		*/
+		options.startTime ?? (options.startTime = startTime);
+		options.finalKeyframe = finalKeyframe;
+		options.keyframes = keyframes;
+		/**
+		* JSAnimation and NativeAnimation call onComplete exactly when
+		* their own `finished` resolves, so this replaces a promise chain
+		* per value with a callback.
+		*/
+		options.onComplete = () => {
+			onComplete?.();
+			this.notifyFinished();
 		};
 		/**
 		* Animate via WAAPI if possible. If this is a handoff animation, the optimised animation will be running via
@@ -2429,21 +2856,21 @@ var AsyncMotionValueAnimation = class extends WithPromise {
 		* Also skip WAAPI when keyframes aren't animatable, as the resolved
 		* values may not be valid CSS and would trigger browser warnings.
 		*/
-		const useWaapi = canAnimateValue && !isHandoff && supportsBrowserAnimation(resolvedOptions);
-		const element = resolvedOptions.motionValue?.owner?.current;
+		const useWaapi = canAnimateValue && !isHandoff && supportsBrowserAnimation(options);
 		let animation;
-		if (useWaapi) try {
-			animation = new NativeAnimationExtended({
-				...resolvedOptions,
-				element
-			});
-		} catch {
-			animation = new JSAnimation(resolvedOptions);
-		}
-		else animation = new JSAnimation(resolvedOptions);
-		animation.finished.then(() => {
-			this.notifyFinished();
-		}).catch(noop);
+		if (useWaapi) {
+			/**
+			* The resolver needed the VisualElement, WAAPI needs the DOM
+			* element. JSAnimation reads neither, so this is safe to
+			* leave in place if we fall back to it.
+			*/
+			options.element = options.motionValue?.owner?.current;
+			try {
+				animation = new NativeAnimationExtended(options);
+			} catch {
+				animation = new JSAnimation(options);
+			}
+		} else animation = new JSAnimation(options);
 		if (this.pendingTimeline) {
 			this.stopTimeline = animation.attachTimeline(this.pendingTimeline);
 			this.pendingTimeline = void 0;
@@ -2451,8 +2878,7 @@ var AsyncMotionValueAnimation = class extends WithPromise {
 		this._animation = animation;
 	}
 	get finished() {
-		if (!this._animation) return this._finished;
-		else return this.animation.finished;
+		return this._animation ? this._animation.finished : super.finished;
 	}
 	then(onResolve, _onReject) {
 		return this.finished.finally(onResolve).then(() => {});
@@ -2562,7 +2988,7 @@ var MotionValue = class {
 			this.prev = this.current;
 			this.setCurrent(v);
 			if (this.current !== this.prev) {
-				this.events.change?.notify(this.current);
+				this.notifyChange();
 				if (this.dependents) for (const dependent of this.dependents) dependent.dirty();
 			}
 		};
@@ -2623,21 +3049,38 @@ var MotionValue = class {
 		return this.on("change", subscription);
 	}
 	on(eventName, callback) {
-		if (!this.events[eventName]) this.events[eventName] = new SubscriptionManager();
-		const unsubscribe = this.events[eventName].add(callback);
-		if (eventName === "change") return () => {
-			unsubscribe();
-			/**
-			* If we have no more change listeners by the start
-			* of the next frame, stop active animations.
-			*/
-			frame.read(() => {
-				if (!this.events.change.getSize()) this.stop();
-			});
+		var _a;
+		if (eventName === "change") return this.onChangeSubscribe(callback);
+		return ((_a = this.events)[eventName] || (_a[eventName] = new SubscriptionManager())).add(callback);
+	}
+	onChangeSubscribe(callback) {
+		const { events } = this;
+		if (!events.change && !this.changeSubscriber) this.changeSubscriber = callback;
+		else {
+			if (!events.change) {
+				events.change = new SubscriptionManager();
+				events.change.add(this.changeSubscriber);
+				this.changeSubscriber = void 0;
+			}
+			events.change.add(callback);
+		}
+		return () => {
+			if (this.changeSubscriber === callback) this.changeSubscriber = void 0;
+			else events.change?.remove(callback);
+			this.stopIfUnobserved();
 		};
-		return unsubscribe;
+	}
+	/**
+	* If we have no more change listeners by the start
+	* of the next frame, stop active animations.
+	*/
+	stopIfUnobserved() {
+		frame.read(() => {
+			if (!this.changeSubscriber && !this.events.change?.getSize()) this.stop();
+		});
 	}
 	clearListeners() {
+		this.changeSubscriber = void 0;
 		for (const eventManagers in this.events) this.events[eventManagers].clear();
 	}
 	/**
@@ -2684,7 +3127,17 @@ var MotionValue = class {
 		if (this.stopPassiveEffect) this.stopPassiveEffect();
 	}
 	dirty() {
-		this.events.change?.notify(this.current);
+		this.notifyChange();
+	}
+	notifyChange() {
+		const { current, changeSubscriber } = this;
+		/**
+		* One or the other exists. Subscribing during the direct
+		* subscriber's call moves it into a new manager, which must not
+		* then be notified for the same change.
+		*/
+		if (changeSubscriber) changeSubscriber(current);
+		else this.events.change?.notify(current);
 	}
 	addDependent(dependent) {
 		if (!this.dependents) this.dependents = /* @__PURE__ */ new Set();
@@ -2737,11 +3190,21 @@ var MotionValue = class {
 		this.stop();
 		return new Promise((resolve) => {
 			this.hasAnimated = true;
-			this.animation = startAnimation(resolve);
-			if (this.events.animationStart) this.events.animationStart.notify();
-		}).then(() => {
-			if (this.events.animationComplete) this.events.animationComplete.notify();
-			this.clearAnimation();
+			/**
+			* Complete synchronously via the callback rather than chaining a
+			* second promise per animation. Guard against animations that
+			* complete before startAnimation has returned.
+			*/
+			let isComplete = false;
+			let animation;
+			animation = startAnimation(() => {
+				isComplete = true;
+				this.events.animationComplete?.notify();
+				if (this.animation === animation) this.clearAnimation();
+				resolve();
+			});
+			if (!isComplete) this.animation = animation;
+			this.events.animationStart?.notify();
 		});
 	}
 	/**
@@ -2765,7 +3228,7 @@ var MotionValue = class {
 		return !!this.animation;
 	}
 	clearAnimation() {
-		delete this.animation;
+		this.animation = void 0;
 	}
 	/**
 	* Destroy and clean up subscribers to this `MotionValue`.
@@ -3265,175 +3728,6 @@ function isNone(value) {
 	else return true;
 }
 //#endregion
-//#region node_modules/motion-dom/dist/es/value/types/complex/filter.mjs
-/**
-* Properties that should default to 1 or 100%
-*/
-var maxDefaults = /* @__PURE__ */ new Set([
-	"brightness",
-	"contrast",
-	"saturate",
-	"opacity"
-]);
-function applyDefaultFilter(v) {
-	const [name, value] = v.slice(0, -1).split("(");
-	if (name === "drop-shadow") return v;
-	const [number] = value.match(floatRegex) || [];
-	if (!number) return v;
-	const unit = value.replace(number, "");
-	let defaultValue = maxDefaults.has(name) ? 1 : 0;
-	if (number !== value) defaultValue *= 100;
-	return name + "(" + defaultValue + unit + ")";
-}
-var functionRegex = /\b([a-z-]*)\(.*?\)/gu;
-var filter = {
-	...complex,
-	getAnimatableNone: (v) => {
-		const functions = v.match(functionRegex);
-		return functions ? functions.map(applyDefaultFilter).join(" ") : v;
-	}
-};
-//#endregion
-//#region node_modules/motion-dom/dist/es/value/types/complex/mask.mjs
-var mask = {
-	...complex,
-	getAnimatableNone: (v) => {
-		const parsed = complex.parse(v);
-		return complex.createTransformer(v)(parsed.map((v) => typeof v === "number" ? 0 : typeof v === "object" ? {
-			...v,
-			alpha: 1
-		} : v));
-	}
-};
-//#endregion
-//#region node_modules/motion-dom/dist/es/value/types/int.mjs
-var int = {
-	...number,
-	transform: Math.round
-};
-//#endregion
-//#region node_modules/motion-dom/dist/es/value/types/maps/number.mjs
-var numberValueTypes = {
-	borderWidth: px,
-	borderTopWidth: px,
-	borderRightWidth: px,
-	borderBottomWidth: px,
-	borderLeftWidth: px,
-	borderRadius: px,
-	borderTopLeftRadius: px,
-	borderTopRightRadius: px,
-	borderBottomRightRadius: px,
-	borderBottomLeftRadius: px,
-	width: px,
-	maxWidth: px,
-	height: px,
-	maxHeight: px,
-	top: px,
-	right: px,
-	bottom: px,
-	left: px,
-	inset: px,
-	insetBlock: px,
-	insetBlockStart: px,
-	insetBlockEnd: px,
-	insetInline: px,
-	insetInlineStart: px,
-	insetInlineEnd: px,
-	padding: px,
-	paddingTop: px,
-	paddingRight: px,
-	paddingBottom: px,
-	paddingLeft: px,
-	paddingBlock: px,
-	paddingBlockStart: px,
-	paddingBlockEnd: px,
-	paddingInline: px,
-	paddingInlineStart: px,
-	paddingInlineEnd: px,
-	margin: px,
-	marginTop: px,
-	marginRight: px,
-	marginBottom: px,
-	marginLeft: px,
-	marginBlock: px,
-	marginBlockStart: px,
-	marginBlockEnd: px,
-	marginInline: px,
-	marginInlineStart: px,
-	marginInlineEnd: px,
-	fontSize: px,
-	backgroundPositionX: px,
-	backgroundPositionY: px,
-	rotate: degrees,
-	/**
-	* Internal channel for `transition.path` orientToPath. Composed onto
-	* `rotate` at the transform-build sites so the user's `rotate` is
-	* never read or overwritten. Not part of `transformPropOrder`.
-	*/
-	pathRotation: degrees,
-	rotateX: degrees,
-	rotateY: degrees,
-	rotateZ: degrees,
-	scale,
-	scaleX: scale,
-	scaleY: scale,
-	scaleZ: scale,
-	skew: degrees,
-	skewX: degrees,
-	skewY: degrees,
-	distance: px,
-	translateX: px,
-	translateY: px,
-	translateZ: px,
-	x: px,
-	y: px,
-	z: px,
-	perspective: px,
-	transformPerspective: px,
-	opacity: alpha,
-	originX: progressPercentage,
-	originY: progressPercentage,
-	originZ: px,
-	zIndex: int,
-	fillOpacity: alpha,
-	strokeOpacity: alpha,
-	numOctaves: int
-};
-//#endregion
-//#region node_modules/motion-dom/dist/es/value/types/maps/defaults.mjs
-/**
-* A map of default value types for common values
-*/
-var defaultValueTypes = {
-	...numberValueTypes,
-	color,
-	backgroundColor: color,
-	outlineColor: color,
-	fill: color,
-	stroke: color,
-	borderColor: color,
-	borderTopColor: color,
-	borderRightColor: color,
-	borderBottomColor: color,
-	borderLeftColor: color,
-	filter,
-	WebkitFilter: filter,
-	mask,
-	WebkitMask: mask
-};
-/**
-* Gets the default ValueType for the provided value key
-*/
-var getDefaultValueType = (key) => defaultValueTypes[key];
-//#endregion
-//#region node_modules/motion-dom/dist/es/value/types/utils/animatable-none.mjs
-var customTypes = /*@__PURE__*/ new Set([filter, mask]);
-function getAnimatableNone(key, value) {
-	let defaultValueType = getDefaultValueType(key);
-	if (!customTypes.has(defaultValueType)) defaultValueType = complex;
-	return defaultValueType.getAnimatableNone ? defaultValueType.getAnimatableNone(value) : void 0;
-}
-//#endregion
 //#region node_modules/motion-dom/dist/es/animation/keyframes/utils/make-none-animatable.mjs
 /**
 * If we encounter keyframes like "none" or "0" and we also have keyframes like
@@ -3451,10 +3745,17 @@ function makeNoneKeyframesAnimatable(unresolvedKeyframes, noneKeyframeIndexes, n
 	let animatableTemplate = void 0;
 	while (i < unresolvedKeyframes.length && !animatableTemplate) {
 		const keyframe = unresolvedKeyframes[i];
-		if (typeof keyframe === "string" && !invalidTemplates.has(keyframe) && analyseComplexValue(keyframe).values.length) animatableTemplate = unresolvedKeyframes[i];
+		if (typeof keyframe === "string" && !invalidTemplates.has(keyframe) && hasComplexValues(keyframe)) animatableTemplate = unresolvedKeyframes[i];
 		i++;
 	}
-	if (animatableTemplate && name) for (const noneIndex of noneKeyframeIndexes) unresolvedKeyframes[noneIndex] = getAnimatableNone(name, animatableTemplate);
+	if (animatableTemplate && name) for (const noneIndex of noneKeyframeIndexes) {
+		/**
+		* A zero-valued template like "0%" is already its own
+		* animatable none, so there's nothing to derive.
+		*/
+		if (unresolvedKeyframes[noneIndex] === animatableTemplate) continue;
+		unresolvedKeyframes[noneIndex] = getAnimatableNone(name, animatableTemplate);
+	}
 }
 //#endregion
 //#region node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs
@@ -3494,6 +3795,7 @@ var DOMKeyframesResolver = class extends KeyframeResolver {
 		*/
 		if (!positionalKeys.has(name) || unresolvedKeyframes.length !== 2) return;
 		const [origin, target] = unresolvedKeyframes;
+		if (typeof origin === "number" && typeof target === "number") return;
 		const originType = findDimensionValueType(origin);
 		const targetType = findDimensionValueType(target);
 		if (containsCSSVariable(origin) !== containsCSSVariable(target) && positionalValues[name]) {
@@ -3524,23 +3826,26 @@ var DOMKeyframesResolver = class extends KeyframeResolver {
 		for (let i = 0; i < unresolvedKeyframes.length; i++) if (unresolvedKeyframes[i] === null || isNone(unresolvedKeyframes[i])) noneKeyframeIndexes.push(i);
 		if (noneKeyframeIndexes.length) makeNoneKeyframesAnimatable(unresolvedKeyframes, noneKeyframeIndexes, name);
 	}
+	measure() {
+		const { element, name } = this;
+		return positionalValues[name](window.getComputedStyle(element.current), () => element.measureViewportBox());
+	}
 	measureInitialState() {
 		const { element, unresolvedKeyframes, name } = this;
 		if (!element || !element.current) return;
 		if (name === "height") this.suspendedScrollY = window.pageYOffset;
-		this.measuredOrigin = positionalValues[name](element.measureViewportBox(), window.getComputedStyle(element.current));
+		this.measuredOrigin = this.measure();
 		unresolvedKeyframes[0] = this.measuredOrigin;
 		const measureKeyframe = unresolvedKeyframes[unresolvedKeyframes.length - 1];
-		if (measureKeyframe !== void 0) element.getValue(name, measureKeyframe).jump(measureKeyframe, false);
+		if (measureKeyframe !== void 0) this.motionValue?.jump(measureKeyframe, false);
 	}
 	measureEndState() {
-		const { element, name, unresolvedKeyframes } = this;
+		const { element, unresolvedKeyframes } = this;
 		if (!element || !element.current) return;
-		const value = element.getValue(name);
-		value && value.jump(this.measuredOrigin, false);
+		this.motionValue?.jump(this.measuredOrigin, false);
 		const finalKeyframeIndex = unresolvedKeyframes.length - 1;
 		const finalKeyframe = unresolvedKeyframes[finalKeyframeIndex];
-		unresolvedKeyframes[finalKeyframeIndex] = positionalValues[name](element.measureViewportBox(), window.getComputedStyle(element.current));
+		unresolvedKeyframes[finalKeyframeIndex] = this.measure();
 		if (finalKeyframe !== null && this.finalKeyframe === void 0) this.finalKeyframe = finalKeyframe;
 		if (this.removedTransforms?.length) this.removedTransforms.forEach(([unsetTransformName, unsetTransformValue]) => {
 			element.getValue(unsetTransformName).set(unsetTransformValue);
@@ -3563,6 +3868,32 @@ var cornerRadiusProps = [
 	"borderBottomLeftRadius"
 ];
 //#endregion
+//#region node_modules/motion-dom/dist/es/utils/is-html-element.mjs
+/**
+* Checks if an element is an HTML element in a way
+* that works across iframes
+*/
+function isHTMLElement(element) {
+	return isObject(element) && "offsetHeight" in element && !("ownerSVGElement" in element);
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/utils/is-svg-element.mjs
+/**
+* Checks if an element is an SVG element in a way
+* that works across iframes
+*/
+function isSVGElement(element) {
+	return isObject(element) && "ownerSVGElement" in element;
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/value/types/utils/get-as-type.mjs
+/**
+* Provided a value and a ValueType, returns the value as that value type.
+*/
+var getValueAsType = (value, type) => {
+	return type && typeof value === "number" ? type.transform(value) : value;
+};
+//#endregion
 //#region node_modules/motion-dom/dist/es/utils/resolve-elements.mjs
 function resolveElements(elementOrSelector, scope, selectorCache) {
 	if (elementOrSelector == null) return [];
@@ -3576,21 +3907,349 @@ function resolveElements(elementOrSelector, scope, selectorCache) {
 	return Array.from(elementOrSelector).filter((element) => element != null);
 }
 //#endregion
-//#region node_modules/motion-dom/dist/es/value/types/utils/get-as-type.mjs
-/**
-* Provided a value and a ValueType, returns the value as that value type.
-*/
-var getValueAsType = (value, type) => {
-	return type && typeof value === "number" ? type.transform(value) : value;
+//#region node_modules/motion-dom/dist/es/render/html/utils/build-transform.mjs
+var translateAlias = {
+	x: "translateX",
+	y: "translateY",
+	z: "translateZ",
+	transformPerspective: "perspective"
 };
-//#endregion
-//#region node_modules/motion-dom/dist/es/utils/is-html-element.mjs
+var numTransforms = transformPropOrder.length;
 /**
-* Checks if an element is an HTML element in a way
-* that works across iframes
+* Build a CSS transform style from individual x/y/scale etc properties.
+*
+* This outputs with a default order of transforms/scales/rotations, this can be customised by
+* providing a transformTemplate function.
 */
-function isHTMLElement(element) {
-	return isObject(element) && "offsetHeight" in element && !("ownerSVGElement" in element);
+function buildTransform(latestValues, transform, transformTemplate) {
+	let transformString = "";
+	let transformIsDefault = true;
+	/**
+	* Loop over all possible transforms in order, adding the ones that
+	* are present to the transform string.
+	*/
+	for (let i = 0; i < numTransforms; i++) {
+		const key = transformPropOrder[i];
+		const value = latestValues[key];
+		if (value === void 0) continue;
+		let valueIsDefault = true;
+		if (typeof value === "number") valueIsDefault = value === (key.startsWith("scale") ? 1 : 0);
+		else {
+			const parsed = parseFloat(value);
+			valueIsDefault = key.startsWith("scale") ? parsed === 1 : parsed === 0;
+		}
+		if (!valueIsDefault || transformTemplate) {
+			const valueAsType = getValueAsType(value, numberValueTypes[key]);
+			if (!valueIsDefault) {
+				transformIsDefault = false;
+				const transformName = translateAlias[key] || key;
+				transformString += `${transformName}(${valueAsType}) `;
+			}
+			if (transformTemplate) transform[key] = valueAsType;
+		}
+	}
+	const pathRotation = latestValues.pathRotation;
+	if (pathRotation) {
+		transformIsDefault = false;
+		transformString += `rotate(${getValueAsType(pathRotation, numberValueTypes.pathRotation)}) `;
+	}
+	transformString = transformString.trim();
+	if (transformTemplate) transformString = transformTemplate(transform, transformIsDefault ? "" : transformString);
+	else if (transformIsDefault) transformString = "none";
+	return transformString;
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/render/html/utils/build-styles.mjs
+function buildHTMLStyles(state, latestValues, transformTemplate) {
+	const { style, vars, transformOrigin } = state;
+	let hasTransform = false;
+	let hasTransformOrigin = false;
+	/**
+	* Loop over all our latest animated values and decide whether to handle them
+	* as a style or CSS variable.
+	*
+	* Transforms and transform origins are kept separately for further processing.
+	*/
+	for (const key in latestValues) {
+		const value = latestValues[key];
+		if (transformProps.has(key)) {
+			hasTransform = true;
+			continue;
+		} else if (isCSSVariableName(key)) {
+			vars[key] = value;
+			continue;
+		} else {
+			const valueAsType = getValueAsType(value, numberValueTypes[key]);
+			if (key.startsWith("origin")) {
+				hasTransformOrigin = true;
+				transformOrigin[key] = valueAsType;
+			} else style[key] = valueAsType;
+		}
+	}
+	if (!latestValues.transform) {
+		if (hasTransform || transformTemplate) style.transform = buildTransform(latestValues, state.transform, transformTemplate);
+		else if (style.transform)
+ /**
+		* If we have previously created a transform but currently don't have any,
+		* reset transform style to none.
+		*/
+		style.transform = "none";
+	}
+	/**
+	* Build a transformOrigin style. Uses the same defaults as the browser for
+	* undefined origins.
+	*/
+	if (hasTransformOrigin) {
+		const { originX = "50%", originY = "50%", originZ = 0 } = transformOrigin;
+		style.transformOrigin = `${originX} ${originY} ${originZ}`;
+	}
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/render/svg/utils/path.mjs
+var dashKeys = {
+	offset: "stroke-dashoffset",
+	array: "stroke-dasharray"
+};
+var camelKeys = {
+	offset: "strokeDashoffset",
+	array: "strokeDasharray"
+};
+/**
+* Build SVG path properties. Uses the path's measured length to convert
+* our custom pathLength, pathSpacing and pathOffset into stroke-dashoffset
+* and stroke-dasharray attributes.
+*
+* This function is mutative to reduce per-frame GC.
+*
+* Note: We use unitless values for stroke-dasharray and stroke-dashoffset
+* because Safari incorrectly scales px values when the page is zoomed.
+*/
+function buildSVGPath(attrs, length, spacing = 1, offset = 0, useDashCase = true) {
+	attrs.pathLength = 1;
+	const keys = useDashCase ? dashKeys : camelKeys;
+	attrs[keys.offset] = `${-offset}`;
+	attrs[keys.array] = `${length} ${spacing}`;
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/render/svg/utils/build-attrs.mjs
+var cssStyleProperties = [
+	"transform",
+	"opacity",
+	"offsetDistance",
+	"offsetPath",
+	"offsetRotate",
+	"offsetAnchor"
+];
+/**
+* Build SVG visual attributes, like cx and style.transform
+*/
+function buildSVGAttrs(state, { attrX, attrY, attrScale, pathLength, pathSpacing = 1, pathOffset = 0, ...latest }, isSVGTag, transformTemplate, styleProp) {
+	buildHTMLStyles(state, latest, transformTemplate);
+	/**
+	* For svg tags we just want to make sure viewBox is animatable and treat all the styles
+	* as normal HTML tags.
+	*/
+	if (isSVGTag) {
+		if (state.style.viewBox) state.attrs.viewBox = state.style.viewBox;
+		return;
+	}
+	state.attrs = state.style;
+	state.style = {};
+	const { attrs, style } = state;
+	for (const key of cssStyleProperties) if (attrs[key] !== void 0) {
+		style[key] = attrs[key];
+		delete attrs[key];
+	}
+	if (style.transform || attrs.transformOrigin) {
+		style.transformOrigin = attrs.transformOrigin ?? "50% 50%";
+		delete attrs.transformOrigin;
+	}
+	if (style.transform) {
+		/**
+		* SVG's element transform-origin uses its own median as a reference.
+		* Therefore, transformBox becomes a fill-box
+		*/
+		style.transformBox = styleProp?.transformBox ?? "fill-box";
+		delete attrs.transformBox;
+	}
+	if (attrX !== void 0) attrs.x = attrX;
+	if (attrY !== void 0) attrs.y = attrY;
+	if (attrScale !== void 0) attrs.scale = attrScale;
+	if (pathLength !== void 0) buildSVGPath(attrs, pathLength, pathSpacing, pathOffset, false);
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/projection/geometry/conversion.mjs
+/**
+* Bounding boxes tend to be defined as top, left, right, bottom. For various operations
+* it's easier to consider each axis individually. This function returns a bounding box
+* as a map of single-axis min/max values.
+*/
+function convertBoundingBoxToBox({ top, left, right, bottom }) {
+	return {
+		x: {
+			min: left,
+			max: right
+		},
+		y: {
+			min: top,
+			max: bottom
+		}
+	};
+}
+function convertBoxToBoundingBox({ x, y }) {
+	return {
+		top: y.min,
+		right: x.max,
+		bottom: y.max,
+		left: x.min
+	};
+}
+/**
+* Applies a TransformPoint function to a bounding box. TransformPoint is usually a function
+* provided by Framer to allow measured points to be corrected for device scaling. This is used
+* when measuring DOM elements and DOM event points.
+*/
+function transformBoxPoints(point, transformPoint) {
+	if (!transformPoint) return point;
+	const topLeft = transformPoint({
+		x: point.left,
+		y: point.top
+	});
+	const bottomRight = transformPoint({
+		x: point.right,
+		y: point.bottom
+	});
+	return {
+		top: topLeft.y,
+		left: topLeft.x,
+		bottom: bottomRight.y,
+		right: bottomRight.x
+	};
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/projection/utils/has-transform.mjs
+function isIdentityScale(scale) {
+	return scale === void 0 || scale === 1;
+}
+function hasScale({ scale, scaleX, scaleY }) {
+	return !isIdentityScale(scale) || !isIdentityScale(scaleX) || !isIdentityScale(scaleY);
+}
+function hasTransform(values) {
+	return hasScale(values) || has2DTranslate(values) || values.z || values.rotate || values.rotateX || values.rotateY || values.skewX || values.skewY;
+}
+function has2DTranslate(values) {
+	return is2DTranslate(values.x) || is2DTranslate(values.y);
+}
+function is2DTranslate(value) {
+	return value && value !== "0%";
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/projection/geometry/delta-apply.mjs
+/**
+* Scales a point based on a factor and an originPoint
+*/
+function scalePoint(point, scale, originPoint) {
+	return originPoint + scale * (point - originPoint);
+}
+/**
+* Applies a translate/scale delta to a point
+*/
+function applyPointDelta(point, translate, scale, originPoint, boxScale) {
+	if (boxScale !== void 0) point = scalePoint(point, boxScale, originPoint);
+	return scalePoint(point, scale, originPoint) + translate;
+}
+/**
+* Applies a translate/scale delta to an axis
+*/
+function applyAxisDelta(axis, translate = 0, scale = 1, originPoint, boxScale) {
+	axis.min = applyPointDelta(axis.min, translate, scale, originPoint, boxScale);
+	axis.max = applyPointDelta(axis.max, translate, scale, originPoint, boxScale);
+}
+/**
+* Applies a translate/scale delta to a box
+*/
+function applyBoxDelta(box, { x, y }) {
+	applyAxisDelta(box.x, x.translate, x.scale, x.originPoint);
+	applyAxisDelta(box.y, y.translate, y.scale, y.originPoint);
+}
+var TREE_SCALE_SNAP_MIN = .999999999999;
+var TREE_SCALE_SNAP_MAX = 1.0000000000001;
+/**
+* Apply a tree of deltas to a box. We do this to calculate the effect of all the transforms
+* in a tree upon our box before then calculating how to project it into our desired viewport-relative box
+*
+* This is the final nested loop within updateLayoutDelta for future refactoring
+*/
+function applyTreeDeltas(box, treeScale, treePath, isSharedTransition = false) {
+	const treeLength = treePath.length;
+	if (!treeLength) return;
+	treeScale.x = treeScale.y = 1;
+	let node;
+	let delta;
+	for (let i = 0; i < treeLength; i++) {
+		node = treePath[i];
+		delta = node.projectionDelta;
+		/**
+		* TODO: Prefer to remove this, but currently we have motion components with
+		* display: contents in Framer.
+		*/
+		const { visualElement } = node.options;
+		if (visualElement && visualElement.props.style && visualElement.props.style.display === "contents") continue;
+		if (isSharedTransition && node.options.layoutScroll && node.scroll && node !== node.root) {
+			translateAxis(box.x, -node.scroll.offset.x);
+			translateAxis(box.y, -node.scroll.offset.y);
+		}
+		if (delta) {
+			treeScale.x *= delta.x.scale;
+			treeScale.y *= delta.y.scale;
+			applyBoxDelta(box, delta);
+		}
+		if (isSharedTransition && hasTransform(node.latestValues)) transformBox(box, node.latestValues, node.layout?.layoutBox);
+	}
+	/**
+	* Snap tree scale back to 1 if it's within a non-perceivable threshold.
+	* This will help reduce useless scales getting rendered.
+	*/
+	if (treeScale.x < TREE_SCALE_SNAP_MAX && treeScale.x > TREE_SCALE_SNAP_MIN) treeScale.x = 1;
+	if (treeScale.y < TREE_SCALE_SNAP_MAX && treeScale.y > TREE_SCALE_SNAP_MIN) treeScale.y = 1;
+}
+function translateAxis(axis, distance) {
+	axis.min += distance;
+	axis.max += distance;
+}
+/**
+* Apply a transform to an axis from the latest resolved motion values.
+* This function basically acts as a bridge between a flat motion value map
+* and applyAxisDelta
+*/
+function transformAxis(axis, axisTranslate, axisScale, boxScale, axisOrigin = .5) {
+	applyAxisDelta(axis, axisTranslate, axisScale, mixNumber$1(axis.min, axis.max, axisOrigin), boxScale);
+}
+function resolveAxisTranslate(value, axis) {
+	if (typeof value === "string") return parseFloat(value) / 100 * (axis.max - axis.min);
+	return value;
+}
+/**
+* Apply a transform to a box from the latest resolved motion values.
+*/
+function transformBox(box, transform, sourceBox) {
+	const resolveBox = sourceBox ?? box;
+	transformAxis(box.x, resolveAxisTranslate(transform.x, resolveBox.x), transform.scaleX, transform.scale, transform.originX);
+	transformAxis(box.y, resolveAxisTranslate(transform.y, resolveBox.y), transform.scaleY, transform.scale, transform.originY);
+}
+//#endregion
+//#region node_modules/motion-dom/dist/es/projection/utils/measure.mjs
+function measureViewportBox(instance, transformPoint) {
+	return convertBoundingBoxToBox(transformBoxPoints(instance.getBoundingClientRect(), transformPoint));
+}
+function measurePageBox(element, rootProjectionNode, transformPagePoint) {
+	const viewportBox = measureViewportBox(element, transformPagePoint);
+	const { scroll } = rootProjectionNode;
+	if (scroll) {
+		translateAxis(viewportBox.x, scroll.offset.x);
+		translateAxis(viewportBox.y, scroll.offset.y);
+	}
+	return viewportBox;
 }
 //#endregion
 //#region node_modules/motion-dom/dist/es/frameloop/microtask.mjs
@@ -3880,15 +4539,6 @@ function press(targetOrSelector, onPressStart, options = {}) {
 	return cancelEvents;
 }
 //#endregion
-//#region node_modules/motion-dom/dist/es/utils/is-svg-element.mjs
-/**
-* Checks if an element is an SVG element in a way
-* that works across iframes
-*/
-function isSVGElement(element) {
-	return isObject(element) && "ownerSVGElement" in element;
-}
-//#endregion
 //#region node_modules/motion-dom/dist/es/resize/handle-element.mjs
 var resizeHandlers = /* @__PURE__ */ new WeakMap();
 var observer;
@@ -3988,20 +4638,6 @@ function isSVGSVGElement(element) {
 	return isSVGElement(element) && element.tagName === "svg";
 }
 //#endregion
-//#region node_modules/motion-dom/dist/es/value/types/utils/find.mjs
-/**
-* A list of all ValueTypes
-*/
-var valueTypes = [
-	...dimensionValueTypes,
-	color,
-	complex
-];
-/**
-* Tests a value against the list of ValueTypes
-*/
-var findValueType = (v) => valueTypes.find(testValueType(v));
-//#endregion
 //#region node_modules/motion-dom/dist/es/projection/geometry/models.mjs
 var createAxisDelta = () => ({
 	translate: 0,
@@ -4052,7 +4688,9 @@ var variantProps = ["initial", ...variantPriorityOrder];
 //#endregion
 //#region node_modules/motion-dom/dist/es/render/utils/is-controlling-variants.mjs
 function isControllingVariants(props) {
-	return isAnimationControls(props.animate) || variantProps.some((name) => isVariantLabel(props[name]));
+	if (isAnimationControls(props.animate)) return true;
+	for (let i = 0; i < variantProps.length; i++) if (isVariantLabel(props[variantProps[i]])) return true;
+	return false;
 }
 function isVariantNode(props) {
 	return Boolean(isControllingVariants(props) || props.variants);
@@ -4517,7 +5155,7 @@ var VisualElement = class {
 		let value = this.latestValues[key] !== void 0 || !this.current ? this.latestValues[key] : this.getBaseTargetFromProps(this.props, key) ?? this.readValueFromInstance(this.current, key, this.options);
 		if (value !== void 0 && value !== null) {
 			if (typeof value === "string" && (isNumericalString(value) || isZeroValueString(value))) value = parseFloat(value);
-			else if (!findValueType(value) && complex.test(target)) value = getAnimatableNone(key, target);
+			else if (typeof value !== "number" && !complex.test(value) && complex.test(target)) value = getAnimatableNone(key, target);
 			this.setBaseTarget(key, isMotionValue(value) ? value.get() : value);
 		}
 		return isMotionValue(value) ? value.get() : value;
@@ -4615,278 +5253,6 @@ var Feature = class {
 	}
 	update() {}
 };
-//#endregion
-//#region node_modules/motion-dom/dist/es/projection/geometry/conversion.mjs
-/**
-* Bounding boxes tend to be defined as top, left, right, bottom. For various operations
-* it's easier to consider each axis individually. This function returns a bounding box
-* as a map of single-axis min/max values.
-*/
-function convertBoundingBoxToBox({ top, left, right, bottom }) {
-	return {
-		x: {
-			min: left,
-			max: right
-		},
-		y: {
-			min: top,
-			max: bottom
-		}
-	};
-}
-function convertBoxToBoundingBox({ x, y }) {
-	return {
-		top: y.min,
-		right: x.max,
-		bottom: y.max,
-		left: x.min
-	};
-}
-/**
-* Applies a TransformPoint function to a bounding box. TransformPoint is usually a function
-* provided by Framer to allow measured points to be corrected for device scaling. This is used
-* when measuring DOM elements and DOM event points.
-*/
-function transformBoxPoints(point, transformPoint) {
-	if (!transformPoint) return point;
-	const topLeft = transformPoint({
-		x: point.left,
-		y: point.top
-	});
-	const bottomRight = transformPoint({
-		x: point.right,
-		y: point.bottom
-	});
-	return {
-		top: topLeft.y,
-		left: topLeft.x,
-		bottom: bottomRight.y,
-		right: bottomRight.x
-	};
-}
-//#endregion
-//#region node_modules/motion-dom/dist/es/projection/utils/has-transform.mjs
-function isIdentityScale(scale) {
-	return scale === void 0 || scale === 1;
-}
-function hasScale({ scale, scaleX, scaleY }) {
-	return !isIdentityScale(scale) || !isIdentityScale(scaleX) || !isIdentityScale(scaleY);
-}
-function hasTransform(values) {
-	return hasScale(values) || has2DTranslate(values) || values.z || values.rotate || values.rotateX || values.rotateY || values.skewX || values.skewY;
-}
-function has2DTranslate(values) {
-	return is2DTranslate(values.x) || is2DTranslate(values.y);
-}
-function is2DTranslate(value) {
-	return value && value !== "0%";
-}
-//#endregion
-//#region node_modules/motion-dom/dist/es/projection/geometry/delta-apply.mjs
-/**
-* Scales a point based on a factor and an originPoint
-*/
-function scalePoint(point, scale, originPoint) {
-	return originPoint + scale * (point - originPoint);
-}
-/**
-* Applies a translate/scale delta to a point
-*/
-function applyPointDelta(point, translate, scale, originPoint, boxScale) {
-	if (boxScale !== void 0) point = scalePoint(point, boxScale, originPoint);
-	return scalePoint(point, scale, originPoint) + translate;
-}
-/**
-* Applies a translate/scale delta to an axis
-*/
-function applyAxisDelta(axis, translate = 0, scale = 1, originPoint, boxScale) {
-	axis.min = applyPointDelta(axis.min, translate, scale, originPoint, boxScale);
-	axis.max = applyPointDelta(axis.max, translate, scale, originPoint, boxScale);
-}
-/**
-* Applies a translate/scale delta to a box
-*/
-function applyBoxDelta(box, { x, y }) {
-	applyAxisDelta(box.x, x.translate, x.scale, x.originPoint);
-	applyAxisDelta(box.y, y.translate, y.scale, y.originPoint);
-}
-var TREE_SCALE_SNAP_MIN = .999999999999;
-var TREE_SCALE_SNAP_MAX = 1.0000000000001;
-/**
-* Apply a tree of deltas to a box. We do this to calculate the effect of all the transforms
-* in a tree upon our box before then calculating how to project it into our desired viewport-relative box
-*
-* This is the final nested loop within updateLayoutDelta for future refactoring
-*/
-function applyTreeDeltas(box, treeScale, treePath, isSharedTransition = false) {
-	const treeLength = treePath.length;
-	if (!treeLength) return;
-	treeScale.x = treeScale.y = 1;
-	let node;
-	let delta;
-	for (let i = 0; i < treeLength; i++) {
-		node = treePath[i];
-		delta = node.projectionDelta;
-		/**
-		* TODO: Prefer to remove this, but currently we have motion components with
-		* display: contents in Framer.
-		*/
-		const { visualElement } = node.options;
-		if (visualElement && visualElement.props.style && visualElement.props.style.display === "contents") continue;
-		if (isSharedTransition && node.options.layoutScroll && node.scroll && node !== node.root) {
-			translateAxis(box.x, -node.scroll.offset.x);
-			translateAxis(box.y, -node.scroll.offset.y);
-		}
-		if (delta) {
-			treeScale.x *= delta.x.scale;
-			treeScale.y *= delta.y.scale;
-			applyBoxDelta(box, delta);
-		}
-		if (isSharedTransition && hasTransform(node.latestValues)) transformBox(box, node.latestValues, node.layout?.layoutBox);
-	}
-	/**
-	* Snap tree scale back to 1 if it's within a non-perceivable threshold.
-	* This will help reduce useless scales getting rendered.
-	*/
-	if (treeScale.x < TREE_SCALE_SNAP_MAX && treeScale.x > TREE_SCALE_SNAP_MIN) treeScale.x = 1;
-	if (treeScale.y < TREE_SCALE_SNAP_MAX && treeScale.y > TREE_SCALE_SNAP_MIN) treeScale.y = 1;
-}
-function translateAxis(axis, distance) {
-	axis.min += distance;
-	axis.max += distance;
-}
-/**
-* Apply a transform to an axis from the latest resolved motion values.
-* This function basically acts as a bridge between a flat motion value map
-* and applyAxisDelta
-*/
-function transformAxis(axis, axisTranslate, axisScale, boxScale, axisOrigin = .5) {
-	applyAxisDelta(axis, axisTranslate, axisScale, mixNumber$1(axis.min, axis.max, axisOrigin), boxScale);
-}
-function resolveAxisTranslate(value, axis) {
-	if (typeof value === "string") return parseFloat(value) / 100 * (axis.max - axis.min);
-	return value;
-}
-/**
-* Apply a transform to a box from the latest resolved motion values.
-*/
-function transformBox(box, transform, sourceBox) {
-	const resolveBox = sourceBox ?? box;
-	transformAxis(box.x, resolveAxisTranslate(transform.x, resolveBox.x), transform.scaleX, transform.scale, transform.originX);
-	transformAxis(box.y, resolveAxisTranslate(transform.y, resolveBox.y), transform.scaleY, transform.scale, transform.originY);
-}
-//#endregion
-//#region node_modules/motion-dom/dist/es/projection/utils/measure.mjs
-function measureViewportBox(instance, transformPoint) {
-	return convertBoundingBoxToBox(transformBoxPoints(instance.getBoundingClientRect(), transformPoint));
-}
-function measurePageBox(element, rootProjectionNode, transformPagePoint) {
-	const viewportBox = measureViewportBox(element, transformPagePoint);
-	const { scroll } = rootProjectionNode;
-	if (scroll) {
-		translateAxis(viewportBox.x, scroll.offset.x);
-		translateAxis(viewportBox.y, scroll.offset.y);
-	}
-	return viewportBox;
-}
-//#endregion
-//#region node_modules/motion-dom/dist/es/render/html/utils/build-transform.mjs
-var translateAlias = {
-	x: "translateX",
-	y: "translateY",
-	z: "translateZ",
-	transformPerspective: "perspective"
-};
-var numTransforms = transformPropOrder.length;
-/**
-* Build a CSS transform style from individual x/y/scale etc properties.
-*
-* This outputs with a default order of transforms/scales/rotations, this can be customised by
-* providing a transformTemplate function.
-*/
-function buildTransform(latestValues, transform, transformTemplate) {
-	let transformString = "";
-	let transformIsDefault = true;
-	/**
-	* Loop over all possible transforms in order, adding the ones that
-	* are present to the transform string.
-	*/
-	for (let i = 0; i < numTransforms; i++) {
-		const key = transformPropOrder[i];
-		const value = latestValues[key];
-		if (value === void 0) continue;
-		let valueIsDefault = true;
-		if (typeof value === "number") valueIsDefault = value === (key.startsWith("scale") ? 1 : 0);
-		else {
-			const parsed = parseFloat(value);
-			valueIsDefault = key.startsWith("scale") ? parsed === 1 : parsed === 0;
-		}
-		if (!valueIsDefault || transformTemplate) {
-			const valueAsType = getValueAsType(value, numberValueTypes[key]);
-			if (!valueIsDefault) {
-				transformIsDefault = false;
-				const transformName = translateAlias[key] || key;
-				transformString += `${transformName}(${valueAsType}) `;
-			}
-			if (transformTemplate) transform[key] = valueAsType;
-		}
-	}
-	const pathRotation = latestValues.pathRotation;
-	if (pathRotation) {
-		transformIsDefault = false;
-		transformString += `rotate(${getValueAsType(pathRotation, numberValueTypes.pathRotation)}) `;
-	}
-	transformString = transformString.trim();
-	if (transformTemplate) transformString = transformTemplate(transform, transformIsDefault ? "" : transformString);
-	else if (transformIsDefault) transformString = "none";
-	return transformString;
-}
-//#endregion
-//#region node_modules/motion-dom/dist/es/render/html/utils/build-styles.mjs
-function buildHTMLStyles(state, latestValues, transformTemplate) {
-	const { style, vars, transformOrigin } = state;
-	let hasTransform = false;
-	let hasTransformOrigin = false;
-	/**
-	* Loop over all our latest animated values and decide whether to handle them
-	* as a style or CSS variable.
-	*
-	* Transforms and transform origins are kept separately for further processing.
-	*/
-	for (const key in latestValues) {
-		const value = latestValues[key];
-		if (transformProps.has(key)) {
-			hasTransform = true;
-			continue;
-		} else if (isCSSVariableName(key)) {
-			vars[key] = value;
-			continue;
-		} else {
-			const valueAsType = getValueAsType(value, numberValueTypes[key]);
-			if (key.startsWith("origin")) {
-				hasTransformOrigin = true;
-				transformOrigin[key] = valueAsType;
-			} else style[key] = valueAsType;
-		}
-	}
-	if (!latestValues.transform) {
-		if (hasTransform || transformTemplate) style.transform = buildTransform(latestValues, state.transform, transformTemplate);
-		else if (style.transform)
- /**
-		* If we have previously created a transform but currently don't have any,
-		* reset transform style to none.
-		*/
-		style.transform = "none";
-	}
-	/**
-	* Build a transformOrigin style. Uses the same defaults as the browser for
-	* undefined origins.
-	*/
-	if (hasTransformOrigin) {
-		const { originX = "50%", originY = "50%", originZ = 0 } = transformOrigin;
-		style.transformOrigin = `${originX} ${originY} ${originZ}`;
-	}
-}
 //#endregion
 //#region node_modules/motion-dom/dist/es/render/html/utils/render.mjs
 function renderHTML(element, { style, vars }, styleProp, projection) {
@@ -5010,79 +5376,6 @@ var HTMLVisualElement = class extends DOMVisualElement {
 		return scrapeMotionValuesFromProps$1(props, prevProps, visualElement);
 	}
 };
-//#endregion
-//#region node_modules/motion-dom/dist/es/render/svg/utils/path.mjs
-var dashKeys = {
-	offset: "stroke-dashoffset",
-	array: "stroke-dasharray"
-};
-var camelKeys = {
-	offset: "strokeDashoffset",
-	array: "strokeDasharray"
-};
-/**
-* Build SVG path properties. Uses the path's measured length to convert
-* our custom pathLength, pathSpacing and pathOffset into stroke-dashoffset
-* and stroke-dasharray attributes.
-*
-* This function is mutative to reduce per-frame GC.
-*
-* Note: We use unitless values for stroke-dasharray and stroke-dashoffset
-* because Safari incorrectly scales px values when the page is zoomed.
-*/
-function buildSVGPath(attrs, length, spacing = 1, offset = 0, useDashCase = true) {
-	attrs.pathLength = 1;
-	const keys = useDashCase ? dashKeys : camelKeys;
-	attrs[keys.offset] = `${-offset}`;
-	attrs[keys.array] = `${length} ${spacing}`;
-}
-//#endregion
-//#region node_modules/motion-dom/dist/es/render/svg/utils/build-attrs.mjs
-var cssStyleProperties = [
-	"transform",
-	"opacity",
-	"offsetDistance",
-	"offsetPath",
-	"offsetRotate",
-	"offsetAnchor"
-];
-/**
-* Build SVG visual attributes, like cx and style.transform
-*/
-function buildSVGAttrs(state, { attrX, attrY, attrScale, pathLength, pathSpacing = 1, pathOffset = 0, ...latest }, isSVGTag, transformTemplate, styleProp) {
-	buildHTMLStyles(state, latest, transformTemplate);
-	/**
-	* For svg tags we just want to make sure viewBox is animatable and treat all the styles
-	* as normal HTML tags.
-	*/
-	if (isSVGTag) {
-		if (state.style.viewBox) state.attrs.viewBox = state.style.viewBox;
-		return;
-	}
-	state.attrs = state.style;
-	state.style = {};
-	const { attrs, style } = state;
-	for (const key of cssStyleProperties) if (attrs[key] !== void 0) {
-		style[key] = attrs[key];
-		delete attrs[key];
-	}
-	if (style.transform || attrs.transformOrigin) {
-		style.transformOrigin = attrs.transformOrigin ?? "50% 50%";
-		delete attrs.transformOrigin;
-	}
-	if (style.transform) {
-		/**
-		* SVG's element transform-origin uses its own median as a reference.
-		* Therefore, transformBox becomes a fill-box
-		*/
-		style.transformBox = styleProp?.transformBox ?? "fill-box";
-		delete attrs.transformBox;
-	}
-	if (attrX !== void 0) attrs.x = attrX;
-	if (attrY !== void 0) attrs.y = attrY;
-	if (attrScale !== void 0) attrs.scale = attrScale;
-	if (pathLength !== void 0) buildSVGPath(attrs, pathLength, pathSpacing, pathOffset, false);
-}
 //#endregion
 //#region node_modules/motion-dom/dist/es/render/svg/utils/camel-case-attrs.mjs
 /**
@@ -6795,6 +7088,7 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
 						this.completeAnimation();
 					}
 				});
+				notifyLayoutAnimationStart(this.currentAnimation, this);
 				if (this.resumingFrom) this.resumingFrom.currentAnimation = this.currentAnimation;
 				this.pendingAnimation = void 0;
 			});
@@ -6818,7 +7112,8 @@ function createProjectionNode$1({ attachResizeListener, defaultParent, measureSc
 		}
 		applyTransformsToTarget() {
 			const lead = this.getLead();
-			let { targetWithTransforms, target, layout, latestValues } = lead;
+			const { targetWithTransforms, layout, latestValues } = lead;
+			let { target } = lead;
 			if (!targetWithTransforms || !target || !layout) return;
 			/**
 			* If we're only animating position, and this element isn't the lead element,

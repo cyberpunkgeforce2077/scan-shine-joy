@@ -1,5 +1,5 @@
 import { o as __toESM } from "../_runtime.mjs";
-import { G as require_react } from "./@tanstack/react-router+[...].mjs";
+import { u as require_react } from "./@floating-ui/react-dom+[...].mjs";
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 /**
@@ -232,6 +232,26 @@ var Camera = createLucideIcon("camera", [["path", {
 var Check = createLucideIcon("check", [["path", {
 	d: "M20 6 9 17l-5-5",
 	key: "1gmf2c"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChevronDown = createLucideIcon("chevron-down", [["path", {
+	d: "m6 9 6 6 6-6",
+	key: "qrunsl"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChevronUp = createLucideIcon("chevron-up", [["path", {
+	d: "m18 15-6-6-6 6",
+	key: "153udz"
 }]]);
 /**
 * @license lucide-react v0.575.0 - ISC
@@ -1134,6 +1154,23 @@ var UserRound = createLucideIcon("user-round", [["circle", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Video = createLucideIcon("video", [["path", {
+	d: "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5",
+	key: "ftymec"
+}], ["rect", {
+	x: "2",
+	y: "6",
+	width: "14",
+	height: "12",
+	rx: "2",
+	key: "158x01"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var WandSparkles = createLucideIcon("wand-sparkles", [
 	["path", {
 		d: "m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72",
@@ -1242,4 +1279,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { LogOut as A, DatabaseBackup as B, Moon as C, Menu as D, MessageSquare as E, Image as F, Camera as G, Clock as H, Gauge as I, BatteryCharging as J, Bot as K, Fish as L, Link2 as M, Lightbulb as N, MemoryStick as O, Laptop as P, ExternalLink as R, Music4 as S, MicOff as T, ClipboardPaste as U, Copy as V, Check as W, ArrowLeft as X, ArrowRight as Y, Scan as _, UserRound as a, Plus as b, Trash2 as c, Sparkles as d, ShieldCheck as f, SearchX as g, Search as h, WandSparkles as i, LoaderCircle as j, Mail as k, Thermometer as l, SendHorizontal as m, Wifi as n, Upload as o, Settings as p, BookOpen as q, WifiOff as r, Type as s, X as t, Sun as u, RefreshCw as v, Mic as w, Music as x, QrCode as y, Download as z };
+export { ArrowLeft as $, Mail as A, Download as B, Music4 as C, MessageSquare as D, MicOff as E, Laptop as F, ChevronUp as G, Copy as H, Image as I, Camera as J, ChevronDown as K, Gauge as L, LoaderCircle as M, Link2 as N, Menu as O, Lightbulb as P, ArrowRight as Q, Fish as R, Music as S, Mic as T, Clock as U, DatabaseBackup as V, ClipboardPaste as W, BookOpen as X, Bot as Y, BatteryCharging as Z, SearchX as _, Video as a, QrCode as b, Type as c, Sun as d, Sparkles as f, Search as g, SendHorizontal as h, WandSparkles as i, LogOut as j, MemoryStick as k, Trash2 as l, Settings as m, Wifi as n, UserRound as o, ShieldCheck as p, Check as q, WifiOff as r, Upload as s, X as t, Thermometer as u, Scan as v, Moon as w, Plus as x, RefreshCw as y, ExternalLink as z };

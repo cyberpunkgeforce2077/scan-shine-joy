@@ -9,7 +9,7 @@ function record(error) {
 }
 var CAUSE_DEPTH_LIMIT = 5;
 var DESCRIPTION_LENGTH_LIMIT = 8e3;
-function describeError$1(error) {
+function describeError(error) {
 	const parts = [];
 	let current = error;
 	for (let depth = 0; depth < CAUSE_DEPTH_LIMIT && current != null; depth++) {
@@ -44,7 +44,7 @@ console.error = (...args) => {
 	originalConsoleError(...args.map((arg) => {
 		if (!isErrorLike(arg)) return arg;
 		record(arg);
-		return describeError$1(arg);
+		return describeError(arg);
 	}));
 };
 if (typeof globalThis.addEventListener === "function") {
@@ -99,7 +99,7 @@ function escapeHtml(value) {
 }
 var serverEntryPromise;
 async function getServerEntry() {
-	if (!serverEntryPromise) serverEntryPromise = import("./server-BEVvidUz.mjs").then((n) => n.t).then((m) => m.default ?? m);
+	if (!serverEntryPromise) serverEntryPromise = import("./server-DlXSfxAW.mjs").then((n) => n.t).then((m) => m.default ?? m);
 	return serverEntryPromise;
 }
 async function normalizeCatastrophicSsrResponse(response) {

@@ -1,4 +1,5 @@
-import { C as require_jsx_runtime, S as ClientOnly } from "../_libs/@tanstack/react-router+[...].mjs";
+import { x as ClientOnly } from "../_libs/@tanstack/react-router+[...].mjs";
+import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-collection+[...].mjs";
 import { t as PageShell } from "./primitives-KMHgUwZj.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/ocr-V3Bzb2Sw.js
 var import_jsx_runtime = require_jsx_runtime();

@@ -15,10 +15,12 @@ import { Route as DakphraserRouteImport } from './routes/dakphraser'
 import { Route as DownloaderRouteImport } from './routes/downloader'
 import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as HubRouteImport } from './routes/hub'
+import { Route as MusicRouteImport } from './routes/music'
 import { Route as OcrRouteImport } from './routes/ocr'
 import { Route as QrRouteImport } from './routes/qr'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as VideoRouteImport } from './routes/video'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as GuidesSlugRouteImport } from './routes/guides_.$slug'
 
@@ -52,6 +54,11 @@ const HubRoute = HubRouteImport.update({
   path: '/hub',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MusicRoute = MusicRouteImport.update({
+  id: '/music',
+  path: '/music',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OcrRoute = OcrRouteImport.update({
   id: '/ocr',
   path: '/ocr',
@@ -72,6 +79,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideoRoute = VideoRouteImport.update({
+  id: '/video',
+  path: '/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -90,10 +102,12 @@ export interface FileRoutesByFullPath {
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
   '/hub': typeof HubRoute
+  '/music': typeof MusicRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
   '/settings': typeof SettingsRoute
+  '/video': typeof VideoRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/guides/$slug': typeof GuidesSlugRoute
 }
@@ -104,10 +118,12 @@ export interface FileRoutesByTo {
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
   '/hub': typeof HubRoute
+  '/music': typeof MusicRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
   '/settings': typeof SettingsRoute
+  '/video': typeof VideoRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/guides/$slug': typeof GuidesSlugRoute
 }
@@ -119,10 +135,12 @@ export interface FileRoutesById {
   '/downloader': typeof DownloaderRoute
   '/guides': typeof GuidesRoute
   '/hub': typeof HubRoute
+  '/music': typeof MusicRoute
   '/ocr': typeof OcrRoute
   '/qr': typeof QrRoute
   '/scanner': typeof ScannerRoute
   '/settings': typeof SettingsRoute
+  '/video': typeof VideoRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/guides_/$slug': typeof GuidesSlugRoute
 }
@@ -135,10 +153,12 @@ export interface FileRouteTypes {
     | '/downloader'
     | '/guides'
     | '/hub'
+    | '/music'
     | '/ocr'
     | '/qr'
     | '/scanner'
     | '/settings'
+    | '/video'
     | '/auth/callback'
     | '/guides/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -149,10 +169,12 @@ export interface FileRouteTypes {
     | '/downloader'
     | '/guides'
     | '/hub'
+    | '/music'
     | '/ocr'
     | '/qr'
     | '/scanner'
     | '/settings'
+    | '/video'
     | '/auth/callback'
     | '/guides/$slug'
   id:
@@ -163,10 +185,12 @@ export interface FileRouteTypes {
     | '/downloader'
     | '/guides'
     | '/hub'
+    | '/music'
     | '/ocr'
     | '/qr'
     | '/scanner'
     | '/settings'
+    | '/video'
     | '/auth/callback'
     | '/guides_/$slug'
   fileRoutesById: FileRoutesById
@@ -178,10 +202,12 @@ export interface RootRouteChildren {
   DownloaderRoute: typeof DownloaderRoute
   GuidesRoute: typeof GuidesRoute
   HubRoute: typeof HubRoute
+  MusicRoute: typeof MusicRoute
   OcrRoute: typeof OcrRoute
   QrRoute: typeof QrRoute
   ScannerRoute: typeof ScannerRoute
   SettingsRoute: typeof SettingsRoute
+  VideoRoute: typeof VideoRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
 }
@@ -230,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/music': {
+      id: '/music'
+      path: '/music'
+      fullPath: '/music'
+      preLoaderRoute: typeof MusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ocr': {
       id: '/ocr'
       path: '/ocr'
@@ -258,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/video': {
+      id: '/video'
+      path: '/video'
+      fullPath: '/video'
+      preLoaderRoute: typeof VideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -282,10 +322,12 @@ const rootRouteChildren: RootRouteChildren = {
   DownloaderRoute: DownloaderRoute,
   GuidesRoute: GuidesRoute,
   HubRoute: HubRoute,
+  MusicRoute: MusicRoute,
   OcrRoute: OcrRoute,
   QrRoute: QrRoute,
   ScannerRoute: ScannerRoute,
   SettingsRoute: SettingsRoute,
+  VideoRoute: VideoRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   GuidesSlugRoute: GuidesSlugRoute,
 }

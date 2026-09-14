@@ -10,7 +10,7 @@ import { Buffer } from "node:buffer";
 import { deprecate, promisify, types } from "node:util";
 import { format } from "node:url";
 import { isIP } from "node:net";
-//#region node_modules/gaxios/node_modules/node-fetch/src/errors/base.js
+//#region node_modules/node-fetch/src/errors/base.js
 var FetchBaseError;
 var init_base = __esmMin((() => {
 	FetchBaseError = class extends Error {
@@ -28,7 +28,7 @@ var init_base = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/errors/fetch-error.js
+//#region node_modules/node-fetch/src/errors/fetch-error.js
 var FetchError;
 var init_fetch_error = __esmMin((() => {
 	init_base();
@@ -48,7 +48,7 @@ var init_fetch_error = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/utils/is.js
+//#region node_modules/node-fetch/src/utils/is.js
 var NAME, isURLSearchParameters, isBlob, isAbortSignal, isDomainOrSubdomain, isSameProtocol;
 var init_is = __esmMin((() => {
 	NAME = Symbol.toStringTag;
@@ -71,7 +71,7 @@ var init_is = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/body.js
+//#region node_modules/node-fetch/src/body.js
 /**
 * Body.js
 *
@@ -265,7 +265,7 @@ var init_body = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/headers.js
+//#region node_modules/node-fetch/src/headers.js
 /**
 * Headers.js
 *
@@ -432,7 +432,7 @@ var init_headers = __esmMin((() => {
 	}, {}));
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/utils/is-redirect.js
+//#region node_modules/node-fetch/src/utils/is-redirect.js
 var redirectStatus, isRedirect;
 var init_is_redirect = __esmMin((() => {
 	redirectStatus = /* @__PURE__ */ new Set([
@@ -447,7 +447,7 @@ var init_is_redirect = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/response.js
+//#region node_modules/node-fetch/src/response.js
 var INTERNALS$1, Response;
 var init_response = __esmMin((() => {
 	init_headers();
@@ -564,7 +564,7 @@ var init_response = __esmMin((() => {
 	});
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/utils/get-search.js
+//#region node_modules/node-fetch/src/utils/get-search.js
 var getSearch;
 var init_get_search = __esmMin((() => {
 	getSearch = (parsedURL) => {
@@ -575,7 +575,7 @@ var init_get_search = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/utils/referrer.js
+//#region node_modules/node-fetch/src/utils/referrer.js
 /**
 * @external URL
 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/URL|URL}
@@ -720,7 +720,7 @@ var init_referrer = __esmMin((() => {
 	DEFAULT_REFERRER_POLICY = "strict-origin-when-cross-origin";
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/request.js
+//#region node_modules/node-fetch/src/request.js
 /**
 * Request.js
 *
@@ -871,7 +871,7 @@ var init_request = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/errors/abort-error.js
+//#region node_modules/node-fetch/src/errors/abort-error.js
 var AbortError;
 var init_abort_error = __esmMin((() => {
 	init_base();
@@ -882,7 +882,7 @@ var init_abort_error = __esmMin((() => {
 	};
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/index.js
+//#region node_modules/node-fetch/src/index.js
 /**
 * Index.js
 *
@@ -1149,7 +1149,7 @@ var init_src = __esmMin((() => {
 	]);
 }));
 //#endregion
-//#region node_modules/gaxios/node_modules/node-fetch/src/utils/multipart-parser.js
+//#region node_modules/node-fetch/src/utils/multipart-parser.js
 var multipart_parser_exports = /* @__PURE__ */ __exportAll({ toFormData: () => toFormData });
 function _fileName(headerValue) {
 	const m = headerValue.match(/\bfilename=("(.*?)"|([^()<>@,;:\\"/[\]?={}\s\t]+))($|;\s)/i);

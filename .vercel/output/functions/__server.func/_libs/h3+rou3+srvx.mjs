@@ -1,4 +1,6 @@
+import "node:http";
 import { PassThrough, Readable } from "node:stream";
+import "node:https";
 //#region node_modules/h3/node_modules/rou3/dist/index.mjs
 var NullProtoObj = /* @__PURE__ */ (() => {
 	const e = function() {};
@@ -411,7 +413,7 @@ var HTTPError = class HTTPError extends Error {
 	body;
 	unhandled;
 	static isError(input) {
-		return input instanceof Error && input?.name === "HTTPError";
+		return input instanceof Error && input?.name === "HTTPError" && input.status > 99;
 	}
 	static status(status, statusText, details) {
 		return new HTTPError({

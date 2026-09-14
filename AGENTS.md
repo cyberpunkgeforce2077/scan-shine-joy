@@ -24,3 +24,10 @@
 - CI `.github/workflows/build.yml` output detection: `dist` → `.vercel/output/public` → `.vercel/output` → `.output/public` → `.output` → `build`.
 - Guest login: `AuthGate` treats `isGuest` as authenticated (`authenticated = !!session || isGuest`) so guests reach OnboardingScreen.
 - **Serving the prebuilt locally / on the runtime hosts**: the commits carry the Nitro `.vercel/output` prebuilt, but the all-hands runtime hosts (ports 12000 / 12001) do not auto-deploy — the app's servers must be started manually after a rebuild: `node scripts/serve-test.mjs 12000` and `node scripts/serve-test.mjs 12001` (SERVE_ORIGIN can be set to the public host URL so absolute redirects match).
+
+## Stale committed prebuilt (2026-09-14)
+
+- The committed `.vercel/output` had drifted from source: it was an old build (missing shared chunks now emitted at `_libs/@floating-ui/*`, `_libs/@radix-ui/*`, `_libs/debug+[...].mjs`, `_libs/fetch-blob+[...].mjs`), and `src/routeTree.gen.ts` was stale (missing the `/music` and `/video` routes). Symptom: every route 500s at SSR with `TypeError: Getter must be a function: Symbol(react.activity)` during module init, then `ReferenceError: describeError is not defined` when rendering the error page — so the user only ever saw "This page didn't load".
+- Root cause is simply that the prebuilt was not rebuilt after source changes. A fresh `npm run build` (with the Supabase env vars) regenerates everything consistently and every route returns 200.
+- Latent source bug fixed at the same time: `src/server.ts` called `describeError(...)` without importing it, so the debug error page itself threw. It now imports `describeError` from `./lib/error-capture`.
+- After any rebuild, verify with `node scripts/serve-test.mjs 12000` + `curl -o /dev/null -w '%{http_code}' http://localhost:12000/` (expect 200, no `didn't load` / `debug-error` in the body) before committing the regenerated output.

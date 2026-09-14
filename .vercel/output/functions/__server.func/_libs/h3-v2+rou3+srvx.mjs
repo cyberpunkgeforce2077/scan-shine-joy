@@ -1,4 +1,6 @@
+import "node:http";
 import { PassThrough, Readable } from "node:stream";
+import "node:https";
 //#region node_modules/srvx/dist/_chunks/_url.mjs
 function lazyInherit(target, source, sourceKey) {
 	for (const key of [...Object.getOwnPropertyNames(source), ...Object.getOwnPropertySymbols(source)]) {
