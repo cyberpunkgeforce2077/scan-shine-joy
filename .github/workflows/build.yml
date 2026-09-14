@@ -1,55 +1,65 @@
-name: Build Web Assets
+name: Build Android APK
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install --legacy-peer-deps
 
-      - name: Build Project
+      - name: Install Capacitor CLI & Android
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Build Web App
         run: npm run build
 
-      - name: Verify server function boots
+      - name: Detect and Sync Web Directory
         run: |
-          FUNC=".vercel/output/functions/__server.func/index.mjs"
-          if [ -f "$FUNC" ]; then
-            node -e "import('./$FUNC').then(()=>console.log('BOOT OK')).catch(e=>{console.error('BOOT FAIL:', e.code, e.message.split('\n')[0]);process.exit(1)})"
-          else
-            echo "No .vercel/output function produced — skipping boot check"
-          fi
-
-      - name: Find and Package Output Folder
-        run: |
-          if [ -d "dist" ]; then
-            echo "TARGET_DIR=dist" >> $GITHUB_ENV
-          elif [ -d ".vercel/output/public" ]; then
-            echo "TARGET_DIR=.vercel/output/public" >> $GITHUB_ENV
-          elif [ -d ".vercel/output" ]; then
-            echo "TARGET_DIR=.vercel/output" >> $GITHUB_ENV
-          elif [ -d ".output/public" ]; then
-            echo "TARGET_DIR=.output/public" >> $GITHUB_ENV
-          elif [ -d ".output" ]; then
-            echo "TARGET_DIR=.output" >> $GITHUB_ENV
+          mkdir -p dist
+          if [ -d ".output/public" ]; then
+            cp -r .output/public/* dist/
           elif [ -d "build" ]; then
-            echo "TARGET_DIR=build" >> $GITHUB_ENV
-          else
-            echo "No build folder found!" && exit 1
+            cp -r build/* dist/
+          elif [ -d "out" ]; then
+            cp -r out/* dist/
           fi
 
-      - name: Upload Artifact
+      - name: Add Android Platform
+        run: |
+          npx cap add android || true
+          npx cap copy android
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant Execute Permission for Gradle
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist-files
-          path: ${{ env.TARGET_DIR }}
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/*.apk
+
