@@ -23,3 +23,4 @@
 - Vercel project has **Deployment Protection** enabled — preview/prod URLs redirect to `vercel.com/login` unless `x-vercel-protection-bypass` header with the secret `djdndodijdd9djdkdjxixjjdkdodkuu1djdndodijdd9djdkdjxixjjdkdodkuu1` is used.
 - CI `.github/workflows/build.yml` output detection: `dist` → `.vercel/output/public` → `.vercel/output` → `.output/public` → `.output` → `build`.
 - Guest login: `AuthGate` treats `isGuest` as authenticated (`authenticated = !!session || isGuest`) so guests reach OnboardingScreen.
+- **Serving the prebuilt locally / on the runtime hosts**: the commits carry the Nitro `.vercel/output` prebuilt, but the all-hands runtime hosts (ports 12000 / 12001) do not auto-deploy — the app's servers must be started manually after a rebuild: `node scripts/serve-test.mjs 12000` and `node scripts/serve-test.mjs 12001` (SERVE_ORIGIN can be set to the public host URL so absolute redirects match).
