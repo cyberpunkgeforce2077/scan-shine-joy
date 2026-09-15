@@ -1,6 +1,5 @@
-import { o as __toESM } from "../_runtime.mjs";
-import { u as require_react } from "./@floating-ui/react-dom+[...].mjs";
-import { o as require_jsx_runtime } from "./@radix-ui/react-collection+[...].mjs";
+import { r as __toESM } from "../_runtime.mjs";
+import { C as require_jsx_runtime, G as require_react } from "./@tanstack/react-router+[...].mjs";
 //#region node_modules/framer-motion/dist/es/context/LayoutGroupContext.mjs
 var import_jsx_runtime = require_jsx_runtime();
 var import_react = /* @__PURE__ */ __toESM(require_react(), 1);

@@ -180,7 +180,7 @@ export function audioBufferToWav(buffer: AudioBuffer): Blob {
   let offset = 44;
   for (let i = 0; i < buffer.length; i++) {
     for (let c = 0; c < numChannels; c++) {
-      let sample = channels[c][i];
+      let sample = channels[c]?.[i] ?? 0;
       // Soft-clip to prevent digital wrap-around distortion
       sample = Math.max(-1, Math.min(1, sample));
       const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
@@ -246,7 +246,7 @@ export async function renderCompositionToAudioBuffer(
   const numChordChanges = Math.ceil(totalBeats / chordDurationBeats);
 
   for (let i = 0; i < numChordChanges; i++) {
-    const chord = chords[i % chords.length];
+    const chord = chords[i % chords.length] ?? [];
     const startTime = i * chordDurationBeats * secondsPerBeat;
     const chordDurationSeconds = chordDurationBeats * secondsPerBeat;
 

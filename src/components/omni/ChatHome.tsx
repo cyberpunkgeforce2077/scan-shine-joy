@@ -20,6 +20,22 @@ import {
 } from "@/lib/conversationStore";
 import { cn } from "@/lib/utils";
 
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: { length: number } & Record<number, { 0: { transcript: string } } | undefined>;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
 export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const { isOnline, checkConnection } = useNetworkStatus();
   const ask = useServerFn(askAssistant);
@@ -32,8 +48,8 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
   const [listening, setListening] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<unknown>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     // Fire and forget sync
@@ -108,8 +124,8 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
       return;
     }
     const win = window as unknown as {
-      SpeechRecognition?: new () => Record<string, unknown>;
-      webkitSpeechRecognition?: new () => Record<string, unknown>;
+      SpeechRecognition?: new () => SpeechRecognitionLike;
+      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
     };
     const Ctor = win.SpeechRecognition ?? win.webkitSpeechRecognition;
     if (!Ctor) {
@@ -121,10 +137,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
     rec.interimResults = true;
     rec.continuous = false;
     const finalText = input;
-    rec.onresult = (e: {
-      resultIndex: number;
-      results: { [key: number]: [{ transcript: string }] }[] & { length: number };
-    }) => {
+    rec.onresult = (e) => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         interim += e.results[i]?.[0]?.transcript ?? "";
@@ -140,7 +153,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
     };
     recognitionRef.current = rec;
     setListening(true);
-    (rec.start as () => void)();
+    rec.start();
   }, [listening, input]);
 
   async function send(text: string) {

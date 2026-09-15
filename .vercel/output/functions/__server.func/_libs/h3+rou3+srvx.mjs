@@ -1,6 +1,4 @@
-import "node:http";
 import { PassThrough, Readable } from "node:stream";
-import "node:https";
 //#region node_modules/h3/node_modules/rou3/dist/index.mjs
 var NullProtoObj = /* @__PURE__ */ (() => {
 	const e = function() {};

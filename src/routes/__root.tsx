@@ -45,13 +45,13 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
       const id = getActiveConversationId();
       if (id) {
         const conv = getConversation(id);
-        if (conv && conv.messages.length > 0) {
+        const first = conv?.messages[0];
+        if (conv && first) {
           // Basic heuristic for dynamic title based on the first message
           setChatTitle(
             conv.title !== "Untitled Chat"
               ? conv.title
-              : conv.messages[0].content.slice(0, 30) +
-                  (conv.messages[0].content.length > 30 ? "..." : ""),
+              : first.content.slice(0, 30) + (first.content.length > 30 ? "..." : ""),
           );
           return;
         }
@@ -257,12 +257,13 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+function ErrorComponent({ error }: { error: unknown }) {
+  const message = error instanceof Error ? error.message : String(error);
   return (
     <div className="flex min-h-screen items-center justify-center px-6 bg-background">
       <div className="max-w-md p-10 text-center text-foreground">
         <h1 className="text-3xl font-extrabold">Something broke</h1>
-        <p className="mt-2 break-words text-sm text-muted-foreground">{error.message}</p>
+        <p className="mt-2 break-words text-sm text-muted-foreground">{message}</p>
         <Link
           to="/"
           className="mt-6 inline-block rounded-full bg-card hover:bg-surface-3 px-5 py-2.5 text-sm font-semibold text-foreground transition-colors"

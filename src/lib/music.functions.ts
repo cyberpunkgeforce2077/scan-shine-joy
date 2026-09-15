@@ -24,7 +24,7 @@ export type GeneratedMusicResult = {
   bpm: number;
   key: string;
   durationSeconds: number;
-  lyrics?: string;
+  lyrics?: string | undefined;
   description: string;
   audioBase64?: string; // Direct audio if generated via Lyria
   mimeType?: string;
@@ -52,7 +52,7 @@ export const generateLyrics = createServerFn({ method: "POST" })
           maxOutputTokens: 400,
         },
       });
-      return response.text() || "";
+      return response.text ?? "";
     }
 
     const key = process.env["AI_API_KEY"] || process.env["LOVABLE_API_KEY"];

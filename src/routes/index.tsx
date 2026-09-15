@@ -14,7 +14,16 @@ export const Route = createFileRoute("/")({
   component: AppSelector,
 });
 
-const tools = [
+const tools: {
+  id: string;
+  name: string;
+  description: string;
+  icon: typeof MessageSquare;
+  href: string;
+  color: string;
+  iconColor: string;
+  badge?: string;
+}[] = [
   {
     id: "chat",
     name: "Vlad Bot",
