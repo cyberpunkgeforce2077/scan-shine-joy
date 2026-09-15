@@ -31,3 +31,9 @@
 - Root cause is simply that the prebuilt was not rebuilt after source changes. A fresh `npm run build` (with the Supabase env vars) regenerates everything consistently and every route returns 200.
 - Latent source bug fixed at the same time: `src/server.ts` called `describeError(...)` without importing it, so the debug error page itself threw. It now imports `describeError` from `./lib/error-capture`.
 - After any rebuild, verify with `node scripts/serve-test.mjs 12000` + `curl -o /dev/null -w '%{http_code}' http://localhost:12000/` (expect 200, no `didn't load` / `debug-error` in the body) before committing the regenerated output.
+
+## TypeScript / lint cleanliness (2026-09-14)
+
+- `npx tsc --noEmit` must pass. `tsconfig.json` enables `strict`, `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`, and `exactOptionalPropertyTypes`, so: index into env/records with `obj["KEY"]`, guard `arr[i]` before use, and declare optional props as `prop?: T | undefined` when assigning an explicit `undefined`.
+- `npx eslint .` should have 0 errors (the 11 `react-refresh/only-export-components` warnings in `src/components/ui/*` are expected). Prettier formatting is enforced through eslint — run `npx prettier --write .` if needed.
+- Config gotcha: `defineConfig()` from `@lovable.dev/vite-tanstack-config` takes `{ vite, nitro, tanstackStart, react, ... }` — put Vite dev-server settings (`server.host`/`server.port`) under `vite`, not top level.
