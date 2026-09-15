@@ -45,15 +45,15 @@ export const Sparkle = GeminiStar;
 export function OmniLogo({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#1e1f20] text-primary shadow-xs">
+      <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface-1 text-primary shadow-xs">
         <GeminiStar className="h-5 w-5" />
       </span>
       {!compact && (
         <span className="min-w-0">
-          <span className="block truncate font-sans text-[15px] font-semibold leading-tight tracking-tight text-[#e3e3e3]">
+          <span className="block truncate font-sans text-[15px] font-semibold leading-tight tracking-tight text-foreground">
             Assistant
           </span>
-          <span className="block truncate text-[10px] font-medium tracking-[0.05em] text-[#c4c7c5]">
+          <span className="block truncate text-[10px] font-medium tracking-[0.05em] text-muted-foreground">
             Assistant
           </span>
         </span>

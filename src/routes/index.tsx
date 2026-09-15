@@ -7,11 +7,6 @@ import {
   Download,
   Type,
   BookOpen,
-  Music,
-  Sparkles,
-  ArrowRight,
-  Disc,
-  Video,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -20,26 +15,6 @@ export const Route = createFileRoute("/")({
 });
 
 const tools = [
-  {
-    id: "video",
-    name: "Text to Video",
-    description: "Generate high-quality videos using Gemini Omni Flash.",
-    icon: Video,
-    href: "/video",
-    color: "from-blue-500/20 via-cyan-500/20 to-teal-500/20",
-    iconColor: "text-blue-400",
-    badge: "New",
-  },
-  {
-    id: "music",
-    name: "Text to Music",
-    description: "Synthesize original tracks, lo-fi beats, and soundscapes from text prompts.",
-    icon: Music,
-    href: "/music",
-    color: "from-purple-500/20 via-pink-500/20 to-indigo-500/20",
-    iconColor: "text-purple-400",
-    badge: "Headliner",
-  },
   {
     id: "chat",
     name: "Vlad Bot",
@@ -120,51 +95,6 @@ function AppSelector() {
           <p className="text-primary font-medium text-base sm:text-lg tracking-wide">
             Intelligent creation & privacy-first device tools
           </p>
-        </motion.div>
-
-        {/* Headliner Feature Banner: Text to Music */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-8"
-        >
-          <Link
-            to="/music"
-            className="group relative block overflow-hidden rounded-[28px] border border-purple-500/30 bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-card p-6 sm:p-8 hover:border-purple-500/50 hover:shadow-lg transition-all duration-300"
-          >
-            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-56 h-56 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-3 max-w-xl">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-purple-400">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Headliner Feature
-                  </span>
-                  <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
-                    AI Music Synthesis
-                  </span>
-                </div>
-                <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground group-hover:text-purple-400 transition-colors">
-                  Text to Music Studio
-                </h2>
-                <p className="text-sm sm:text-[15px] text-muted-foreground leading-relaxed">
-                  Turn words and moods into polyphonic beats, lo-fi sunsets, synthwave hooks, and
-                  orchestral themes with deep harmonic sound design.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4 shrink-0">
-                <div className="grid h-14 w-14 place-items-center rounded-2xl bg-purple-500/20 text-purple-400 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-                  <Music className="h-7 w-7" />
-                </div>
-                <div className="hidden sm:inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-sm group-hover:brightness-105 transition-all">
-                  <span>Create Music</span>
-                  <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </div>
-            </div>
-          </Link>
         </motion.div>
 
         {/* Tools Grid */}

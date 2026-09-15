@@ -68,7 +68,10 @@ const server = createServer(async (req, res) => {
     if (file) {
       res.statusCode = 200;
       res.setHeader("content-type", MIME[extname(file)] ?? "application/octet-stream");
-      res.setHeader("cache-control", reqUrl.pathname.startsWith("/assets/") ? "public, max-age=31536000, immutable" : "no-cache");
+      res.setHeader(
+        "cache-control",
+        reqUrl.pathname.startsWith("/assets/") ? "public, max-age=31536000, immutable" : "no-cache",
+      );
       createReadStream(file).pipe(res);
       return;
     }
@@ -77,17 +80,16 @@ const server = createServer(async (req, res) => {
     for (const [k, v] of Object.entries(req.headers)) {
       if (v !== undefined) headers.set(k, Array.isArray(v) ? v.join(",") : v);
     }
-    const body = req.method === "GET" || req.method === "HEAD"
-      ? undefined
-      : await new Promise((resolve) => {
-          let d = "";
-          req.on("data", (c) => (d += c));
-          req.on("end", () => resolve(d));
-        });
+    const body =
+      req.method === "GET" || req.method === "HEAD"
+        ? undefined
+        : await new Promise((resolve) => {
+            let d = "";
+            req.on("data", (c) => (d += c));
+            req.on("end", () => resolve(d));
+          });
     // Use the same scheme/host as Vercel would so absolute redirects work.
-    const origin = process.env.SERVE_ORIGIN
-      ? new URL(process.env.SERVE_ORIGIN)
-      : reqUrl;
+    const origin = process.env.SERVE_ORIGIN ? new URL(process.env.SERVE_ORIGIN) : reqUrl;
     const r = await handler.fetch(new Request(origin, { method: req.method, headers, body }));
     res.statusCode = r.status;
     r.headers.forEach((v, k) => {
@@ -102,5 +104,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(port, "0.0.0.0", () =>
-  console.log(`[serve-test] listening on http://0.0.0.0:${port} static=${staticDir}`)
+  console.log(`[serve-test] listening on http://0.0.0.0:${port} static=${staticDir}`),
 );

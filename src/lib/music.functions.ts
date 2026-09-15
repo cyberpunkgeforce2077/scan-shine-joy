@@ -42,7 +42,7 @@ export const generateLyrics = createServerFn({ method: "POST" })
     if (geminiKey) {
       const { GoogleGenAI } = await import("@google/genai");
       const ai = new GoogleGenAI({ apiKey: geminiKey });
-      
+
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: userPrompt,
@@ -140,7 +140,14 @@ export const generateMusicTrack = createServerFn({ method: "POST" })
             audioBase64,
             mimeType,
             engine: "lyria",
-            composition: createAlgorithmicComposition(prompt, genre, mood, tempo, durationSeconds, providedLyrics),
+            composition: createAlgorithmicComposition(
+              prompt,
+              genre,
+              mood,
+              tempo,
+              durationSeconds,
+              providedLyrics,
+            ),
           };
         }
       } catch (lyriaError) {
@@ -272,7 +279,14 @@ Notes must be in scientific pitch notation (e.g. C2 to C6). Return ONLY valid JS
     }
 
     // 3. Algorithmic High-Fidelity Music Engine (Always succeeds offline or online)
-    const composition = createAlgorithmicComposition(prompt, genre, mood, tempo, durationSeconds, providedLyrics);
+    const composition = createAlgorithmicComposition(
+      prompt,
+      genre,
+      mood,
+      tempo,
+      durationSeconds,
+      providedLyrics,
+    );
     return {
       title: composition.title,
       genre,

@@ -371,7 +371,7 @@ export function MediaDownloader() {
               </div>
 
               {videos.length > 1 && (
-                <div className="mt-5 space-y-2 border-t border-white/5 pt-4">
+                <div className="mt-5 space-y-2 border-t border-black/5 dark:border-white/5 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     All formats & direct links
                   </p>

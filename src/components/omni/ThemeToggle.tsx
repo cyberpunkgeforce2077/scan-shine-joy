@@ -22,13 +22,13 @@ export function ThemeToggle({ variant = "icon", className = "" }: ThemeTogglePro
         aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
         title={`Switch to ${isDark ? "light" : "dark"} mode`}
         className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-          isDark ? "bg-[#2a2b2e]" : "bg-neutral-200"
+          isDark ? "bg-surface-2" : "bg-neutral-200"
         } ${className}`}
       >
         <motion.div
           layout
           transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          className={`flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-[#121314] shadow-sm transform ${
+          className={`flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-background shadow-sm transform ${
             isDark ? "translate-x-7 text-amber-300" : "translate-x-1 text-amber-500"
           }`}
         >
@@ -71,7 +71,7 @@ export function ThemeToggle({ variant = "icon", className = "" }: ThemeTogglePro
       onClick={toggle}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`relative grid h-9 w-9 place-items-center rounded-full border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-[#1e1f20] text-neutral-700 dark:text-[#e3e3e3] hover:bg-neutral-200 dark:hover:bg-[#2a2b2e] transition-all duration-200 cursor-pointer active:scale-95 ${className}`}
+      className={`relative grid h-9 w-9 place-items-center rounded-full border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-surface-1 text-neutral-700 dark:text-foreground hover:bg-neutral-200 dark:hover:bg-surface-2 transition-all duration-200 cursor-pointer active:scale-95 ${className}`}
     >
       <motion.div
         key={theme}

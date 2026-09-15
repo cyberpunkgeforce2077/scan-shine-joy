@@ -31,7 +31,7 @@ export const generateVideo = createServerFn({ method: "POST" })
           duration: data.duration,
         },
       },
-      { timeout: 300000 }
+      { timeout: 300000 },
     );
 
     const videoPart = interaction.output_video;

@@ -24,9 +24,9 @@ function AuthCallback() {
   }, []);
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-black text-[#e3e3e3]">
+    <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
       <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-[#8ab4f8]" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-lg font-medium">Completing sign in...</p>
       </div>
     </div>

@@ -36,7 +36,7 @@ function QRPage() {
       title="Create and scan QR codes"
       description="Styled generation with logos and gradients, plus camera and file scanning — all local to your device."
     >
-      <div className="mb-7 flex gap-2 rounded-2xl border border-white/10 bg-[#1e1f20] p-1.5 shadow-sm">
+      <div className="mb-7 flex gap-2 rounded-2xl border border-black/10 dark:border-white/10 bg-surface-1 p-1.5 shadow-sm">
         {(["create", "scan"] as const).map((t) => (
           <PillButton
             key={t}

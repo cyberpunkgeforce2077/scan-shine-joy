@@ -24,8 +24,6 @@ import {
   LogOut,
   User as UserIcon,
   MessageSquare,
-  Music,
-  Video,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/omni/ThemeProvider";
@@ -90,7 +88,7 @@ function MobileTopBar({ toggleDrawer }: { toggleDrawer: () => void }) {
         <Link
           to="/settings"
           title="User Profile"
-          className="grid h-8 w-8 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-sm transition-all duration-200 cursor-pointer active:scale-[0.97]"
+          className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-all duration-200 cursor-pointer active:scale-[0.97]"
         >
           {profile?.username?.charAt(0).toUpperCase() || "U"}
         </Link>
@@ -157,40 +155,6 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
             <Search className="h-5 w-5" />
             Search chats
           </button>
-
-          {/* Headliner Tool: Text to Music */}
-          <Link
-            to="/music"
-            onClick={closeDrawer}
-            className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-500/15 via-pink-500/10 to-transparent border border-purple-500/25 hover:border-purple-500/50 rounded-2xl text-foreground font-semibold transition-all duration-200 cursor-pointer active:scale-[0.97] mb-2 shadow-xs"
-          >
-            <div className="flex items-center gap-3">
-              <div className="grid h-8 w-8 place-items-center rounded-xl bg-purple-500/20 text-purple-400">
-                <Music className="h-4 w-4" />
-              </div>
-              <span className="font-semibold">Text to Music</span>
-            </div>
-            <span className="text-[10px] font-bold tracking-wider uppercase text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded-full">
-              Headliner
-            </span>
-          </Link>
-
-          {/* Headliner Tool: Text to Video */}
-          <Link
-            to="/video"
-            onClick={closeDrawer}
-            className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-500/15 via-cyan-500/10 to-transparent border border-blue-500/25 hover:border-blue-500/50 rounded-2xl text-foreground font-semibold transition-all duration-200 cursor-pointer active:scale-[0.97] mb-4 shadow-xs"
-          >
-            <div className="flex items-center gap-3">
-              <div className="grid h-8 w-8 place-items-center rounded-xl bg-blue-500/20 text-blue-400">
-                <Video className="h-4 w-4" />
-              </div>
-              <span className="font-semibold">Text to Video</span>
-            </div>
-            <span className="text-[10px] font-bold tracking-wider uppercase text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded-full">
-              New
-            </span>
-          </Link>
 
           {/* Unified Navigation List */}
           <div className="space-y-1">
@@ -262,7 +226,7 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
             title="User Profile"
             className="flex items-center gap-3 p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl transition-all duration-200 cursor-pointer active:scale-[0.97]"
           >
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-[#D7A2F6] text-[#202124] font-semibold text-lg">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground font-semibold text-lg">
               {profile?.username?.charAt(0).toUpperCase() || "U"}
             </div>
             <div className="flex-1 text-foreground font-medium truncate">
@@ -278,13 +242,13 @@ function MobileDrawer({ isOpen, closeDrawer }: { isOpen: boolean; closeDrawer: (
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 bg-[#000000]">
-      <div className="max-w-md p-10 text-center text-[#e3e3e3]">
+    <div className="flex min-h-screen items-center justify-center px-6 bg-background">
+      <div className="max-w-md p-10 text-center text-foreground">
         <h1 className="text-4xl font-extrabold">404</h1>
-        <p className="mt-2 text-[#c4c7c5]">This page doesn&apos;t exist yet.</p>
+        <p className="mt-2 text-muted-foreground">This page doesn&apos;t exist yet.</p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-full bg-[#1e1f20] hover:bg-[#333538] px-5 py-2.5 text-sm font-semibold text-[#e3e3e3] transition-colors"
+          className="mt-6 inline-block rounded-full bg-card hover:bg-surface-3 px-5 py-2.5 text-sm font-semibold text-foreground transition-colors"
         >
           Back to Home
         </Link>
@@ -295,13 +259,13 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error }: { error: Error }) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 bg-[#000000]">
-      <div className="max-w-md p-10 text-center text-[#e3e3e3]">
+    <div className="flex min-h-screen items-center justify-center px-6 bg-background">
+      <div className="max-w-md p-10 text-center text-foreground">
         <h1 className="text-3xl font-extrabold">Something broke</h1>
-        <p className="mt-2 break-words text-sm text-[#c4c7c5]">{error.message}</p>
+        <p className="mt-2 break-words text-sm text-muted-foreground">{error.message}</p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-full bg-[#1e1f20] hover:bg-[#333538] px-5 py-2.5 text-sm font-semibold text-[#e3e3e3] transition-colors"
+          className="mt-6 inline-block rounded-full bg-card hover:bg-surface-3 px-5 py-2.5 text-sm font-semibold text-foreground transition-colors"
         >
           Back to Home
         </Link>
@@ -315,8 +279,8 @@ function AuthGate({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#000000]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#c4c7c5]" />
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }

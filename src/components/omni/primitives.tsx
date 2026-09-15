@@ -26,7 +26,7 @@ export function PlushCard({
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={interactive ? { y: -4, scale: 1.008 } : {}}
       className={cn(
-        "rounded-[24px] bg-[#1e1f20] group p-5 transition-[box-shadow,transform,border-color] duration-300 border border-transparent hover:border-white/10 shadow-sm",
+        "rounded-[24px] bg-surface-1 group p-5 transition-[box-shadow,transform,border-color] duration-300 border border-transparent hover:border-black/20 dark:hover:border-white/20 shadow-sm",
         className,
       )}
     >
@@ -49,15 +49,15 @@ export function SectionHeading({
   return (
     <div className={cn("max-w-2xl", className)}>
       {eyebrow && (
-        <span className="inline-flex rounded-full bg-[#1e1f20] px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#8ab4f8]">
+        <span className="inline-flex rounded-full bg-surface-1 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-primary">
           {eyebrow}
         </span>
       )}
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-[#e3e3e3] sm:text-4xl">
+      <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.03em] text-foreground sm:text-4xl">
         {title}
       </h2>
       {description && (
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#c4c7c5] sm:text-[15px]">
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
           {description}
         </p>
       )}
@@ -74,11 +74,12 @@ export function PillButton({
   variant?: "primary" | "tonal" | "ghost" | "outline";
 }) {
   const variants = {
-    primary: "bg-[#e3e3e3] text-[#1e1f20] shadow-sm hover:brightness-105 active:scale-[0.97]",
-    tonal: "bg-[#1e1f20] text-[#e3e3e3] hover:brightness-[1.03] active:scale-[0.97]",
-    ghost: "text-[#c4c7c5] hover:bg-white/10 hover:text-[#e3e3e3] active:scale-[0.97]",
+    primary: "bg-foreground text-background shadow-sm hover:brightness-105 active:scale-[0.97]",
+    tonal: "bg-surface-1 text-foreground hover:brightness-[1.03] active:scale-[0.97]",
+    ghost:
+      "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground active:scale-[0.97]",
     outline:
-      "border border-white/10 bg-[#1e1f20] text-[#e3e3e3] hover:bg-white/10 active:scale-[0.97]",
+      "border border-black/10 dark:border-white/10 bg-surface-1 text-foreground hover:bg-black/5 dark:hover:bg-white/10 active:scale-[0.97]",
   } as const;
   return (
     <button
@@ -115,7 +116,7 @@ export function PageShell({
       >
         <Link
           to="/"
-          className="mb-6 inline-flex min-h-8 items-center gap-2 rounded-full border border-white/10 bg-[#1e1f20] px-3.5 py-1 text-xs font-semibold text-[#c4c7c5] transition hover:border-white/20 hover:bg-white/10 hover:text-[#e3e3e3]"
+          className="mb-6 inline-flex min-h-8 items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-surface-1 px-3.5 py-1 text-xs font-semibold text-muted-foreground transition hover:border-black/20 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Home
         </Link>

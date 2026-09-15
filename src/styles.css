@@ -218,22 +218,23 @@
 /* Plush frosted surface used across every module. */
 @utility plush {
   border-radius: var(--radius-2xl);
-  background-color: #1e1f20;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @utility plush-raised {
   border-radius: var(--radius-2xl);
-  background-color: #1e1f20;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
 @utility glass-bar {
-  background-color: #1e1f20;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background-color: color-mix(in oklab, var(--color-surface-1) 85%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 @utility mesh-hero {
@@ -290,18 +291,34 @@
 
 /* Authentic Google Gemini dark canvas with ambient indigo glow as in image.png */
 @utility gemini-canvas-backdrop {
-  background-color: #131314;
+  background-color: var(--color-background);
   background-image:
-    radial-gradient(1200px 750px at 50% 68%, rgba(26, 40, 72, 0.42) 0%, rgba(19, 19, 20, 0) 72%),
-    radial-gradient(800px 480px at 50% 50%, rgba(35, 52, 90, 0.22) 0%, rgba(19, 19, 20, 0) 65%);
+    radial-gradient(
+      1200px 750px at 50% 68%,
+      color-mix(in oklab, var(--color-primary) 15%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      800px 480px at 50% 50%,
+      color-mix(in oklab, var(--color-primary) 8%, transparent) 0%,
+      transparent 65%
+    );
   background-attachment: fixed;
 }
 
 @utility warm-canvas-backdrop {
-  background-color: #131314;
+  background-color: var(--color-background);
   background-image:
-    radial-gradient(1200px 750px at 50% 68%, rgba(26, 40, 72, 0.42) 0%, rgba(19, 19, 20, 0) 72%),
-    radial-gradient(800px 480px at 50% 50%, rgba(35, 52, 90, 0.22) 0%, rgba(19, 19, 20, 0) 65%);
+    radial-gradient(
+      1200px 750px at 50% 68%,
+      color-mix(in oklab, var(--color-primary) 15%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      800px 480px at 50% 50%,
+      color-mix(in oklab, var(--color-primary) 8%, transparent) 0%,
+      transparent 65%
+    );
   background-attachment: fixed;
 }
 

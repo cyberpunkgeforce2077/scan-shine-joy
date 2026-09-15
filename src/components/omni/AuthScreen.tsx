@@ -111,7 +111,7 @@ export function AuthScreen() {
               <button
                 onClick={signInAsGuest}
                 disabled={busy !== null}
-                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-amber-400 px-5 py-3.5 text-sm font-bold text-[#1e1f20] shadow-md transition hover:bg-amber-300 active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-amber-400 px-5 py-3.5 text-sm font-bold text-background shadow-md transition hover:bg-amber-300 active:scale-[0.98]"
               >
                 <UserRound className="h-4 w-4" />
                 Continue in Offline Mode (Guest)

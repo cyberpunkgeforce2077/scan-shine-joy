@@ -233,10 +233,10 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
         <div className="flex flex-1 flex-col items-center justify-center -mt-20">
           {/* Main Greeting */}
           <div className="flex flex-col items-center gap-2 mb-10">
-            <h1 className="text-center text-4xl sm:text-5xl font-medium tracking-tight text-[#e3e3e3]">
+            <h1 className="text-center text-4xl sm:text-5xl font-medium tracking-tight text-foreground">
               What can I help with today?
             </h1>
-            <span className="text-[#8ab4f8] font-medium text-lg tracking-wide">Vlad Bot</span>
+            <span className="text-primary font-medium text-lg tracking-wide">Vlad Bot</span>
           </div>
         </div>
       ) : (
@@ -247,13 +247,13 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
               className={cn("flex w-full", m.role === "user" ? "justify-end" : "justify-start")}
             >
               {m.role === "user" ? (
-                <div className="max-w-[85%] rounded-3xl rounded-tr-md bg-[#282a2c] px-5 py-3.5 text-[15px] leading-relaxed text-[#e3e3e3]">
+                <div className="max-w-[85%] rounded-3xl rounded-tr-md bg-surface-2 px-5 py-3.5 text-[15px] leading-relaxed text-foreground">
                   {m.content}
                 </div>
               ) : (
-                <div className="w-full text-[15px] leading-relaxed text-[#e3e3e3]">
+                <div className="w-full text-[15px] leading-relaxed text-foreground">
                   <div className="flex items-start gap-4">
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-[#1e1f20] text-[#8e8e8e] shrink-0">
+                    <div className="grid h-8 w-8 place-items-center rounded-full bg-surface-1 text-muted-foreground shrink-0">
                       <Bot className="h-4 w-4" />
                     </div>
                     <div className="flex-1 overflow-x-hidden min-w-0">
@@ -265,7 +265,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
                             setCopiedIndex(i);
                             window.setTimeout(() => setCopiedIndex(null), 1600);
                           }}
-                          className="grid h-8 w-8 place-items-center rounded-full hover:bg-[#282a2c] text-[#c4c7c5] transition"
+                          className="grid h-8 w-8 place-items-center rounded-full hover:bg-surface-2 text-muted-foreground transition"
                         >
                           {copiedIndex === i ? (
                             <Check className="h-4 w-4 text-green-400" />
@@ -284,7 +284,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           {busy && (
             <div className="flex items-start gap-4">
               <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#D7A2F6] to-[#8FA2ED] animate-spin shrink-0" />
-              <div className="h-4 w-32 mt-2 rounded bg-[#282a2c] animate-pulse" />
+              <div className="h-4 w-32 mt-2 rounded bg-surface-2 animate-pulse" />
             </div>
           )}
           <div ref={endRef} />
@@ -300,8 +300,8 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
           }}
           className="mx-auto w-full max-w-[800px] px-6"
         >
-          <div className="flex min-h-[56px] w-full items-end gap-3 rounded-[28px] bg-[#1e1f20] p-2 shadow-[0_0_20px_rgba(215,162,246,0.15)] ring-1 ring-white/10 transition-all duration-300 focus-within:bg-[#282a2c] focus-within:shadow-[0_0_30px_rgba(215,162,246,0.25)] focus-within:ring-[#D7A2F6]/50">
-            <label className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[#c4c7c5] hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-[0.97] mb-0.5">
+          <div className="flex min-h-[56px] w-full items-end gap-3 rounded-[28px] bg-surface-1 p-2 shadow-[0_0_20px_rgba(215,162,246,0.15)] ring-1 ring-white/10 transition-all duration-300 focus-within:bg-surface-2 focus-within:shadow-[0_0_30px_rgba(215,162,246,0.25)] focus-within:ring-[#D7A2F6]/50">
+            <label className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-[0.97] mb-0.5">
               <input type="file" className="hidden" multiple accept="*/*" />
               <Plus className="h-6 w-6" />
             </label>
@@ -318,7 +318,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
               }}
               rows={1}
               placeholder="Ask anything..."
-              className="flex-1 max-h-32 resize-none bg-transparent py-3.5 text-[#e3e3e3] placeholder-[#c4c7c5] outline-none text-[17px] leading-tight"
+              className="flex-1 max-h-32 resize-none bg-transparent py-3.5 text-foreground placeholder-[#c4c7c5] outline-none text-[17px] leading-tight"
             />
 
             <div className="flex items-center gap-1 shrink-0 mb-0.5">
@@ -327,7 +327,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
                   type="submit"
                   disabled={busy}
                   aria-label="Send query"
-                  className="grid h-12 w-12 place-items-center rounded-full bg-[#1e1f20] hover:bg-white/10 text-[#c4c7c5] transition-all duration-200 cursor-pointer active:scale-[0.97]"
+                  className="grid h-12 w-12 place-items-center rounded-full bg-surface-1 hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground transition-all duration-200 cursor-pointer active:scale-[0.97]"
                 >
                   <SendHorizonal className="h-6 w-6" />
                 </button>
@@ -335,7 +335,7 @@ export function ChatHome({ resetKey = 0 }: { resetKey?: number }) {
                 <button
                   type="button"
                   onClick={toggleVoice}
-                  className="grid h-12 w-12 place-items-center rounded-full text-[#c4c7c5] hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-[0.97]"
+                  className="grid h-12 w-12 place-items-center rounded-full text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer active:scale-[0.97]"
                 >
                   {listening ? (
                     <MicOff className="h-6 w-6 text-red-400" />

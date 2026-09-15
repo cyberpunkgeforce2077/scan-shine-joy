@@ -33,7 +33,7 @@ export function OnlineRequiredBanner({
   if (compact) {
     return (
       <div
-        className={`flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#1e1f20] border border-amber-500/30 text-xs text-[#e3e3e3] ${className}`}
+        className={`flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-surface-1 border border-amber-500/30 text-xs text-foreground ${className}`}
       >
         <div className="flex items-center gap-2">
           <WifiOff className="h-4 w-4 text-amber-400 shrink-0" />
@@ -46,7 +46,7 @@ export function OnlineRequiredBanner({
           type="button"
           onClick={handleRetry}
           disabled={isChecking}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[#e3e3e3] font-medium transition active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-foreground font-medium transition active:scale-95 disabled:opacity-50"
         >
           {isChecking ? (
             <Loader2 className="h-3 w-3 animate-spin text-amber-400" />
@@ -61,7 +61,7 @@ export function OnlineRequiredBanner({
 
   return (
     <div
-      className={`rounded-3xl bg-[#1e1f20] border border-amber-500/30 p-6 sm:p-8 text-[#e3e3e3] shadow-xl ${className}`}
+      className={`rounded-3xl bg-surface-1 border border-amber-500/30 p-6 sm:p-8 text-foreground shadow-xl ${className}`}
     >
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
@@ -69,24 +69,24 @@ export function OnlineRequiredBanner({
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-[#e3e3e3]">Internet connection required</h3>
+            <h3 className="text-lg font-bold text-foreground">Internet connection required</h3>
             <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[11px] font-semibold text-amber-300 uppercase tracking-wider">
               Offline
             </span>
           </div>
-          <p className="mt-1 text-sm text-[#c4c7c5] leading-relaxed">
+          <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
             {description ||
               `${featureName} connects to cloud intelligence and requires an active internet connection.`}
           </p>
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+      <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-black/10 dark:border-white/10">
         <button
           type="button"
           onClick={handleRetry}
           disabled={isChecking}
-          className="flex items-center gap-2 rounded-full bg-amber-400 hover:bg-amber-300 text-[#1e1f20] px-5 py-2.5 text-sm font-semibold transition active:scale-95 disabled:opacity-60"
+          className="flex items-center gap-2 rounded-full bg-amber-400 hover:bg-amber-300 text-background px-5 py-2.5 text-sm font-semibold transition active:scale-95 disabled:opacity-60"
         >
           {isChecking ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -98,13 +98,13 @@ export function OnlineRequiredBanner({
 
         <Link
           to="/"
-          className="flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/15 px-4 py-2.5 text-sm font-medium text-[#e3e3e3] transition active:scale-95"
+          className="flex items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 px-4 py-2.5 text-sm font-medium text-foreground transition active:scale-95"
         >
           <span>Explore offline tools</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
 
-        <div className="ml-auto text-xs text-[#8e8e8e] hidden md:flex items-center gap-1.5">
+        <div className="ml-auto text-xs text-muted-foreground hidden md:flex items-center gap-1.5">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
           <span>Local tools (QR, Scanner, OCR) remain fully functional</span>
         </div>

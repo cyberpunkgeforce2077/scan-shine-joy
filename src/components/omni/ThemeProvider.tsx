@@ -5,20 +5,20 @@ type Theme = "light" | "dark";
 const KEY = "omni-theme";
 
 const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void; toggle: () => void }>({
-  theme: "dark",
+  theme: "light",
   setTheme: () => {},
   toggle: () => {},
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    let initial: Theme = "dark";
+    let initial: Theme = "light";
     try {
       const stored = localStorage.getItem(KEY) as Theme | null;
       if (stored === "light" || stored === "dark") initial = stored;
-      else initial = "dark";
+      else initial = "light";
     } catch {
       /* ignore */
     }
